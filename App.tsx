@@ -1,18 +1,10 @@
-import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Constants from "expo-constants";
 import { ExpoWebGLRenderingContext, GLView } from "expo-gl";
-import * as tf from "@tensorflow/tfjs";
-import "@tensorflow/tfjs-react-native";
+import { TensorFlowStuff } from "./src/TensorFlowStuff";
 
 export default function App() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    tf.ready().then(() => setReady(true));
-  }, [setReady]);
-
   return (
     <View style={styles.container}>
       <StatusBar style="auto" />
@@ -23,8 +15,8 @@ export default function App() {
         {Constants.deviceName}, {Constants.statusBarHeight}
       </Text>
 
-      <Text style={{ marginTop: 24 }}>Tf ready?</Text>
-      <Text>{ready ? "YES" : "no"}</Text>
+      <Text style={{ marginTop: 24 }}>TensorFlow.js</Text>
+      <TensorFlowStuff />
 
       <Text style={{ marginTop: 30 }}>GL:</Text>
       <GLView
