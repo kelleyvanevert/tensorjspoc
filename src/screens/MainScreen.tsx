@@ -4,6 +4,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {AppButton} from '../components/AppButton';
 import {BaseColors} from '../components/colors';
+import {BrainJsTest} from '../components/BrainJsTest';
 
 export function MainScreen() {
   const insets = useSafeAreaInsets();
@@ -27,6 +28,8 @@ export function MainScreen() {
           TensorFlow JS is not too hard and maintainable, (2) it can also be
           used for training the model.
         </Text>
+
+        <BrainJsTest />
 
         <View style={{flexGrow: 1}} />
 
