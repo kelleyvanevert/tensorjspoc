@@ -1,10 +1,11 @@
-import React, {useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {AppButton} from '../components/AppButton';
-import {BaseColors} from '../components/colors';
-import {BrainJsTest} from '../components/BrainJsTest';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AppButton } from '../components/AppButton';
+import { BaseColors } from '../components/colors';
+import { BrainJsTest } from '../components/BrainJsTest';
+import { BrainJsTestv2 } from '../components/BrainJsTestv2';
 
 export function MainScreen() {
   const insets = useSafeAreaInsets();
@@ -13,9 +14,9 @@ export function MainScreen() {
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <View style={{height: insets.top + 24}} />
+      <View style={{ height: insets.top + 24 }} />
 
-      <View style={{marginHorizontal: 24, flexGrow: 1}}>
+      <View style={{ marginHorizontal: 24, flexGrow: 1 }}>
         <Text style={styles.title}>Hello world!</Text>
 
         <Text style={styles.paragraph}>
@@ -30,8 +31,8 @@ export function MainScreen() {
         </Text>
 
         <BrainJsTest />
-
-        <View style={{flexGrow: 1}} />
+        <BrainJsTestv2 />
+        <View style={{ flexGrow: 1 }} />
 
         <AppButton
           title={`Press me! ${count}`}
@@ -41,7 +42,7 @@ export function MainScreen() {
         />
       </View>
 
-      <View style={{height: insets.bottom + 24}} />
+      <View style={{ height: insets.bottom + 24 }} />
     </ScrollView>
   );
 }

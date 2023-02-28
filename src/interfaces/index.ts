@@ -1,0 +1,7 @@
+export * from './IActivity'
+export * from './IGender'
+export * from './IScore'
+export * from './IStudent'
+export * from './ITasteProfile'
+export * from './ITimeOfDay'
+export * from './IWeather'
