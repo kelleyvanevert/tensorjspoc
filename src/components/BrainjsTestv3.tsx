@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 // @ts-ignore
 import brain from 'brain.js/browser';
-import { Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { AppButton } from '../components/AppButton';
 import { FlatList } from 'react-native-gesture-handler';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { TrainingData, IExcercise, IExcerciseFeatures, YesNo, MoodIndex, Exercises } from '../interfaces';
+import { BaseColors } from './colors';
 
 export function BrainJsTestv3() {
     const softmax_beta = 2;
@@ -52,7 +52,8 @@ export function BrainJsTestv3() {
             scores.push(exercise.Score || 0)
         }
 
-        setModelRecommendations(computedReccommendation);
+        const sorted = computedReccommendation.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+        setModelRecommendations(sorted);
         const probs = converToProbabilityDistribution(scores);
         const index = sampleFromProbabilityDistribution(probs);
         setRecommendation(exercises[index]);
@@ -116,19 +117,39 @@ export function BrainJsTestv3() {
     const setCurrentMood = (mood: MoodIndex) => setMood(mood)
 
     return (
-        <SafeAreaView>
-            <Text>I am feeling {MoodIndex[mood]}</Text>
+        <View>
             <AppButton title="Are you feeling so so?" onPress={() => setCurrentMood(0)}></AppButton>
-            <AppButton title="Are you crying?" onPress={() => setCurrentMood(1)}></AppButton>
-
-            <Text>Recommended: {recommendation?.DisplayName}</Text>
+            <AppButton title="Are you feeling depressed?" onPress={() => setCurrentMood(1)}></AppButton>
+            <Text style={style.title}>Recommended: {recommendation?.DisplayName}</Text>
+            <Text style={style.title}>Mood: {MoodIndex[mood]}</Text>
 
             <FlatList data={modelRecommendations || []}
                 keyExtractor={(item) => item.InternalName}
-                renderItem={({ item }) => <Text>{item.DisplayName} - {item.Score}</Text>}></FlatList>
+                style={{ marginTop: 10 }}
+                renderItem={({ item }) => <View style={{ marginBottom: 5 }}>
+                    <Text style={style.paragraph}>Name: {item.DisplayName}</Text>
+                    <Text style={style.paragraph}>Score: {Math.round((item.Score || 0) * 100)}</Text>
+                </View>}></FlatList>
 
             <AppButton title="Yes" onPress={() => btnRating(1)}></AppButton>
             <AppButton title="No" onPress={() => btnRating(0)}></AppButton>
-        </SafeAreaView >
+        </View >
     );
 }
+
+const style = StyleSheet.create({
+    title: {
+        fontSize: 20,
+        lineHeight: 26,
+        fontFamily: 'Rubik-Bold',
+        color: BaseColors.deepblue,
+        marginBottom: 18,
+    },
+    paragraph: {
+        fontSize: 15,
+        lineHeight: 26,
+        fontFamily: 'Rubik',
+        color: BaseColors.deepblue,
+        // marginBottom: 12,
+    },
+})

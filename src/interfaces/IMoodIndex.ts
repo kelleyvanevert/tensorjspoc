@@ -1,4 +1,4 @@
 export enum MoodIndex {
     SoSo,
-    Crying
+    Depressed
   }
