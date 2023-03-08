@@ -67,3 +67,5 @@ todo.*
 # build things
 # Android builds
 /android/app/release
+cache
+coverage
