@@ -17,7 +17,7 @@ export function BrainJsTestv3() {
         hiddenLayers: [4]
     }));
     const [mood, setMood] = useState<MoodIndex>(MoodIndex.SoSo);
-    const [recommendation, setRecommendation] = useState<IExcercise>();
+    const [recommendation, setRecommendation] = useState<{ recommendation1: IExcercise, recommendation2: IExcercise, recommendation3: IExcercise }>();
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
 
     useEffect(() => {
@@ -42,24 +42,38 @@ export function BrainJsTestv3() {
     }, []);
 
     const compute_recommendation = () => {
-        const scores = [];
         const computedReccommendation: IExcercise[] = []
         for (let index = 0; index < exercises.length; index++) {
             const exercise = exercises[index];
             exercise.Value.mood_index = mood;
             exercise.Score = net.run(exercise.Value).score
             computedReccommendation.push(exercise)
-            scores.push(exercise.Score || 0)
         }
 
-        const sorted = computedReccommendation.sort((a, b) => (b.Score || 0) - (a.Score || 0));
-        setModelRecommendations(sorted);
-        const probs = converToProbabilityDistribution(scores);
-        const index = sampleFromProbabilityDistribution(probs);
-        setRecommendation(exercises[index]);
+        const sortedRecommendation: IExcercise[] = computedReccommendation.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+        setModelRecommendations(sortedRecommendation);
+
+        const sortedRecommendationCopy = sortedRecommendation.slice()
+        let recommendationArray: IExcercise[] = []
+        for (let index = 0; index < 3; index++) {
+            const scores = sortedRecommendationCopy.map(s => s.Score);
+            if (scores == undefined) {
+                throw "Fatal error. Scores was undefined while computing recommendation."
+            }
+            const probs = convertToProbabilityDistribution(scores as number[]);
+            const recommendedExIndex = sampleFromProbabilityDistribution(probs);
+            recommendationArray[index] = sortedRecommendationCopy[recommendedExIndex];
+            const removedItem = sortedRecommendationCopy.splice(recommendedExIndex, 1)
+        }
+
+        setRecommendation({
+            recommendation1: recommendationArray[0],
+            recommendation2: recommendationArray[1],
+            recommendation3: recommendationArray[2],
+        })
     }
 
-    const converToProbabilityDistribution = (scores: number[]): number[] => {
+    const convertToProbabilityDistribution = (scores: number[]): number[] => {
         let probabilities: number[] = []
         let softmax_denomenator = 0
         const numerators: number[] = []
@@ -92,37 +106,54 @@ export function BrainJsTestv3() {
         return -1;
     }
 
-    const btnRating = (rating: number) => {
-        let current_exercise: IExcercise | undefined = exercises.find((curr: IExcercise) => curr.InternalName == recommendation?.InternalName)
-        if (current_exercise == undefined) {
-            throw "Could not find recommendation!"
-        }
+    // const btnRating = (rating: number) => {
+    //     let current_exercise: IExcercise | undefined = exercises.find((curr: IExcercise) => curr.InternalName == recommendation?.InternalName)
+    //     if (current_exercise == undefined) {
+    //         throw "Could not find recommendation!"
+    //     }
 
-        if (mood !== undefined) {
-            current_exercise.Value.mood_index = mood
-        }
+    //     if (mood !== undefined) {
+    //         current_exercise.Value.mood_index = mood
+    //     }
 
-        let newData: TrainingData = {
-            input: current_exercise.Value,
-            output: {
-                score: rating
-            }
-        }
+    //     let newData: TrainingData = {
+    //         input: current_exercise.Value,
+    //         output: {
+    //             score: rating
+    //         }
+    //     }
 
-        setTrainingData([...(trainingData || []), newData.input]);
-        net.train(newData);
-        compute_recommendation();
+    //     setTrainingData([...(trainingData || []), newData.input]);
+    //     net.train(newData);
+    //     compute_recommendation();
+    // }
+
+    const selectRecommendation = (recommendation: IExcercise | undefined) => {
+        if (recommendation == undefined) {
+            throw "Recommendation is undefined. Cannot execute function selectRecommendation."
+        }
     }
 
     const setCurrentMood = (mood: MoodIndex) => setMood(mood)
 
     return (
         <View>
-            <AppButton title="Are you feeling so so?" onPress={() => setCurrentMood(0)}></AppButton>
-            <AppButton title="Are you feeling depressed?" onPress={() => setCurrentMood(1)}></AppButton>
-            <Text style={style.title}>Recommended: {recommendation?.DisplayName}</Text>
+            <AppButton style={style.button} title="Are you feeling so so?" onPress={() => setCurrentMood(0)}></AppButton>
+            <AppButton style={style.button} title="Are you feeling depressed?" onPress={() => setCurrentMood(1)}></AppButton>
             <Text style={style.title}>Mood: {MoodIndex[mood]}</Text>
 
+            <AppButton
+                style={style.button}
+                title={recommendation?.recommendation1.DisplayName || 'undefined'}
+                onPress={() => selectRecommendation(recommendation?.recommendation1)}></AppButton>
+            <AppButton
+                style={style.button}
+                title={recommendation?.recommendation2.DisplayName || 'undefined'}
+                onPress={() => selectRecommendation(recommendation?.recommendation2)}></AppButton>
+            <AppButton
+                style={style.button}
+                title={recommendation?.recommendation3.DisplayName || 'undefined'}
+                onPress={() => selectRecommendation(recommendation?.recommendation3)}></AppButton>
             <FlatList data={modelRecommendations || []}
                 keyExtractor={(item) => item.InternalName}
                 style={{ marginTop: 10 }}
@@ -130,9 +161,6 @@ export function BrainJsTestv3() {
                     <Text style={style.paragraph}>Name: {item.DisplayName}</Text>
                     <Text style={style.paragraph}>Score: {Math.round((item.Score || 0) * 100)}</Text>
                 </View>}></FlatList>
-
-            <AppButton title="Yes" onPress={() => btnRating(1)}></AppButton>
-            <AppButton title="No" onPress={() => btnRating(0)}></AppButton>
         </View >
     );
 }
@@ -150,6 +178,8 @@ const style = StyleSheet.create({
         lineHeight: 26,
         fontFamily: 'Rubik',
         color: BaseColors.deepblue,
-        // marginBottom: 12,
     },
+    button: {
+        marginBottom: 10
+    }
 })
