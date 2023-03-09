@@ -7,6 +7,9 @@ const config: Config = {
     "/node_modules/",
     "/jest"
   ],
+  collectCoverageFrom: [
+    "src/**/*.ts*"
+  ],
   coverageThreshold: {
     global: {
       statements: 80

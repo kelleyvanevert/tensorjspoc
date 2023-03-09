@@ -1,19 +1,20 @@
 import React from 'react';
-import {Text, StyleProp, ViewStyle} from 'react-native';
-import {Touchable} from './Touchable';
-import {BaseColors} from './colors';
-import {StyleSheet} from 'react-native';
+import { Text, StyleProp, ViewStyle } from 'react-native';
+import { Touchable } from './Touchable';
+import { BaseColors } from './colors';
+import { StyleSheet } from 'react-native';
 
 type Props = {
   title: string;
   style?: StyleProp<ViewStyle>;
   onPress?: () => void;
+  testID?: string;
 };
 
-export function AppButton({title, style, onPress}: Props) {
+export function AppButton({ title, style, onPress, testID }: Props) {
   return (
     <Touchable onPress={onPress} style={[styles.container, style]}>
-      <Text style={styles.title}>{title}</Text>
+      <Text testID={testID} style={styles.title}>{title}</Text>
     </Touchable>
   );
 }
