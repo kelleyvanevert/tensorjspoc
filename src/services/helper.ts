@@ -12,7 +12,7 @@ const getRandomIntInclusive = (min: number, max: number) => {
 }
 
 const getRandomElement = (arr: any[]): any => {
-    return  arr.length ? arr[Math.floor(Math.random() * arr.length)] : undefined
+    return arr.length ? arr[Math.floor(Math.random() * arr.length)] : undefined
 }
 
 export { normalize, getRandomIntInclusive, getRandomElement }

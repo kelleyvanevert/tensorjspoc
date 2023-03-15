@@ -1,9 +1,7 @@
-import { MoodIndex } from '.';
 import { YesNo } from "./YesNo";
 
-
 export interface IExcerciseFeatures {
-    mood_index: MoodIndex;
+    mood_value: number;
     three_five_mins: YesNo;
     five_seven_mins: YesNo;
     seven_ten_mins: YesNo;

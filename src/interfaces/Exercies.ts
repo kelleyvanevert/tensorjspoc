@@ -1,5 +1,5 @@
 import { IExcercise } from "./IExcercise";
-import { MoodIndex } from "./IMoodIndex";
+import { Moods } from "./IMoodIndex";
 import { YesNo } from "./YesNo";
 
 export const Exercises: IExcercise[] = [
@@ -7,7 +7,7 @@ export const Exercises: IExcercise[] = [
         DisplayName: 'Article ACT',
         InternalName: 'articles_act',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
             seven_ten_mins: YesNo.No,
@@ -24,7 +24,7 @@ export const Exercises: IExcercise[] = [
         InternalName: 'shape_your_thoughts',
         DisplayName: 'Shape Your Thoughts',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.No,
             seven_ten_mins: YesNo.Yes,
@@ -41,7 +41,7 @@ export const Exercises: IExcercise[] = [
         InternalName: 'self_compassion_break',
         DisplayName: 'Self Compassion Break',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             'three_five_mins': YesNo.Yes,
             'five_seven_mins': YesNo.No,
             'seven_ten_mins': YesNo.No,
@@ -58,7 +58,7 @@ export const Exercises: IExcercise[] = [
         InternalName: 'body_scan',
         DisplayName: 'Body Scan',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             'three_five_mins': YesNo.No,
             'five_seven_mins': YesNo.No,
             'seven_ten_mins': YesNo.Yes,
@@ -75,7 +75,7 @@ export const Exercises: IExcercise[] = [
         InternalName: 'article_mindfulness',
         DisplayName: 'Article Mindfulness',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             'three_five_mins': YesNo.Yes,
             'five_seven_mins': YesNo.No,
             'seven_ten_mins': YesNo.No,
@@ -92,7 +92,7 @@ export const Exercises: IExcercise[] = [
         InternalName: 'progressive_muscle_relaxation',
         DisplayName: 'Progressive Muscle Relaxation',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             'three_five_mins': YesNo.No,
             'five_seven_mins': YesNo.No,
             'seven_ten_mins': YesNo.Yes,
@@ -109,7 +109,7 @@ export const Exercises: IExcercise[] = [
         InternalName: 'article_breathing_relaxation',
         DisplayName: 'Article Breathing Relaxation',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             'three_five_mins': YesNo.Yes,
             'five_seven_mins': YesNo.No,
             'seven_ten_mins': YesNo.No,
@@ -126,7 +126,7 @@ export const Exercises: IExcercise[] = [
         InternalName: 'compassionate_friend',
         DisplayName: 'Compassionate Friend',
         Value: {
-            mood_index: MoodIndex.SoSo,
+            mood_value: Moods[0].value,
             'three_five_mins': YesNo.No,
             'five_seven_mins': YesNo.No,
             'seven_ten_mins': YesNo.Yes,
