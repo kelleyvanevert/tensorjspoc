@@ -5,4 +5,6 @@ export interface IExcercise {
     InternalName: string;
     Value: IExcerciseFeatures;
     Score: number | undefined;
+    SoftmaxNumerator: number | undefined;
+    Probability: number | undefined;
 }

@@ -15,6 +15,7 @@ export function ExerciseScores({ recommendations }: Props) {
         renderItem={({ item }) => <View style={style.item}>
             <Text accessibilityRole={'text'} style={style.paragraph}>Name: {item.DisplayName}</Text>
             <Text accessibilityRole={'text'} style={style.paragraph}>Score: {Math.round((item.Score || 0) * 100)}</Text>
+            <Text accessibilityRole={'text'} style={style.paragraph}>Proba: {Math.round((item.Probability || 0) * 10000) / 100}</Text>
         </View>}></FlatList>);
 }
 

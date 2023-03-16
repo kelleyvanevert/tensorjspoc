@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BaseColors } from '../components/colors';
-import { BrainJs } from '../components/BrainJs';
+// import { BrainJs } from '../components/BrainJs';
+import { RoomOracle } from '../components/RoomOracle';
+
 
 export function MainScreen() {
   const insets = useSafeAreaInsets();
@@ -11,7 +13,7 @@ export function MainScreen() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <BrainJs />
+      <RoomOracle />
     </SafeAreaView>
     //    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
     //    <View style={{ height: insets.top + 24 }} />
