@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "react-native-svg";
-import { IExcercise, TrainingData } from "../interfaces";
-import { ExerciseMathService } from "../services/exercise-math-service";
+import { IExcercise, ITrainingData } from "../interfaces";
+import { ExerciseMathService } from "../services";
 import { AppButton } from "./AppButton";
 
 type Props = {
     exercises: IExcercise[]
-    callback: (exercise: TrainingData[]) => void;
+    callback: (exercise: ITrainingData[]) => void;
 }
 
 type RecommendationState = {
@@ -38,7 +38,7 @@ export function RecommendedExercises({ exercises, callback }: Props) {
     const submitRecommendation = (selected?: IExcercise) => {
         if (recommendation?.recommendations != undefined) {
             const exerciseArray: IExcercise[] = recommendation?.recommendations
-            let result: TrainingData[] = []
+            let result: ITrainingData[] = []
             for (let index = 0; index < exerciseArray.length; index++) {
                 if (exerciseArray[index].InternalName == selected?.InternalName) {
                     result.push({

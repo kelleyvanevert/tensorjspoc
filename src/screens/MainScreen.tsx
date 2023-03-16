@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BaseColors } from '../components/colors';
-import { BrainJsTestv3 } from '../components/BrainjsTestv3';
+import { BrainJs } from '../components/BrainJs';
 
 export function MainScreen() {
   const insets = useSafeAreaInsets();
@@ -11,7 +11,7 @@ export function MainScreen() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <BrainJsTestv3 />
+      <BrainJs />
     </SafeAreaView>
     //    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
     //    <View style={{ height: insets.top + 24 }} />
@@ -31,7 +31,7 @@ export function MainScreen() {
     //      </Text>
 
     //      <BrainJsTest />
-  
+
     //      <View style={{ flexGrow: 1 }} />
 
     //      <AppButton

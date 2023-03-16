@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 // @ts-ignore
 import brain from 'brain.js/browser';
 import { View } from 'react-native';
-import { TrainingData, IExcercise, YesNo, Exercises, Mood, Moods } from '../interfaces';
+import { ITrainingData, IExcercise, YesNo, Exercises, Mood, Moods } from '../interfaces';
 import { MoodComponent } from './mood-selector';
-import { ModelScores } from './ModelScore';
+import { ExerciseScores } from './exercise-scores';
 import { RecommendedExercises } from './recommended-exercises';
 
-export function BrainJsTestv3() {
+export function BrainJs() {
     const [exercises] = useState<IExcercise[]>(Exercises)
-    const [trainingData, setTrainingData] = useState<TrainingData[]>([]);
+    const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
     const [net] = useState<brain.NeuralNetwork>(new brain.NeuralNetwork({
         activation: 'sigmoid',
         hiddenLayers: [4]
@@ -18,7 +18,7 @@ export function BrainJsTestv3() {
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
 
     useEffect(() => {
-        const trainingData: TrainingData = {
+        const trainingData: ITrainingData = {
             input: {
                 mood_value: Moods[0].value, //SOSO
                 three_five_mins: YesNo.No,
@@ -51,9 +51,8 @@ export function BrainJsTestv3() {
         setModelRecommendations(sortedRecommendation);
     }
 
-    const selectRecommendation = (newTrainingData: TrainingData[]) => {
+    const selectRecommendation = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
-        // console.log(newTrainingData.map(s => s.output.score));
         net.train(newTrainingData); // re-training only on new training data
         compute_recommendation();
     }
@@ -73,7 +72,7 @@ export function BrainJsTestv3() {
                     }
                 })()
             }
-            <ModelScores recommendations={modelRecommendations || []} />
+            <ExerciseScores recommendations={modelRecommendations || []} />
         </View >
     );
 }

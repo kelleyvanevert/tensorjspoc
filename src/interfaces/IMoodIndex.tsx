@@ -14,8 +14,3 @@ export const Moods: Mood[] = [
     value: 1
   }
 ]
-
-// export enum MoodIndex {
-//   SoSo,
-//   Depressed
-// }

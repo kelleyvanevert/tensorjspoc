@@ -8,13 +8,13 @@ type Props = {
     recommendations: IExcercise[]
 }
 
-export function ModelScores({ recommendations }: Props) {
+export function ExerciseScores({ recommendations }: Props) {
     return (<FlatList data={recommendations || []}
         keyExtractor={(item) => item.InternalName}
         style={style.list}
         renderItem={({ item }) => <View style={style.item}>
-            <Text style={style.paragraph}>Name: {item.DisplayName}</Text>
-            <Text style={style.paragraph}>Score: {Math.round((item.Score || 0) * 100)}</Text>
+            <Text accessibilityRole={'text'} style={style.paragraph}>Name: {item.DisplayName}</Text>
+            <Text accessibilityRole={'text'} style={style.paragraph}>Score: {Math.round((item.Score || 0) * 100)}</Text>
         </View>}></FlatList>);
 }
 

@@ -1,6 +1,6 @@
 import { IExcerciseFeatures } from "./IExerciseFeatures";
 
-export interface TrainingData {
+export interface ITrainingData {
     input: IExcerciseFeatures;
     output: {
         score: number;
