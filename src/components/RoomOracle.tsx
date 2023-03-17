@@ -24,29 +24,13 @@ export function RoomOracle() {
         'feeling_angry',
         'mood_boost',
         'self_compassion'
-    ], 1.0));
+    ], 0.25));
     const [mood, setMood] = useState<Mood>(Moods[0]);
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
 
-    useEffect(() => {
-        const trainingData: ITrainingData = {
-            input: {
-                mood_value: Moods[0].value, //SOSO
-                three_five_mins: YesNo.No,
-                five_seven_mins: YesNo.No,
-                seven_ten_mins: YesNo.Yes,
-                deffuse: YesNo.No,
-                zoom_out: YesNo.No,
-                feeling_stressed: YesNo.No,
-                feeling_angry: YesNo.No,
-                mood_boost: YesNo.No,
-                self_compassion: YesNo.No
-            },
-            output: { score: 1 },
-        }
-        oracle.fit(trainingData.input, trainingData.output.score);
+    useEffect(() => {        
         compute_recommendation();
-        setTrainingData([trainingData])
+        setTrainingData([])
     }, []);
 
     const compute_recommendation = () => {
@@ -72,6 +56,7 @@ export function RoomOracle() {
     const selectRecommendation = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
         oracle.fit(newTrainingData[0].input, newTrainingData[0].output.score); // re-training only on new training data
+        console.log("oracle theta", oracle.getThetaHash());
         compute_recommendation();
     }
 
