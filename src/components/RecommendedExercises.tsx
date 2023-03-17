@@ -4,24 +4,28 @@ import { Text } from "react-native-svg";
 import { IExcercise, ITrainingData } from "../interfaces";
 import { ExerciseMathService } from "../services";
 import { AppButton } from "./AppButton";
+import { IContext } from "../interfaces";
 
 type Props = {
+    context: IContext;
     exercises: IExcercise[]
+    softmaxBeta: number;
     callback: (exercise: ITrainingData[]) => void;
 }
 
 type RecommendationState = {
-    recommendations: IExcercise[]
+    recommendations: IExcercise[],
+    context: IContext;
 }
 
-export function RecommendedExercises({ exercises, callback }: Props) {
-    const [recommendation, setRecommendation] = useState<RecommendationState>({ recommendations: [] });
+export function RecommendedExercises({context, exercises, softmaxBeta, callback }: Props) {
+    const [recommendation, setRecommendation] = useState<RecommendationState>({ recommendations: [], context:context});
 
     useEffect(() => {
         const exercisesCopy = exercises.slice()
         let recommendationArray: IExcercise[] = []
         for (let index = 0; index < 3; index++) {
-            const sample = ExerciseMathService(exercisesCopy).getSampleFromProbabilityDistributedScores();
+            const sample = ExerciseMathService(exercisesCopy, softmaxBeta).getSampleFromProbabilityDistributedScores();
             recommendationArray[index] = sample.exercise; // set i-th recommendation
             exercisesCopy.splice(sample.index, 1); // remove the recent recommended item
 
@@ -32,7 +36,7 @@ export function RecommendedExercises({ exercises, callback }: Props) {
             exercisesCopy.splice(indexToRemove, 1)
             // remove the last selected value and shrink size by 1
         }
-        setRecommendation({ recommendations: recommendationArray });
+        setRecommendation({ recommendations: recommendationArray, context: context });
     }, [exercises])
 
     const submitRecommendation = (selected?: IExcercise) => {
@@ -42,14 +46,22 @@ export function RecommendedExercises({ exercises, callback }: Props) {
             for (let index = 0; index < exerciseArray.length; index++) {
                 if (exerciseArray[index].InternalName == selected?.InternalName) {
                     result.push({
-                        input: exerciseArray[index].Value,
-                        output: { score: 1 }
+                        input: {
+                            contextFeatures: recommendation.context,
+                            exerciseFeatures: exerciseArray[index].Features,
+                        },
+                        output: { score: 1 },
+                        probability: exerciseArray[index].Probability,
                     })
                 }
                 else {
                     result.push({
-                        input: exerciseArray[index].Value,
-                        output: { score: 0 }
+                        input: {
+                            contextFeatures: recommendation.context,
+                            exerciseFeatures: exerciseArray[index].Features,
+                        },
+                        output: { score: 0 },
+                        probability: exerciseArray[index].Probability,
                     })
                 }
             }
@@ -62,7 +74,8 @@ export function RecommendedExercises({ exercises, callback }: Props) {
             return <AppButton
                 key={exercise.InternalName}
                 style={style.button}
-                title={exercise.DisplayName}
+                // title is the name of the exercise with probability in brackets:
+                title={exercise.DisplayName + " (p=" + Number(exercise.Probability).toFixed(3) + ")"}
                 onPress={() => { submitRecommendation(exercise) }}></AppButton>
         else {
             return <Text>Undefined</Text>;

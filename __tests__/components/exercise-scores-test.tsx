@@ -1,7 +1,7 @@
 import { fireEvent, render } from '@testing-library/react-native';
 import { hasUncaughtExceptionCaptureCallback } from 'process';
-import { ExerciseScores } from '../../src/components/exercise-scores';
-import { MoodComponent } from '../../src/components/mood-selector';
+import { ExerciseScores } from '../../src/components/ExerciseScores';
+import { MoodComponent } from '../../src/components/ContextComponent';
 import { IExcercise, Moods } from '../../src/interfaces';
 
 describe("exercise-scores compoment", () => {
@@ -15,7 +15,7 @@ describe("exercise-scores compoment", () => {
             DisplayName: 'test',
             Score: 0,
             InternalName: '',
-            Value: {
+            Features: {
                 mood_boost: 0,
                 mood_value: 0,
                 deffuse: 0,

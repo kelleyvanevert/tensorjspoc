@@ -1,0 +1,90 @@
+import React from 'react';
+import { StyleSheet, Text, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
+import { IExcercise } from '../interfaces';
+import { BaseColors } from './colors';
+
+type Props = {
+    recommendations: IExcercise[]
+}
+
+export function ExerciseScores({ recommendations }: Props) {
+    // console.log("ExerciseScores", recommendations)
+    return (
+        <FlatList
+            data={recommendations || []}
+            keyExtractor={(item) => item.InternalName}
+            style={styles.list}
+            renderItem={({ item }) => (
+                <View style={styles.item}>
+                    <Text style={styles.title}>{item.DisplayName}</Text>
+                    <View style={styles.scoreContainer}>
+                        <Text style={styles.label}>Score:</Text>
+                        <Text style={styles.score}>{Math.round((item.Score || 0) * 100)}</Text>
+                    </View>
+                    <View style={styles.probaContainer}>
+                        <Text style={styles.label}>Proba:</Text>
+                        <Text style={styles.proba}>{Math.round((item.Probability || 0) * 10000) / 100}%</Text>
+                    </View>
+                </View>
+            )}
+            numColumns={2}
+            columnWrapperStyle={styles.columnWrapper}
+        />
+    );
+}
+
+const styles = StyleSheet.create({
+    list: {
+        marginTop: 10,
+        paddingHorizontal: 10,
+    },
+    item: {
+        flex: 1,
+        marginVertical: 5,
+        marginHorizontal: 10,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        shadowOffset: { width: 0, height: 2 },
+        padding: 10,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: BaseColors.deepblue,
+        marginBottom: 5,
+    },
+    scoreContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 5,
+    },
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: BaseColors.deepblue,
+        marginRight: 5,
+    },
+    score: {
+        fontSize: 16,
+        fontWeight: 'normal',
+        color: BaseColors.green,
+    },
+    probaContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    proba: {
+        fontSize: 16,
+        fontWeight: 'normal',
+        color: BaseColors.orange,
+    },
+    columnWrapper: {
+        justifyContent: 'space-between',
+        marginHorizontal: 5,
+    }
+})

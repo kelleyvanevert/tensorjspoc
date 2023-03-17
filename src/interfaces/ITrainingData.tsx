@@ -1,8 +1,13 @@
 import { IExcerciseFeatures } from "./IExerciseFeatures";
+import { IContext } from "./IContext";
 
 export interface ITrainingData {
-    input: IExcerciseFeatures;
+    input: {
+        contextFeatures: IContext;
+        exerciseFeatures: IExcerciseFeatures;
+    }
     output: {
         score: number;
     };
+    probability : number | undefined;
 }

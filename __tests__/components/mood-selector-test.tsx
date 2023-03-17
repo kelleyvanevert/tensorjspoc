@@ -1,5 +1,5 @@
 import { fireEvent, render } from '@testing-library/react-native';
-import { MoodComponent } from '../../src/components/mood-selector';
+import { MoodComponent } from '../../src/components/ContextComponent';
 import { Moods } from '../../src/interfaces';
 
 describe("mood-selector component", () => {

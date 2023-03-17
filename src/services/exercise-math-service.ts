@@ -1,19 +1,19 @@
 import { IExcercise, IExcerciseFeatures } from "../interfaces";
 
-export const ExerciseMathService = (exercises: IExcercise[], softmax_beta: number = 2) => {
+export const ExerciseMathService = (exercises: IExcercise[], softmaxBeta: number = 2) => {
 
-    const p_ConvertToProbabilityDistribution = (scores: number[], softmax: number): number[] => {
+    const p_ConvertToProbabilityDistribution = (scores: number[], softmaxBeta: number): number[] => {
         let probabilities: number[] = []
-        let softmax_denomenator = 0
-        const numerators: number[] = []
+        let softmaxDenomenator = 0
+        const softmaxNumerators: number[] = []
         for (let i = 0; i < scores.length; i++) {
-            let softmax_numerator = Math.exp(softmax * scores[i]);
-            softmax_denomenator += softmax_numerator
-            numerators.push(softmax_numerator);
+            let softmaxNumerator = Math.exp(softmaxBeta * scores[i]);
+            softmaxDenomenator += softmaxNumerator
+            softmaxNumerators.push(softmaxNumerator);
         }
 
-        for (let i = 0; i < numerators.length; i++) {
-            probabilities.push(numerators[i] / softmax_denomenator)
+        for (let i = 0; i < softmaxNumerators.length; i++) {
+            probabilities.push(softmaxNumerators[i] / softmaxDenomenator)
         }
         return probabilities;
     }
@@ -64,9 +64,9 @@ export const ExerciseMathService = (exercises: IExcercise[], softmax_beta: numbe
 
     const getCosineDistance = (exercise: IExcercise): { exercise: IExcercise, distance: number }[] => {
         let result: { exercise: IExcercise, distance: number }[] = []
-        let current_ex_value = p_CastOrderedFeatureToNumArray(exercise.Value)
+        let current_ex_value = p_CastOrderedFeatureToNumArray(exercise.Features)
         exercises.forEach((ex) => {
-            const ex_value = p_CastOrderedFeatureToNumArray(ex.Value)
+            const ex_value = p_CastOrderedFeatureToNumArray(ex.Features)
             const distance = p_CosineSimilarity(current_ex_value, ex_value)
             result.push({
                 exercise: ex,
@@ -78,14 +78,21 @@ export const ExerciseMathService = (exercises: IExcercise[], softmax_beta: numbe
         return result
     }
 
-    const getSampleFromProbabilityDistributedScores = (): { exercise: IExcercise, index: number } => {
-        const scores = exercises.map(s => s.Score);
+    const getSampleFromProbabilityDistributedScores = (): { exercise: IExcercise, index: number} => {
+        const scores = exercises.map(s => s.PenalizedScore);
         if (scores == undefined) {
             throw "Fatal error. Scores was undefined while computing recommendation."
         }
-        const probabilities = p_ConvertToProbabilityDistribution(scores as number[], softmax_beta);
+        const probabilities = p_ConvertToProbabilityDistribution(scores as number[], softmaxBeta);
         const recommendedExIndex = p_SampledIndexFromProbabilityDistribution(probabilities);
-        return { exercise: exercises[recommendedExIndex], index: recommendedExIndex }
+        //set probability of each exercise in exercise equal to the probability in probabilities:
+        for (let i = 0; i < exercises.length; i++) {
+            exercises[i].PenalizedProbability = probabilities[i];
+        }
+        return { 
+            exercise: exercises[recommendedExIndex], 
+            index: recommendedExIndex, 
+        }
     }
 
     return {

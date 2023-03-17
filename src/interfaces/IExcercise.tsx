@@ -3,8 +3,10 @@ import { IExcerciseFeatures } from './IExerciseFeatures';
 export interface IExcercise {
     DisplayName: string;
     InternalName: string;
-    Value: IExcerciseFeatures;
+    Features: IExcerciseFeatures;
     Score: number | undefined;
-    SoftmaxNumerator: number | undefined;
+    // SoftmaxNumerator: number | undefined;
     Probability: number | undefined;
+    PenalizedScore: number | undefined;
+    PenalizedProbability: number | undefined;
 }
