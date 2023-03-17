@@ -1,10 +1,11 @@
 // https://github.com/javascript-machine-learning/logistic-regression-gradient-descent-javascript/blob/master/src/index.js
 let math = require('mathjs');
 
+// TODO
+// - add context * activity features interactions
+// - add inverse propensity score weighting
 
 export class LogisticRoomOracle {
-
-    // math = math.create(); // create a math object and assign it to a class property
 
     constructor(features, learningRate=0.1, iterations=1, theta) {
       this.features = features;
