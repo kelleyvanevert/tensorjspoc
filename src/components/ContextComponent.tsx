@@ -1,27 +1,28 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { Mood, Moods, IContext } from "../interfaces";
+import { Mood, Moods, IContext, generateContext } from "../interfaces";
 import { AppButton } from "./AppButton";
 import { BaseColors } from "./colors";
 
 
 type Props = {
-    initialContext: IContext,
+    // initialContext: IContext,
     callback: (context: IContext) => void;
 };
 
 
-export function ContextComponent({ initialContext, callback }: Props) {
+export function ContextComponent({ callback }: Props) {
 
-    const [current, setCurrentContext] = useState<IContext>(initialContext)
+    //const [current, setCurrentContext] = useState<IContext>(initialContext)
     const [moodValues] = useState<Mood[]>(Moods);
     const [currentMood, setCurrentMood] = useState<Mood>(moodValues[0])
 
-    const updateContext = (mood: Mood) => {
+    
+    const onMoodPress = (mood: Mood) => {
         setCurrentMood(mood)
-        let newContext: IContext = {mood: mood.value}
-        setCurrentContext(newContext);
-        callback(newContext);
+        //const newContext: IContext = {mood: currentMood.value}
+        //setCurrentContext(newContext);
+        callback(generateContext(mood));
     }
     // updateContext(currentMood)
 
@@ -34,7 +35,7 @@ export function ContextComponent({ initialContext, callback }: Props) {
                         testID={`MoodChoice.${mood.name}`} 
                         title={mood.name + " (" + mood.value + ")"} 
                         key={mood.value} 
-                        onPress={() => updateContext(mood)} 
+                        onPress={() => onMoodPress(mood)} 
                     />
                 )
             }

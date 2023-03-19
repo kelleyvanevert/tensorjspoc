@@ -1,9 +1,18 @@
 // https://github.com/javascript-machine-learning/logistic-regression-gradient-descent-javascript/blob/master/src/index.js
 let math = require('mathjs');
 
-// TODO
-// - add context * activity features interactions - DONE
-// - add inverse propensity score weighting - DONE
+
+export function LogisticOracleFromJSON(json) {
+    let data = JSON.parse(json);
+    return new LogisticOracle(
+        data.contextFeatures,
+        data.activityFeatures,
+        data.learningRate,
+        data.iterations,
+        data.addIntercept,
+        data.useInversePropensityWeighting,
+        data.theta);  
+}
 
 export class LogisticOracle {
 
@@ -14,7 +23,7 @@ export class LogisticOracle {
         iterations=1, 
         addIntercept=true, 
         useInversePropensityWeighting=true,
-        theta) {
+        theta,) {
       this.contextFeatures = contextFeatures;
       this.activityFeatures = activityFeatures;
       if (this.contextFeatures == undefined){this.contextFeatures = []}
@@ -28,7 +37,7 @@ export class LogisticOracle {
           this.interactionFeatures.push(this.contextFeatures[i] + '_' + this.activityFeatures[j]);
         }
       }
-      this.features = [... this.allInputFeatures, ... this.interactionFeatures];
+      this.features = [... this.activityFeatures, ... this.interactionFeatures];
       // console.log("this.contextFeatures, this.activityFeatures, this.interactionFeatures", this.contextFeatures, this.activityFeatures, this.interactionFeatures)
       // console.log("this.allInputFeatures, this.features", this.allInputFeatures, this.features)
       
@@ -50,6 +59,21 @@ export class LogisticOracle {
       this.useInversePropensityWeighting = useInversePropensityWeighting;
     }
 
+    toJSON() {
+      return JSON.stringify(
+        {
+          contextFeatures: this.contextFeatures,
+          activityFeatures: this.activityFeatures,
+          theta: this.theta,
+          learningRate: this.learningRate,
+          iterations: this.iterations,
+          addIntercept: this.addIntercept,
+          useInversePropensityWeighting: this.useInversePropensityWeighting,
+        }
+      )
+    }
+      
+
     setlearningRate(learningRate) {
       this.learningRate = learningRate;
     }
@@ -69,11 +93,17 @@ export class LogisticOracle {
     
     getThetaMap(round=3) {
       const result = new Map;
-      if (this.addIntercept) {result.set('intercept', Number(this.theta[0]).toFixed(round));}
-
-      this.features.forEach((key, i) => {
-        result.set(key, Number(this.theta[i+1]).toFixed(round));
-      });
+      if (this.addIntercept) {
+        result.set('intercept', Number(this.theta[0]).toFixed(round));
+        this.features.forEach((key, i) => {
+          result.set(key, Number(this.theta[i+1]).toFixed(round));
+        });
+      }
+      else {
+        this.features.forEach((key, i) => {
+          result.set(key, Number(this.theta[i]).toFixed(round));
+        });
+      }
       return result;
     }
 
@@ -123,22 +153,22 @@ export class LogisticOracle {
     }
     
     fit(trainingData, learningRate, iterations, useInversePropensityWeighting) {
-        if (learningRate === undefined) {learningRate = this.learningRate;}
-        if (iterations === undefined) {iterations = this.iterations;}
-        if (useInversePropensityWeighting === undefined) {useInversePropensityWeighting = this.useInversePropensityWeighting;}
+        if (learningRate == undefined) {learningRate = this.learningRate;}
+        if (iterations == undefined) {iterations = this.iterations;}
+        if (useInversePropensityWeighting == undefined) {useInversePropensityWeighting = this.useInversePropensityWeighting;}
         // console.log("oracle fit trainingData", trainingData)
         let X = this.getOrderedInputsArray(
           trainingData.input.contextFeatures, 
           trainingData.input.exerciseFeatures,
         )
         let y = [trainingData.output.score]
-        // console.log("X, y", X, y)
+        
         // console.log("this.theta", this.theta)
         let weight = 1;
-        if (this.useInversePropensityWeighting) {
+        if (useInversePropensityWeighting) {
           weight = 1 / Math.sqrt(trainingData.probability);
         }
-
+        console.log("Fitting on weight, X, y", weight, X, y)
         for (let i = 0; i < iterations; i++) {
           let pred = this.sigmoid(math.evaluate(`X * theta`, {X, theta:this.theta}));
           this.theta = math.evaluate(
@@ -154,6 +184,5 @@ export class LogisticOracle {
         this.fit(trainingDataList[i], learningRate, iterations);
       }
     }
-  
-   
+
   }

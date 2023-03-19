@@ -19,5 +19,20 @@ export const Moods: Mood[] = [
 ]
 
 export interface IContext {
-    mood: Number;
+    happy: Number;
+    sad: Number;
 }
+
+
+export function generateContext(mood:Mood): IContext { 
+    if (mood.name == "Happy") {
+        return {happy: 1, sad: 0}
+    } else if (mood.name == "Sad") {  
+        return {happy: 0, sad: 1}
+    } else {
+        return {happy: 0, sad: 0}
+    }
+    
+}
+
+
