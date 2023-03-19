@@ -214,9 +214,14 @@ export class LogisticOracle {
     }
   }
 
-  fit_multiple(trainingDataList: ITrainingData[], learningRate: number, iterations: number) {
+  fit_multiple(
+    trainingDataList: ITrainingData[], 
+    learningRate: number | undefined,
+    iterations: number | undefined,
+    useInversePropensityWeighting: boolean | undefined,
+    ) {
     for (let i = 0; i < trainingDataList.length; i++) {
-      this.fit(trainingDataList[i], learningRate, iterations);
+      this.fit(trainingDataList[i], learningRate, iterations, useInversePropensityWeighting);
     }
   }
 }
