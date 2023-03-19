@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Slider from '@react-native-community/slider';
 import { ITrainingData, IExcercise, YesNo, Exercises, Mood, Moods, IContext, generateContext} from '../interfaces';
 import { ContextComponent } from './ContextComponent';

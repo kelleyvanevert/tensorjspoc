@@ -6,25 +6,18 @@ import { BaseColors } from "./colors";
 
 
 type Props = {
-    // initialContext: IContext,
     callback: (context: IContext) => void;
 };
 
-
 export function ContextComponent({ callback }: Props) {
 
-    //const [current, setCurrentContext] = useState<IContext>(initialContext)
     const [moodValues] = useState<Mood[]>(Moods);
     const [currentMood, setCurrentMood] = useState<Mood>(moodValues[0])
 
-    
     const onMoodPress = (mood: Mood) => {
         setCurrentMood(mood)
-        //const newContext: IContext = {mood: currentMood.value}
-        //setCurrentContext(newContext);
         callback(generateContext(mood));
     }
-    // updateContext(currentMood)
 
     return (
         <View>

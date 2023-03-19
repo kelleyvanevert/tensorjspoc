@@ -9,7 +9,6 @@ type Props = {
 }
 
 export function ExerciseScores({ recommendations }: Props) {
-    // console.log("ExerciseScores", recommendations)
     return (
         <FlatList
             data={recommendations || []}

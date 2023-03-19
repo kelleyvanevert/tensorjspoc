@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BaseColors } from '../components/colors';
-// import { BrainJs } from '../components/BrainJs';
 import { RoomOracle } from '../components/RoomOracle';
 
 
