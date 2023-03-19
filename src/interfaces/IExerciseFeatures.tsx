@@ -10,4 +10,5 @@ export interface IExcerciseFeatures {
     feeling_angry: YesNo;
     mood_boost: YesNo;
     self_compassion: YesNo;
+    [key: string]: number;
 }

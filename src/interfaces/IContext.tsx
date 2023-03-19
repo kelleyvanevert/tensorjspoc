@@ -19,8 +19,9 @@ export const Moods: Mood[] = [
 ]
 
 export interface IContext {
-    happy: Number;
-    sad: Number;
+    happy: number;
+    sad: number;
+    [key: string]: number;
 }
 
 

@@ -5,7 +5,7 @@ import { ITrainingData, IExcercise, YesNo, Exercises, Mood, Moods, IContext, gen
 import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
-import { LogisticOracle} from './LogisticOracle.js';
+import { LogisticOracle} from './LogisticOracle';
 
 
 export function RoomOracle() {
@@ -70,16 +70,17 @@ export function RoomOracle() {
         const scores = exercises.map(exercise => exercise.Score);
         const probabilities = exercises.map(exercise => exercise.Probability);
         console.log("recomputeRecommendations", updatedContext, scores, probabilities, oracle.getThetaMap());
-        const X = oracle.getOrderedInputsArray(
-            updatedContext, 
-            exercises[0].Features,
-          )
-        console.log("recomputeRecommendations X", exercises[0].Features, X);
+        // const X = oracle.getOrderedInputsArray(
+        //     updatedContext, 
+        //     exercises[0].Features,
+        //   )
+        // console.log("recomputeRecommendations X", exercises[0].Features, X);
 
         // console.log("compute_recommendation softmax ", SoftmaxNumerators, SoftmaxDenominator);
         const sortedRecommendation: IExcercise[] = computedRecommendation.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+        console.log("compute_recommendation computedReccommendation", sortedRecommendation);
         setModelRecommendations(sortedRecommendation);
-        // console.log("compute_recommendation computedReccommendation", sortedRecommendation);
+        
     }
 
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
@@ -87,14 +88,7 @@ export function RoomOracle() {
         // for each new training data, re-train the model:
         for (let index = 0; index < newTrainingData.length; index++) {
             const trainingData = newTrainingData[index];
-            if (trainingData.output.score == 1){
-                oracle.fit(trainingData, learningRate, 1, true);
-            }
-            else {
-                
-                oracle.fit(trainingData, learningRate, 1, false);
-            }
-            
+            oracle.fit(trainingData, learningRate, undefined, undefined);
         }
         // console.log("oracle theta", oracle.getThetaMap());
         recomputeRecommendations(context);

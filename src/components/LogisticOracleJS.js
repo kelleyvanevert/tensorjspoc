@@ -165,8 +165,8 @@ export class LogisticOracle {
         
         // console.log("this.theta", this.theta)
         let weight = 1;
-        if (useInversePropensityWeighting) {
-          weight = 1 / Math.sqrt(trainingData.probability);
+        if ((useInversePropensityWeighting) && (trainingData.output.score == 1)) {
+          weight = 1 / Math.sqrt(trainingData.probability || 1);
         }
         console.log("Fitting on weight, X, y", weight, X, y)
         for (let i = 0; i < iterations; i++) {
