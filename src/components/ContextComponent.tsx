@@ -26,7 +26,7 @@ export function ContextComponent({ callback }: Props) {
                     <AppButton 
                         style={style.button} 
                         testID={`MoodChoice.${mood.name}`} 
-                        title={mood.name + " (" + mood.value + ")"} 
+                        title={mood.name} 
                         key={mood.value} 
                         onPress={() => onMoodPress(mood)} 
                     />
