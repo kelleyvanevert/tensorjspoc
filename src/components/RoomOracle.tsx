@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Slider from '@react-native-community/slider';
 import { ITrainingData, IExcercise, Exercises, exerciseNames, Moods, IContext, generateContext} from '../interfaces';
 import { ContextComponent } from './ContextComponent';
@@ -25,22 +27,23 @@ export function RoomOracle() {
     const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
     const [learningRate, setLearningRate] = useState<number>(0.05);
     const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
+    const [contextFeatures, setContextFeatures] = useState<string[]>(
+        ['happy', 'sad', ]);
+    const [exerciseFeatures, setExerciseFeatures] = useState<string[]>(
+        [ 
+            'three_five_mins',
+            'five_seven_mins',
+            'seven_ten_mins',
+            'deffuse',
+            'zoom_out',
+            'feeling_stressed',
+            'feeling_angry',
+            'mood_boost',
+            'self_compassion'
+        ]);
     const [oracle, setOracle] = useState<LogisticOracle>(new LogisticOracle(
-            [ //contextFeatures
-                'happy',
-                'sad', 
-            ], 
-            [ //exerciseFeatures
-                'three_five_mins',
-                'five_seven_mins',
-                'seven_ten_mins',
-                'deffuse',
-                'zoom_out',
-                'feeling_stressed',
-                'feeling_angry',
-                'mood_boost',
-                'self_compassion'
-            ], 
+            contextFeatures, 
+            exerciseFeatures, 
             exerciseNames, //exerciseNames
             0.05, //learningRate
             1, //iterations
@@ -81,6 +84,47 @@ export function RoomOracle() {
         setSoftmaxBeta(value);
         recalculateRecommendations(context);
     }
+
+    const onContextFeaturesChange = (value: string[]) => {  
+        console.log(value)
+        setContextFeatures(value);
+        // oracle.updateFeatures(value, oracle.exerciseFeatures);   
+        // recalculateRecommendations(context);
+    }
+
+    const items = [
+        // this is the parent or 'item'
+        {
+          name: 'Context Features',
+          id: 0,
+          // these are the children or 'sub items'
+          children: [
+            {
+              name: 'Happy',
+              id: 10,
+            },
+            {
+              name: 'Sad',
+              id: 11,
+            },
+          ],
+        }, 
+        {
+            name: 'Exercise Features',
+            id: 1,
+            // these are the children or 'sub items'
+            children: [
+              {
+                name: 'mood_boost',
+                id: 21,
+              },
+              {
+                name: 'self_compassion',
+                id: 22,
+              },
+            ],
+          },        
+      ];
 
     return (
         <View>
@@ -126,6 +170,20 @@ export function RoomOracle() {
             />
             <Text style={{marginLeft: 10}}>{softmaxBeta.toFixed(1)}</Text>
             </View>
+
+            <Text>Context Features:</Text>
+            {/* <SectionedMultiSelect
+            items={items}
+            IconRenderer={Icon}
+            uniqueKey="id"
+            subKey="children"
+            selectText="Select features..."
+            showDropDowns={true}
+            readOnlyHeadings={true}
+            onSelectedItemsChange={onContextFeaturesChange}
+            selectedItems={[]}
+            /> */}
+
 
             <ExerciseScores recommendations={modelRecommendations || []} />
         </View >

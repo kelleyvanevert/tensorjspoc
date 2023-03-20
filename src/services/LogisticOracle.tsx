@@ -31,9 +31,9 @@ export class LogisticOracle {
   nFeatures: number;
 
   constructor(
-    contextFeatures: string[],
-    exerciseFeatures: string[],
-    exerciseNames: string[],
+    contextFeatures: string[] = [],
+    exerciseFeatures: string[] = [],
+    exerciseNames: string[] = [],
     learningRate = 0.1,
     iterations = 1,
     addIntercept = true,
@@ -43,33 +43,13 @@ export class LogisticOracle {
     this.contextFeatures = contextFeatures;
     this.exerciseFeatures = exerciseFeatures;
     this.exerciseNames = exerciseNames;
-
-    if (this.contextFeatures === undefined) {
-      this.contextFeatures = [];
-    }
-
-    if (this.exerciseFeatures === undefined) {
-      this.exerciseFeatures = [];
-    }
+    this.addIntercept = addIntercept;
 
     this.allInputFeatures = [...this.contextFeatures, ...this.exerciseFeatures];
-
-    this.interactionFeatures = [];
-    for (let i = 0; i < this.contextFeatures.length; i++) {
-      for (let j = 0; j < this.exerciseFeatures.length; j++) {
-        this.interactionFeatures.push(this.contextFeatures[i] + '*' + this.exerciseFeatures[j]);
-      }
-    }
-
-    this.features = [...this.exerciseNames, ...this.exerciseFeatures, ...this.interactionFeatures];
-
-    this.addIntercept = addIntercept;
-    if (this.addIntercept) {
-      this.nFeatures = this.features.length + 1;
-    } else {
-      this.nFeatures = this.features.length;
-    }
-
+    this.interactionFeatures = this.generateInteractionFeatures()
+    this.features = this.generateFeatures();
+    this.nFeatures = this.generateNFeatures();
+  
     if (theta === undefined) {
       this.theta = this.zeroWeights(this.nFeatures);
     } else if (theta.length == this.nFeatures) {
@@ -82,6 +62,53 @@ export class LogisticOracle {
     this.learningRate = learningRate;
     this.iterations = iterations;
     this.useInversePropensityWeighting = useInversePropensityWeighting;
+  }
+
+  generateFeatures(): string[] {
+    let features = [...this.exerciseNames, ...this.exerciseFeatures, ...this.interactionFeatures];
+    return features
+  }
+
+  generateInteractionFeatures(): string[] {
+    let interactionFeatures = [];
+    for (let i = 0; i < this.contextFeatures.length; i++) {
+      for (let j = 0; j < this.exerciseFeatures.length; j++) {
+        interactionFeatures.push(this.contextFeatures[i] + '*' + this.exerciseFeatures[j]);
+      }
+    }
+    return interactionFeatures
+  }
+
+  generateNFeatures(): number {
+    if (this.addIntercept) {
+      return this.features.length + 1;
+    } else {
+      return this.features.length;
+    }
+  }
+
+  updateTheta(oldTheta: number[], oldFeatures:string[], newFeatures: string[]): number[] {
+    let newTheta: number[] = [];
+    for (let i = 0; i < newFeatures.length; i++) {
+      if (oldFeatures.includes(newFeatures[i])) {
+        let oldIndex = oldFeatures.indexOf(newFeatures[i]);
+        newTheta.push(oldTheta[oldIndex]);
+      } else {
+        newTheta.push(0);
+      }
+    }
+    return newTheta;
+  }
+
+  updateFeatures(contextFeatures: string[] = [], exerciseFeatures: string[] = []): void {
+    this.contextFeatures = contextFeatures;
+    this.exerciseFeatures = exerciseFeatures;
+    this.allInputFeatures = [...this.contextFeatures, ...this.exerciseFeatures];
+    this.interactionFeatures = this.generateInteractionFeatures()
+    const oldFeatures = this.features;
+    this.features = this.generateFeatures();
+    this.theta = this.updateTheta(this.theta, oldFeatures, this.features);
+    this.nFeatures = this.generateNFeatures();
   }
 
   toJSON(): string {
@@ -154,8 +181,6 @@ export class LogisticOracle {
     }
     return true;
   }
-
-
 
   getOrderedInputsArray(
     contextInputs: Record<string, number>, 
