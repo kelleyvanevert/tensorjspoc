@@ -9,6 +9,16 @@ import { LogisticOracle} from '../services/LogisticOracle';
 import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 
+// TODO:
+// - After selecting an exercise, show popup with start rating feedback
+// - Have a seperate rating oracle that is trained on the start rating feedback
+// - add a tab or popup with all exercises details
+// - add a tab or popup with oracle details:
+//      - features used
+//      - current weights
+// - add all the exercises and all the features
+// - allow user to select features to be used by the model
+
 export function RoomOracle() {
     const [exercises] = useState<IExcercise[]>(Exercises)
     const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
@@ -56,12 +66,7 @@ export function RoomOracle() {
 
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
-        // for each new training data, re-train the model:
-        for (let index = 0; index < newTrainingData.length; index++) {
-            const trainingData = newTrainingData[index];
-            oracle.fit(trainingData, learningRate, undefined, undefined);
-        }
-        // console.log("oracle theta", oracle.getThetaMap());
+        oracle.fit_multiple(newTrainingData, learningRate, undefined, undefined);
         recalculateRecommendations(context);
     }
 

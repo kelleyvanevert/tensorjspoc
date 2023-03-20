@@ -51,7 +51,6 @@ export class LogisticOracle {
 
     this.allInputFeatures = [...this.contextFeatures, ...this.activityFeatures];
 
-    // make list of combination of all contextFeatures and all activityFeatures (interaction features):
     this.interactionFeatures = [];
     for (let i = 0; i < this.contextFeatures.length; i++) {
       for (let j = 0; j < this.activityFeatures.length; j++) {
@@ -171,8 +170,7 @@ export class LogisticOracle {
     
     let pred = this.sigmoid(
       math.evaluate(`X * theta`, { X, theta: this.theta })
-    )[0];//[0];
-    console.log("predict", X[0].length, this.theta.length, pred)
+    )[0];
     return pred;
   }
 
