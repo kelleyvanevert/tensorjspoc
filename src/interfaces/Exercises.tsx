@@ -1,5 +1,4 @@
 import { IExcercise } from "./IExcercise";
-import { Moods } from "./IContext";
 import { YesNo } from "./YesNo";
 
 export const Exercises: IExcercise[] = [
@@ -156,3 +155,6 @@ export const Exercises: IExcercise[] = [
         PenalizedProbability: undefined,
     }
 ]
+
+// exerciseNames is a list of all the exercise DisplayNames:
+export const exerciseNames = Exercises.map((exercise) => exercise.InternalName);

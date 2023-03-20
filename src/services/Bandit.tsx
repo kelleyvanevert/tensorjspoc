@@ -25,6 +25,8 @@ export function calculateScoresAndSortExercises(
     }
 
     sortedExercises = sortedExercises.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+    
+    console.log("theta -> ", oracle.getThetaMap())
     return sortedExercises;
 }
 

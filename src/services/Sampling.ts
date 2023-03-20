@@ -99,9 +99,3 @@ export function getSoftmaxSample(
         index: recommendedExIndex, 
     }
 }
-
-//     return {
-//         getSampleFromProbabilityDistributedScores,
-//         getCosineDistance
-//     }
-// }

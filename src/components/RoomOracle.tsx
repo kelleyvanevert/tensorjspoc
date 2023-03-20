@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import Slider from '@react-native-community/slider';
-import { ITrainingData, IExcercise, YesNo, Exercises, Mood, Moods, IContext, generateContext} from '../interfaces';
+import { ITrainingData, IExcercise, Exercises, exerciseNames, Moods, IContext, generateContext} from '../interfaces';
 import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
@@ -18,7 +18,7 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 //      - current weights
 // - add all the exercises and all the features
 // - allow user to select features to be used by the model
-// - add onehotencoded features for the activity
+// - add onehotencoded features for the exercise
 
 export function RoomOracle() {
     const [exercises] = useState<IExcercise[]>(Exercises)
@@ -30,7 +30,7 @@ export function RoomOracle() {
                 'happy',
                 'sad', 
             ], 
-            [ //activityFeatures
+            [ //exerciseFeatures
                 'three_five_mins',
                 'five_seven_mins',
                 'seven_ten_mins',
@@ -41,6 +41,7 @@ export function RoomOracle() {
                 'mood_boost',
                 'self_compassion'
             ], 
+            exerciseNames, //exerciseNames
             0.05, //learningRate
             1, //iterations
             true, //addIntercept

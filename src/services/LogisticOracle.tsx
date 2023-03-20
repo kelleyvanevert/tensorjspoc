@@ -6,7 +6,7 @@ export function LogisticOracleFromJSON(json: string): LogisticOracle {
   let data = JSON.parse(json);
   return new LogisticOracle(
     data.contextFeatures,
-    data.activityFeatures,
+    data.exerciseFeatures,
     data.learningRate,
     data.iterations,
     data.addIntercept,
@@ -17,7 +17,8 @@ export function LogisticOracleFromJSON(json: string): LogisticOracle {
 
 export class LogisticOracle {
   contextFeatures: string[];
-  activityFeatures: string[];
+  exerciseFeatures: string[];
+  exerciseNames: string[];
   learningRate: number;
   iterations: number;
   addIntercept: boolean;
@@ -31,7 +32,8 @@ export class LogisticOracle {
 
   constructor(
     contextFeatures: string[],
-    activityFeatures: string[],
+    exerciseFeatures: string[],
+    exerciseNames: string[],
     learningRate = 0.1,
     iterations = 1,
     addIntercept = true,
@@ -39,26 +41,27 @@ export class LogisticOracle {
     theta?: number[]
   ) {
     this.contextFeatures = contextFeatures;
-    this.activityFeatures = activityFeatures;
+    this.exerciseFeatures = exerciseFeatures;
+    this.exerciseNames = exerciseNames;
 
     if (this.contextFeatures === undefined) {
       this.contextFeatures = [];
     }
 
-    if (this.activityFeatures === undefined) {
-      this.activityFeatures = [];
+    if (this.exerciseFeatures === undefined) {
+      this.exerciseFeatures = [];
     }
 
-    this.allInputFeatures = [...this.contextFeatures, ...this.activityFeatures];
+    this.allInputFeatures = [...this.contextFeatures, ...this.exerciseFeatures];
 
     this.interactionFeatures = [];
     for (let i = 0; i < this.contextFeatures.length; i++) {
-      for (let j = 0; j < this.activityFeatures.length; j++) {
-        this.interactionFeatures.push(this.contextFeatures[i] + '*' + this.activityFeatures[j]);
+      for (let j = 0; j < this.exerciseFeatures.length; j++) {
+        this.interactionFeatures.push(this.contextFeatures[i] + '*' + this.exerciseFeatures[j]);
       }
     }
 
-    this.features = [...this.activityFeatures, ...this.interactionFeatures];
+    this.features = [...this.exerciseNames, ...this.exerciseFeatures, ...this.interactionFeatures];
 
     this.addIntercept = addIntercept;
     if (this.addIntercept) {
@@ -84,7 +87,7 @@ export class LogisticOracle {
   toJSON(): string {
     return JSON.stringify({
       contextFeatures: this.contextFeatures,
-      activityFeatures: this.activityFeatures,
+      exerciseFeatures: this.exerciseFeatures,
       theta: this.theta,
       learningRate: this.learningRate,
       iterations: this.iterations,
@@ -106,9 +109,23 @@ export class LogisticOracle {
 
   addInteractionFeatures(inputsHash: Record<string, number>): Record<string, number> {
     for (let i = 0; i < this.contextFeatures.length; i++) {
-      for (let j = 0; j < this.activityFeatures.length; j++) {
-        inputsHash[this.contextFeatures[i] + '*' + this.activityFeatures[j]] =
-          inputsHash[this.contextFeatures[i]] * inputsHash[this.activityFeatures[j]];
+      for (let j = 0; j < this.exerciseFeatures.length; j++) {
+        inputsHash[this.contextFeatures[i] + '*' + this.exerciseFeatures[j]] =
+          inputsHash[this.contextFeatures[i]] * inputsHash[this.exerciseFeatures[j]];
+      }
+    }
+    return inputsHash;
+  }
+
+  addExerciseNameFeatures(
+    inputsHash: Record<string, number>, 
+    exercisename: string |undefined = undefined
+    ): Record<string, number> {
+    for (let i = 0; i < this.exerciseNames.length; i++) {
+      if (this.exerciseNames[i] === exercisename) {
+        inputsHash[this.exerciseNames[i]] = 1;
+      } else {
+        inputsHash[this.exerciseNames[i]] = 0;
       }
     }
     return inputsHash;
@@ -138,9 +155,15 @@ export class LogisticOracle {
     return true;
   }
 
-  getOrderedInputsArray(contextInputs: Record<string, number>, activityInputs: Record<string, number>): number[][] {
-    let inputsHash: Record<string, number> = {...contextInputs, ...activityInputs};
-    // console.log("getOrderedInputsArray inputsHash:", inputsHash, activityInputs);
+
+
+  getOrderedInputsArray(
+    contextInputs: Record<string, number>, 
+    exerciseInputs: Record<string, number>,
+    exerciseName: string | undefined = undefined,
+    ): number[][] {
+    let inputsHash: Record<string, number> = {...contextInputs, ...exerciseInputs};
+    // console.log("getOrderedInputsArray inputsHash:", inputsHash, exerciseInputs);
     if (!this.hashContainsAllKeys(inputsHash, this.allInputFeatures)) {
         // throw error with missing features:
         const missingFeatures: string[] = [];
@@ -152,6 +175,7 @@ export class LogisticOracle {
         throw new Error(`Missing features in inputsHash: ${missingFeatures}`);
     }
     inputsHash = this.addInteractionFeatures(inputsHash);
+    inputsHash = this.addExerciseNameFeatures(inputsHash, exerciseName);
     // console.log("inputsHash with interactions:", inputsHash);
     const inputsArray: number[] = [];
     if (this.addIntercept) {inputsArray.push(1);} // add intercept
@@ -165,8 +189,8 @@ export class LogisticOracle {
     return math.evaluate(`1 ./ (1 + e.^-z)`, {z});
   }
 
-  predict(contextInputs: any, activityInputs: any): number {
-    let X = this.getOrderedInputsArray(contextInputs, activityInputs);
+  predict(contextInputs: any, exerciseInputs: any): number {
+    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs);
     
     let pred = this.sigmoid(
       math.evaluate(`X * theta`, { X, theta: this.theta })
@@ -174,15 +198,15 @@ export class LogisticOracle {
     return pred;
   }
 
-  predictLogit(contextInputs: any, activityInputs: any): number {
-    let X = this.getOrderedInputsArray(contextInputs, activityInputs);
+  predictLogit(contextInputs: any, exerciseInputs: any): number {
+    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs);
     
     let logit = math.evaluate(`X * theta`, { X, theta: this.theta })[0];
     return logit;
   }
 
-  predictProba(contextInputs: any, activityInputs: any): number {    
-    let logit = this.predictLogit(contextInputs, activityInputs);
+  predictProba(contextInputs: any, exerciseInputs: any): number {    
+    let logit = this.predictLogit(contextInputs, exerciseInputs);
     let proba = this.sigmoid(logit);
     return proba;
   }
