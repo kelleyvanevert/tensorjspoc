@@ -9,13 +9,13 @@ export const Moods: Mood[] = [
     value: 1
 },
 {
-    name: 'Fine',
-    value: 0
-},
-{
     name: 'Sad',
     value: -1
-}
+},
+{
+    name: 'NO EMA',
+    value: 0
+},
 ]
 
 export interface IContext {
@@ -35,5 +35,7 @@ export function generateContext(mood:Mood): IContext {
     }
     
 }
+
+
 
 

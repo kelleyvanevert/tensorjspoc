@@ -13,6 +13,7 @@ export function calculateScoresAndSortExercises(
     for (let index = 0; index < exercises.length; index++) {
         const exercise = exercises[index];
         exercise.Score = oracle.predict(context, exercise.Features);
+        // copy the score to PenalizedScore because the sampler may have side effects on the score
         exercise.PenalizedScore = exercise.Score;
         SoftmaxNumerators.push(Math.exp(softmaxBeta * exercise.Score || 0));
         sortedExercises.push(exercise)
@@ -50,9 +51,9 @@ export function sampleRecommendedExercises(
     return recommendedExercises
 }
 
-export function generateOracleTrianingData(
+export function generateOracleTrainingData(
     recommendedExercises: IExcercise[],
-    selected: IExcercise,
+    selected: IExcercise | undefined,
     context: IContext,
     ) : ITrainingData[] {
     let trainingData: ITrainingData[] = []
@@ -63,7 +64,7 @@ export function generateOracleTrianingData(
                 contextFeatures: context,
                 exerciseFeatures: recommendedExercises[index].Features,
             },
-            label: recommendedExercises[index].InternalName == selected.InternalName ? 1 : 0,
+            label: recommendedExercises[index].InternalName == selected?.InternalName ? 1 : 0,
             probability: recommendedExercises[index].Probability,
         })
     }

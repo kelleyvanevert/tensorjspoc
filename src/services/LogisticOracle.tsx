@@ -174,6 +174,19 @@ export class LogisticOracle {
     return pred;
   }
 
+  predictLogit(contextInputs: any, activityInputs: any): number {
+    let X = this.getOrderedInputsArray(contextInputs, activityInputs);
+    
+    let logit = math.evaluate(`X * theta`, { X, theta: this.theta })[0];
+    return logit;
+  }
+
+  predictProba(contextInputs: any, activityInputs: any): number {    
+    let logit = this.predictLogit(contextInputs, activityInputs);
+    let proba = this.sigmoid(logit);
+    return proba;
+  }
+
   fit(
     trainingData: ITrainingData,
     learningRate: number | undefined,
@@ -212,7 +225,7 @@ export class LogisticOracle {
     }
   }
 
-  fit_multiple(
+  fitMultiple(
     trainingDataList: ITrainingData[], 
     learningRate: number | undefined,
     iterations: number | undefined,

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "react-native-svg";
 import { IExcercise, ITrainingData } from "../interfaces";
-import { generateOracleTrianingData, sampleRecommendedExercises } from "../services/Bandit";
+import { generateOracleTrainingData, sampleRecommendedExercises } from "../services/Bandit";
 import { AppButton } from "./AppButton";
 import { IContext } from "../interfaces";
 
@@ -27,8 +27,8 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
     }, [exercises])
 
     const submitRecommendation = (selected?: IExcercise) => {
-        if ((recommendation?.recommendations != undefined) && (selected != undefined)) {
-            const trainingData = generateOracleTrianingData(
+        if (recommendation?.recommendations != undefined) {
+            const trainingData = generateOracleTrainingData(
                 recommendation?.recommendations, 
                 selected,
                 context,

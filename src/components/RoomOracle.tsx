@@ -18,6 +18,7 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 //      - current weights
 // - add all the exercises and all the features
 // - allow user to select features to be used by the model
+// - add onehotencoded features for the activity
 
 export function RoomOracle() {
     const [exercises] = useState<IExcercise[]>(Exercises)
@@ -66,7 +67,7 @@ export function RoomOracle() {
 
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
-        oracle.fit_multiple(newTrainingData, learningRate, undefined, undefined);
+        oracle.fitMultiple(newTrainingData, learningRate, undefined, undefined);
         recalculateRecommendations(context);
     }
 
