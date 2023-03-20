@@ -78,7 +78,7 @@ export function RoomOracle() {
 
         // console.log("compute_recommendation softmax ", SoftmaxNumerators, SoftmaxDenominator);
         const sortedRecommendation: IExcercise[] = computedRecommendation.sort((a, b) => (b.Score || 0) - (a.Score || 0));
-        console.log("compute_recommendation computedReccommendation", sortedRecommendation);
+        // console.log("compute_recommendation computedReccommendation", sortedRecommendation);
         setModelRecommendations(sortedRecommendation);
         
     }
