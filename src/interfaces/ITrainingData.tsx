@@ -3,11 +3,10 @@ import { IContext } from "./IContext";
 
 export interface ITrainingData {
     input: {
+        exerciseName: string;
         contextFeatures: IContext;
         exerciseFeatures: IExcerciseFeatures;
     }
-    output: {
-        score: number;
-    };
+    label: number;
     probability : number | undefined;
 }

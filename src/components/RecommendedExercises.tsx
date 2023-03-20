@@ -47,20 +47,22 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                 if (exerciseArray[index].InternalName == selected?.InternalName) {
                     result.push({
                         input: {
+                            exerciseName: exerciseArray[index].InternalName,
                             contextFeatures: recommendation.context,
                             exerciseFeatures: exerciseArray[index].Features,
                         },
-                        output: { score: 1 },
+                        label: 1,
                         probability: exerciseArray[index].Probability,
                     })
                 }
                 else {
                     result.push({
                         input: {
+                            exerciseName: exerciseArray[index].InternalName,
                             contextFeatures: recommendation.context,
                             exerciseFeatures: exerciseArray[index].Features,
                         },
-                        output: { score: 0 },
+                        label: 1,
                         probability: exerciseArray[index].Probability,
                     })
                 }

@@ -196,10 +196,10 @@ export class LogisticOracle {
       trainingData.input.contextFeatures,
       trainingData.input.exerciseFeatures
     );
-    let y = [trainingData.output.score];
+    let y = [trainingData.label];
 
     let weight = 1;
-    if ((useInversePropensityWeighting) && (trainingData.output.score == 1)) {
+    if ((useInversePropensityWeighting) && (trainingData.label == 1)) {
       weight = 1 / Math.sqrt(trainingData.probability || 1);
     }
 

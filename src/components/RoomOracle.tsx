@@ -31,7 +31,7 @@ export function RoomOracle() {
             ], 
             0.05, //learningRate
             1, //iterations
-            false, //addIntercept
+            true, //addIntercept
             true, //useInversePropensityWeighting
         )
     );
