@@ -5,7 +5,7 @@ import { ITrainingData, IExcercise, YesNo, Exercises, Mood, Moods, IContext, gen
 import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
-import { LogisticOracle} from './LogisticOracle';
+import { LogisticOracle} from '../services/LogisticOracle';
 
 
 export function RoomOracle() {
