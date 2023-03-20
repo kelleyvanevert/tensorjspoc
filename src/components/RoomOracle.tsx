@@ -104,11 +104,6 @@ export function RoomOracle() {
         recomputeRecommendations(context);
     }
 
-    const onContextChange = (context: IContext) => {
-        setContext(context);
-        recomputeRecommendations(context);
-    }
-
     return (
         <View>
 
