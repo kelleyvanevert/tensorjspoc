@@ -6,6 +6,7 @@ import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
 import { LogisticOracle} from '../services/LogisticOracle';
+import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 
 export function RoomOracle() {
@@ -40,47 +41,17 @@ export function RoomOracle() {
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
 
     useEffect(() => {        
-        recomputeRecommendations(context);
+        recalculateRecommendations(context);
         setTrainingData([])
     }, []);
 
-    const recomputeRecommendations = (newContext: IContext) => {
+    const recalculateRecommendations = (newContext: IContext) => {
         setContext(newContext);
         const updatedContext = { ...context, ...newContext };
-        const computedRecommendation: IExcercise[] = []
-        //let SoftmaxBeta = 2;
-        let SoftmaxNumerators = []
-        for (let index = 0; index < exercises.length; index++) {
-            const exercise = exercises[index];
-            // console.log("RoomOracle predict", context, exercise.Features);
-            exercise.Score = oracle.predict(updatedContext, exercise.Features);
-            exercise.PenalizedScore = exercise.Score;
-            SoftmaxNumerators.push(Math.exp(softmaxBeta * exercise.Score || 0));
-            computedRecommendation.push(exercise)
-        }
-        
-
-        // SoftmaxDenominator equals the sum of softmax numerators:
-        let SoftmaxDenominator = SoftmaxNumerators.reduce((a, b) => a + b, 0);
-        for (let index = 0; index < computedRecommendation.length; index++) {
-            const exercise = computedRecommendation[index];
-            exercise.Probability = SoftmaxNumerators[index] / SoftmaxDenominator;
-        }
-
-        const scores = exercises.map(exercise => exercise.Score);
-        const probabilities = exercises.map(exercise => exercise.Probability);
-        console.log("recomputeRecommendations", updatedContext, scores, probabilities, oracle.getThetaMap());
-        // const X = oracle.getOrderedInputsArray(
-        //     updatedContext, 
-        //     exercises[0].Features,
-        //   )
-        // console.log("recomputeRecommendations X", exercises[0].Features, X);
-
-        // console.log("compute_recommendation softmax ", SoftmaxNumerators, SoftmaxDenominator);
-        const sortedRecommendation: IExcercise[] = computedRecommendation.sort((a, b) => (b.Score || 0) - (a.Score || 0));
-        // console.log("compute_recommendation computedReccommendation", sortedRecommendation);
-        setModelRecommendations(sortedRecommendation);
-        
+        const sortedExercises = calculateScoresAndSortExercises(
+            oracle, updatedContext, exercises, softmaxBeta
+        )
+        setModelRecommendations(sortedExercises);
     }
 
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
@@ -91,7 +62,7 @@ export function RoomOracle() {
             oracle.fit(trainingData, learningRate, undefined, undefined);
         }
         // console.log("oracle theta", oracle.getThetaMap());
-        recomputeRecommendations(context);
+        recalculateRecommendations(context);
     }
 
     const onLearningRateChange = (value: number) => {
@@ -101,13 +72,13 @@ export function RoomOracle() {
 
     const onSoftmaxBetaChange = (value: number) => {
         setSoftmaxBeta(value);
-        recomputeRecommendations(context);
+        recalculateRecommendations(context);
     }
 
     return (
         <View>
 
-            <ContextComponent callback={recomputeRecommendations} />
+            <ContextComponent callback={recalculateRecommendations} />
             {
                 (() => {
                     if (modelRecommendations != undefined) {

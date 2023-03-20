@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "react-native-svg";
 import { IExcercise, ITrainingData } from "../interfaces";
-import { ExerciseMathService } from "../services";
+import { generateOracleTrianingData, sampleRecommendedExercises } from "../services/Bandit";
 import { AppButton } from "./AppButton";
 import { IContext } from "../interfaces";
 
@@ -22,52 +22,18 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
     const [recommendation, setRecommendation] = useState<RecommendationState>({ recommendations: [], context:context});
 
     useEffect(() => {
-        const exercisesCopy = exercises.slice()
-        let recommendationArray: IExcercise[] = []
-        for (let index = 0; index < 3; index++) {
-            const sample = ExerciseMathService(exercisesCopy, softmaxBeta).getSampleFromProbabilityDistributedScores();
-            recommendationArray[index] = sample.exercise; // set i-th recommendation
-            exercisesCopy.splice(sample.index, 1); // remove the recent recommended item
-
-            const distance = ExerciseMathService(exercisesCopy).getCosineDistance(sample.exercise); // calculate distance between curr and all "remaining" exercises
-            const mostSimilarItemToSelectedExercise = distance[distance.length - 1]
-            // console.log("Sample -> ", sample.exercise.DisplayName, "\nRemoved Similar -> ", mostSimilarItemToSelectedExercise.exercise.InternalName)
-            let indexToRemove = exercisesCopy.findIndex(s => s.InternalName == mostSimilarItemToSelectedExercise.exercise.InternalName)
-            exercisesCopy.splice(indexToRemove, 1)
-            // remove the last selected value and shrink size by 1
-        }
-        setRecommendation({ recommendations: recommendationArray, context: context });
+        const recommendedExercises = sampleRecommendedExercises(exercises, softmaxBeta)
+        setRecommendation({ recommendations: recommendedExercises, context: context });
     }, [exercises])
 
     const submitRecommendation = (selected?: IExcercise) => {
-        if (recommendation?.recommendations != undefined) {
-            const exerciseArray: IExcercise[] = recommendation?.recommendations
-            let result: ITrainingData[] = []
-            for (let index = 0; index < exerciseArray.length; index++) {
-                if (exerciseArray[index].InternalName == selected?.InternalName) {
-                    result.push({
-                        input: {
-                            exerciseName: exerciseArray[index].InternalName,
-                            contextFeatures: recommendation.context,
-                            exerciseFeatures: exerciseArray[index].Features,
-                        },
-                        label: 1,
-                        probability: exerciseArray[index].Probability,
-                    })
-                }
-                else {
-                    result.push({
-                        input: {
-                            exerciseName: exerciseArray[index].InternalName,
-                            contextFeatures: recommendation.context,
-                            exerciseFeatures: exerciseArray[index].Features,
-                        },
-                        label: 1,
-                        probability: exerciseArray[index].Probability,
-                    })
-                }
-            }
-            callback(result);
+        if ((recommendation?.recommendations != undefined) && (selected != undefined)) {
+            const trainingData = generateOracleTrianingData(
+                recommendation?.recommendations, 
+                selected,
+                context,
+            )
+            callback(trainingData);
         }
     }
 

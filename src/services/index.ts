@@ -1,1 +1,1 @@
-export * from './exercise-math-service'
+export * from './Bandit'
