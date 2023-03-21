@@ -12,7 +12,7 @@ export function calculateScoresAndSortExercises(
     let SoftmaxNumerators = []
     for (let index = 0; index < exercises.length; index++) {
         const exercise = exercises[index];
-        exercise.Score = oracle.predict(context, exercise.Features);
+        exercise.Score = oracle.predict(context, exercise.Features, exercise.InternalName);
         // copy the score to PenalizedScore because the sampler may have side effects on the score
         exercise.PenalizedScore = exercise.Score;
         SoftmaxNumerators.push(Math.exp(softmaxBeta * exercise.Score || 0));

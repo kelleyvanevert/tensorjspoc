@@ -89,14 +89,21 @@ export class LogisticOracle {
 
   updateTheta(oldTheta: number[], oldFeatures:string[], newFeatures: string[]): number[] {
     let newTheta: number[] = [];
+    let baseIndex = 0;
+    if (this.addIntercept) {
+      newTheta.push(oldTheta[0]);
+      baseIndex = 1;
+    }
     for (let i = 0; i < newFeatures.length; i++) {
       if (oldFeatures.includes(newFeatures[i])) {
         let oldIndex = oldFeatures.indexOf(newFeatures[i]);
-        newTheta.push(oldTheta[oldIndex]);
+        newTheta.push(oldTheta[baseIndex + oldIndex]);
       } else {
         newTheta.push(0);
       }
     }
+    console.log('updateTheta', oldFeatures, newFeatures)
+    console.log('updateTheta', oldTheta, newTheta, oldTheta.length, newTheta.length)
     return newTheta;
   }
 
@@ -120,6 +127,7 @@ export class LogisticOracle {
       iterations: this.iterations,
       addIntercept: this.addIntercept,
       useInversePropensityWeighting: this.useInversePropensityWeighting,
+      features: this.features,
     });
   }
 
@@ -214,24 +222,24 @@ export class LogisticOracle {
     return math.evaluate(`1 ./ (1 + e.^-z)`, {z});
   }
 
-  predict(contextInputs: any, exerciseInputs: any): number {
-    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs);
-    
+  predict(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {
+    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs, exerciseName);
+    console.log("predict X:", X, contextInputs, exerciseInputs, this.theta);
     let pred = this.sigmoid(
       math.evaluate(`X * theta`, { X, theta: this.theta })
     )[0];
     return pred;
   }
 
-  predictLogit(contextInputs: any, exerciseInputs: any): number {
-    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs);
+  predictLogit(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {
+    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs, exerciseName);
     
     let logit = math.evaluate(`X * theta`, { X, theta: this.theta })[0];
     return logit;
   }
 
-  predictProba(contextInputs: any, exerciseInputs: any): number {    
-    let logit = this.predictLogit(contextInputs, exerciseInputs);
+  predictProba(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {    
+    let logit = this.predictLogit(contextInputs, exerciseInputs, exerciseName);
     let proba = this.sigmoid(logit);
     return proba;
   }
@@ -254,7 +262,8 @@ export class LogisticOracle {
 
     let X = this.getOrderedInputsArray(
       trainingData.input.contextFeatures,
-      trainingData.input.exerciseFeatures
+      trainingData.input.exerciseFeatures,
+      trainingData.input.exerciseName,
     );
     let y = [trainingData.label];
 

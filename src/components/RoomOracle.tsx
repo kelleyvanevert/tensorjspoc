@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text} from 'react-native';
+import { StyleSheet, View, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Slider from '@react-native-community/slider';
-import { ITrainingData, IExcercise, Exercises, exerciseNames, Moods, IContext, generateContext} from '../interfaces';
+import { BaseColors } from "./colors";
+
+import { 
+    ITrainingData, 
+    IExcercise, 
+    Exercises,
+    exerciseNames, 
+    Moods, 
+    IContext, 
+    generateContext
+} from '../interfaces';
 import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
@@ -18,9 +28,11 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 // - add a tab or popup with oracle details:
 //      - features used
 //      - current weights
+// - add exerciseCounts to exercises
 // - add all the exercises and all the features
-// - allow user to select features to be used by the model
-// - add onehotencoded features for the exercise
+// - allow user to select features to be used by the model - DONE
+// - add onehotencoded features for the exercise - DONE
+
 
 export function RoomOracle() {
     const [exercises] = useState<IExcercise[]>(Exercises)
@@ -42,8 +54,18 @@ export function RoomOracle() {
             'self_compassion'
         ]);
     const [oracle, setOracle] = useState<LogisticOracle>(new LogisticOracle(
-            contextFeatures, 
-            exerciseFeatures, 
+            ['happy', 'sad', ], 
+            [ 
+                'three_five_mins',
+                'five_seven_mins',
+                'seven_ten_mins',
+                'deffuse',
+                'zoom_out',
+                'feeling_stressed',
+                'feeling_angry',
+                'mood_boost',
+                'self_compassion'
+            ], 
             exerciseNames, //exerciseNames
             0.05, //learningRate
             1, //iterations
@@ -54,7 +76,7 @@ export function RoomOracle() {
     // const [mood, setMood] = useState<Mood>(Moods[0]);
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
-
+    
     useEffect(() => {        
         recalculateRecommendations(context);
         setTrainingData([])
@@ -85,50 +107,45 @@ export function RoomOracle() {
         recalculateRecommendations(context);
     }
 
-    const onContextFeaturesChange = (value: string[]) => {  
+    const onSelectedContextItemsChange = (value: string[]) => {
         console.log(value)
         setContextFeatures(value);
-        // oracle.updateFeatures(value, oracle.exerciseFeatures);   
-        // recalculateRecommendations(context);
+        oracle.updateFeatures(value, oracle.exerciseFeatures);
+        recalculateRecommendations(context);
     }
 
-    const items = [
-        // this is the parent or 'item'
+    const onSelectedExerciseItemsChange = (value: string[]) => {
+        console.log(value)
+        setExerciseFeatures(value);
+        oracle.updateFeatures(oracle.contextFeatures, value);
+        recalculateRecommendations(context);
+    }
+    
+    const contextItems = [
         {
           name: 'Context Features',
-          id: 0,
+          id: 'contextFeatures',
           // these are the children or 'sub items'
-          children: [
-            {
-              name: 'Happy',
-              id: 10,
-            },
-            {
-              name: 'Sad',
-              id: 11,
-            },
-          ],
-        }, 
+          children: Object.keys(context).map((key) => {
+            return { name: key, id: key }
+        }),
+        }
+    ];
+
+    const exerciseItems = [
         {
             name: 'Exercise Features',
-            id: 1,
+            id: 'exerciseFeatures',
             // these are the children or 'sub items'
-            children: [
-              {
-                name: 'mood_boost',
-                id: 21,
-              },
-              {
-                name: 'self_compassion',
-                id: 22,
-              },
-            ],
-          },        
+            children: Object.keys(Exercises[0].Features).map((key) => {
+                return { name: key, id: key }
+            }),
+        }       
       ];
 
     return (
         <View>
-
+            <Text style={style.title}>Do EMA</Text>
             <ContextComponent callback={recalculateRecommendations} />
             {
                 (() => {
@@ -143,6 +160,10 @@ export function RoomOracle() {
                 })()
             }
 
+            <Text style={style.title}>Exercise Scores</Text>
+            <ExerciseScores recommendations={modelRecommendations || []} />
+
+            <Text style={style.title}>Configure Algorithm</Text>
             {/* Slider for learningRate */}
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{marginRight: 10}}>Learning Rate:</Text>
@@ -171,22 +192,51 @@ export function RoomOracle() {
             <Text style={{marginLeft: 10}}>{softmaxBeta.toFixed(1)}</Text>
             </View>
 
-            <Text>Context Features:</Text>
-            {/* <SectionedMultiSelect
-            items={items}
-            IconRenderer={Icon}
-            uniqueKey="id"
-            subKey="children"
-            selectText="Select features..."
-            showDropDowns={true}
-            readOnlyHeadings={true}
-            onSelectedItemsChange={onContextFeaturesChange}
-            selectedItems={[]}
-            /> */}
 
 
-            <ExerciseScores recommendations={modelRecommendations || []} />
+            <SectionedMultiSelect
+                items={contextItems}
+                IconRenderer={Icon}
+                uniqueKey="name"
+                subKey="children"
+                selectText="Select context features..."
+                single={false}
+                showDropDowns={false}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={onSelectedContextItemsChange}
+                selectedItems={contextFeatures}
+            />
+            <SectionedMultiSelect
+                items={exerciseItems}
+                IconRenderer={Icon}
+                uniqueKey="name"
+                subKey="children"
+                selectText="Select exercise features..."
+                single={false}
+                showDropDowns={false}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={onSelectedExerciseItemsChange}
+                selectedItems={exerciseFeatures}
+            />
+
+            <Text style={style.title}>Algorithm JSON payload</Text>
+            <Text>{oracle.toJSON()}</Text>
+
         </View >
     );
 };
+
+const style = StyleSheet.create({
+    title: {
+        fontSize: 20,
+        lineHeight: 26,
+        fontFamily: 'Rubik-Bold',
+        color: BaseColors.deepblue,
+        marginBottom: 18,
+        marginTop:10,
+    },
+    button: {
+        marginBottom: 10
+    }
+})
     

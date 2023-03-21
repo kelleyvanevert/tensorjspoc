@@ -41,8 +41,9 @@ const style = StyleSheet.create({
         fontSize: 20,
         lineHeight: 26,
         fontFamily: 'Rubik-Bold',
-        color: BaseColors.deepblue,
+        color: BaseColors.green,
         marginBottom: 18,
+        textAlign: 'center',
     },
     button: {
         marginBottom: 10

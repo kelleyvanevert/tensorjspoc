@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { Text } from "react-native-svg";
+import { StyleSheet, View, Text } from "react-native";
+// import { Text } from "react-native-svg";
+import { BaseColors } from "./colors";
 import { IExcercise, ITrainingData } from "../interfaces";
 import { generateOracleTrainingData, sampleRecommendedExercises } from "../services/Bandit";
 import { AppButton } from "./AppButton";
@@ -52,6 +53,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
 
     return (
         <View>
+            <Text style={style.title}>Recommendations:</Text>
             {
                 recommendation.recommendations.map((recommendation) => {
                     return renderButton(recommendation)
@@ -68,7 +70,14 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
 
 
 const style = StyleSheet.create({
+    title: {
+        fontSize: 20,
+        lineHeight: 26,
+        fontFamily: 'Rubik-Bold',
+        color: BaseColors.deepblue,
+        marginBottom: 18,
+    },
     button: {
-        marginBottom: 10
+        marginBottom: 10,
     }
 })
