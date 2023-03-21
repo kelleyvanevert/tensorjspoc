@@ -33,7 +33,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                 recommendation?.recommendations, 
                 selected,
                 context,
-            )
+            );
             callback(trainingData);
         }
     }

@@ -16,10 +16,6 @@ export const Exercises: IExcercise[] = [
             mood_boost: YesNo.No,
             self_compassion: YesNo.No
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     },
     {
         InternalName: 'shape_your_thoughts',
@@ -35,10 +31,6 @@ export const Exercises: IExcercise[] = [
             mood_boost: YesNo.No,
             self_compassion: YesNo.No
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     },
     {
         InternalName: 'self_compassion_break',
@@ -54,10 +46,6 @@ export const Exercises: IExcercise[] = [
             'mood_boost': YesNo.No,
             'self_compassion': YesNo.Yes
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     },
     {
         InternalName: 'body_scan',
@@ -73,10 +61,6 @@ export const Exercises: IExcercise[] = [
             'mood_boost': YesNo.No,
             'self_compassion': YesNo.No
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     },
     {
         InternalName: 'article_mindfulness',
@@ -92,10 +76,6 @@ export const Exercises: IExcercise[] = [
             'mood_boost': YesNo.No,
             'self_compassion': YesNo.No
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     },
     {
         InternalName: 'progressive_muscle_relaxation',
@@ -111,10 +91,6 @@ export const Exercises: IExcercise[] = [
             'mood_boost': YesNo.No,
             'self_compassion': YesNo.No
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     },
     {
         InternalName: 'article_breathing_relaxation',
@@ -130,10 +106,6 @@ export const Exercises: IExcercise[] = [
             'mood_boost': YesNo.Yes,
             'self_compassion': YesNo.No
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     },
     {
         InternalName: 'compassionate_friend',
@@ -149,10 +121,6 @@ export const Exercises: IExcercise[] = [
             'mood_boost': YesNo.No,
             'self_compassion': YesNo.Yes
         },
-        Score: undefined,
-        Probability: undefined,
-        PenalizedScore: undefined,
-        PenalizedProbability: undefined,
     }
 ]
 

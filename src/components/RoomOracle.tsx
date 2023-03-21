@@ -35,7 +35,7 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 
 export function RoomOracle() {
-    const [exercises] = useState<IExcercise[]>(Exercises)
+    const [exercises, setExercises] = useState<IExcercise[]>(Exercises)
     const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
     const [learningRate, setLearningRate] = useState<number>(0.05);
     const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
@@ -54,18 +54,8 @@ export function RoomOracle() {
             'self_compassion'
         ]);
     const [oracle, setOracle] = useState<LogisticOracle>(new LogisticOracle(
-            ['happy', 'sad', ], 
-            [ 
-                'three_five_mins',
-                'five_seven_mins',
-                'seven_ten_mins',
-                'deffuse',
-                'zoom_out',
-                'feeling_stressed',
-                'feeling_angry',
-                'mood_boost',
-                'self_compassion'
-            ], 
+            contextFeatures, //contextFeatures
+            exerciseFeatures, //exerciseFeatures
             exerciseNames, //exerciseNames
             0.05, //learningRate
             1, //iterations
@@ -73,7 +63,6 @@ export function RoomOracle() {
             true, //useInversePropensityWeighting
         )
     );
-    // const [mood, setMood] = useState<Mood>(Moods[0]);
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
     
@@ -91,10 +80,29 @@ export function RoomOracle() {
         setModelRecommendations(sortedExercises);
     }
 
+    const updateExerciseCount = (newTrainingData: ITrainingData[]) => {
+        newTrainingData.forEach((trainingData) => {
+            if (trainingData.label == 1) {
+                console.log("Exercise Name", trainingData.input.exerciseName)
+                const exercise = exercises.find((exercise) => exercise.InternalName === trainingData.input.exerciseName);
+                if (exercise) {
+                    if (exercise.SelectedCount === undefined) {
+                        exercise.SelectedCount = 1;
+                    } else {
+                        exercise.SelectedCount += 1;
+                    }
+                    console.log("Exercise Count", exercise, exercise.SelectedCount)
+                }
+            }
+        });
+    }
+    
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
         oracle.fitMultiple(newTrainingData, learningRate, undefined, undefined);
+        
         recalculateRecommendations(context);
+        updateExerciseCount(newTrainingData);        
     }
 
     const onLearningRateChange = (value: number) => {
@@ -125,7 +133,6 @@ export function RoomOracle() {
         {
           name: 'Context Features',
           id: 'contextFeatures',
-          // these are the children or 'sub items'
           children: Object.keys(context).map((key) => {
             return { name: key, id: key }
         }),

@@ -7,6 +7,7 @@ export function LogisticOracleFromJSON(json: string): LogisticOracle {
   return new LogisticOracle(
     data.contextFeatures,
     data.exerciseFeatures,
+    data.exerciseNames,
     data.learningRate,
     data.iterations,
     data.addIntercept,
@@ -122,6 +123,7 @@ export class LogisticOracle {
     return JSON.stringify({
       contextFeatures: this.contextFeatures,
       exerciseFeatures: this.exerciseFeatures,
+      exerciseNames: this.exerciseNames,
       theta: this.theta,
       learningRate: this.learningRate,
       iterations: this.iterations,
