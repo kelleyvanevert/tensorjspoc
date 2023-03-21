@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
-// import { Text } from "react-native-svg";
+import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
 import { BaseColors } from "./colors";
+import StarRating from "react-native-star-rating";
 import { IExcercise, ITrainingData } from "../interfaces";
 import { generateOracleTrainingData, sampleRecommendedExercises } from "../services/Bandit";
 import { AppButton } from "./AppButton";
@@ -21,20 +21,29 @@ type RecommendationState = {
 
 export function RecommendedExercises({context, exercises, softmaxBeta, callback }: Props) {
     const [recommendation, setRecommendation] = useState<RecommendationState>({ recommendations: [], context:context});
+    const [selectedExercise, setSelectedExercise] = useState<IExcercise>();
+    const [ratingModalVisible, setRatingModalVisible] = useState(false);
+    const [starRating, setStarRating] = useState(0);
+    
 
     useEffect(() => {
         const recommendedExercises = sampleRecommendedExercises(exercises, softmaxBeta)
         setRecommendation({ recommendations: recommendedExercises, context: context });
     }, [exercises])
 
-    const submitRecommendation = (selected?: IExcercise) => {
+    const submitRecommendation = (noRating:boolean=false) => {
         if (recommendation?.recommendations != undefined) {
+            console.log("starRating: " + starRating);
             const trainingData = generateOracleTrainingData(
                 recommendation?.recommendations, 
-                selected,
+                selectedExercise,
                 context,
+                noRating ? -1 : starRating,
             );
             callback(trainingData);
+            setSelectedExercise(undefined);
+            setStarRating(0);
+            setRatingModalVisible(false);
         }
     }
 
@@ -45,11 +54,27 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                 style={style.button}
                 // title is the name of the exercise with probability in brackets:
                 title={exercise.DisplayName + " (p=" + Number(exercise.Probability).toFixed(3) + ")"}
-                onPress={() => { submitRecommendation(exercise) }}></AppButton>
+                onPress={() => {
+                    setSelectedExercise(exercise);
+                    setRatingModalVisible(true);
+                }}></AppButton>
         else {
             return <Text>Undefined</Text>;
         }
     }
+
+    // const renderButton = (exercise: IExcercise) => {
+    //     if (exercise != undefined)
+    //         return <AppButton
+    //             key={exercise.InternalName}
+    //             style={style.button}
+    //             // title is the name of the exercise with probability in brackets:
+    //             title={exercise.DisplayName + " (p=" + Number(exercise.Probability).toFixed(3) + ")"}
+    //             onPress={() => { submitRecommendation(exercise) }}></AppButton>
+    //     else {
+    //         return <Text>Undefined</Text>;
+    //     }
+    // }
 
     return (
         <View>
@@ -63,7 +88,44 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                 key={'none_of_the_above'}
                 style={style.button}
                 title='None of the above'
-                onPress={() => submitRecommendation(undefined)}></AppButton>
+                onPress={() => {
+                    setSelectedExercise(undefined);
+                    setStarRating(0);
+                    submitRecommendation();
+                }}></AppButton>
+
+            <Modal
+                visible={ratingModalVisible}
+                animationType="slide"
+                transparent={true}>
+                <View style={style.modalContainer}>
+                    <View style={style.modalContent}>
+                        <Text style={style.modalTitle}>Rate {selectedExercise?.DisplayName}</Text>
+                        <StarRating
+                            starSize={40}
+                            disabled={false}
+                            maxStars={5}
+                            rating={starRating}
+                            selectedStar={(rating) => { setStarRating(rating) }}
+                            fullStarColor={BaseColors.orange}
+                        />
+                        <TouchableOpacity
+                            style={style.modalButton}
+                            onPress={() => { submitRecommendation() }}>
+                            <Text style={style.modalButtonText}>Submit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={style.modalButton}
+                            onPress={() => { 
+                                setStarRating(-1);
+                                submitRecommendation(true) 
+                                }
+                            }>
+                            <Text style={style.modalButtonText}>No rating</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 }
@@ -71,13 +133,44 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
 
 const style = StyleSheet.create({
     title: {
-        fontSize: 20,
-        lineHeight: 26,
-        fontFamily: 'Rubik-Bold',
-        color: BaseColors.deepblue,
-        marginBottom: 18,
+      fontSize: 20,
+      lineHeight: 26,
+      fontFamily: "Rubik-Bold",
+      color: BaseColors.deepblue,
+      marginBottom: 18,
     },
     button: {
-        marginBottom: 10,
-    }
-})
+      marginBottom: 10,
+    },
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      backgroundColor: "white",
+      padding: 20,
+      borderRadius: 10,
+      alignItems: "center",
+      elevation: 5,
+    },
+    modalTitle: {
+      fontFamily: "Rubik-Bold",
+      fontSize: 20,
+      marginBottom: 20,
+    },
+    modalButton: {
+      marginTop: 20,
+      backgroundColor: BaseColors.orange,
+      padding: 10,
+      borderRadius: 5,
+      minWidth: 100,
+      alignItems: "center",
+    },
+    modalButtonText: {
+      fontFamily: "Rubik-Bold",
+      fontSize: 16,
+      color: "white",
+    },
+  });

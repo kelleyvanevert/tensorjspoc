@@ -6,6 +6,7 @@ export interface ITrainingData {
         exerciseName: string;
         contextFeatures: IContext;
         exerciseFeatures: IExcerciseFeatures;
+        starRating: number;
     }
     label: number;
     probability : number | undefined;

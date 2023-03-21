@@ -14,4 +14,5 @@ export const BaseColors = {
   deepblue: '#300096',
 
   lightRed: '#FFC6C6',
+  orange: '#FFA500',
 };

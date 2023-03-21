@@ -57,14 +57,17 @@ export function generateOracleTrainingData(
     recommendedExercises: IExcercise[],
     selected: IExcercise | undefined,
     context: IContext,
+    starRating: number,
     ) : ITrainingData[] {
     let trainingData: ITrainingData[] = []
+    // console.log("generateOracleTrainingData", recommendedExercises, selected, context, starRating)
     for (let index = 0; index < recommendedExercises.length; index++) {
         trainingData.push({
             input: {
                 exerciseName: recommendedExercises[index].InternalName,
                 contextFeatures: context,
                 exerciseFeatures: recommendedExercises[index].Features,
+                starRating: recommendedExercises[index].InternalName == selected?.InternalName ? starRating : -1,
             },
             label: recommendedExercises[index].InternalName == selected?.InternalName ? 1 : 0,
             probability: recommendedExercises[index].Probability,

@@ -16,6 +16,8 @@
 		4522279A66B54E33BDA8B73F /* Rubik-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2BA116B71E4044ABAD539865 /* Rubik-Bold.ttf */; };
 		7699B88040F8A987B510C191 /* libPods-TensorJsPoc-TensorJsPocTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-TensorJsPoc-TensorJsPocTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		94338CF229CA4DE200867C1A /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 94338CF129CA4DE200867C1A /* Fonts */; };
+		94338CF329CA4DE200867C1A /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 94338CF129CA4DE200867C1A /* Fonts */; };
 		CBAFFFF2F8DF42F7BA6841A0 /* Rubik-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0F55E9B7CB1342E99D261EEC /* Rubik-Black.ttf */; };
 		EF3E3292AEF44F6F913D4722 /* Rubik-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81FF592621D4445C819C95CA /* Rubik-Regular.ttf */; };
 /* End PBXBuildFile section */
@@ -50,6 +52,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = TensorJsPoc/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		81FF592621D4445C819C95CA /* Rubik-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Rubik-Regular.ttf"; path = "../assets/fonts/Rubik-Regular.ttf"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-TensorJsPoc-TensorJsPocTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TensorJsPoc-TensorJsPocTests.release.xcconfig"; path = "Target Support Files/Pods-TensorJsPoc-TensorJsPocTests/Pods-TensorJsPoc-TensorJsPocTests.release.xcconfig"; sourceTree = "<group>"; };
+		94338CF129CA4DE200867C1A /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fonts; path = "../node_modules/react-native-vector-icons/Fonts"; sourceTree = "<group>"; };
 		9A1B35D657D442758BE0A637 /* Rubik-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Rubik-Italic.ttf"; path = "../assets/fonts/Rubik-Italic.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
@@ -124,6 +127,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				94338CF129CA4DE200867C1A /* Fonts */,
 				13B07FAE1A68108700A75B9A /* TensorJsPoc */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* TensorJsPocTests */,
@@ -257,6 +261,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				94338CF329CA4DE200867C1A /* Fonts in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +274,7 @@
 				CBAFFFF2F8DF42F7BA6841A0 /* Rubik-Black.ttf in Resources */,
 				4522279A66B54E33BDA8B73F /* Rubik-Bold.ttf in Resources */,
 				1C3265C13ACA49ADBE3EC07B /* Rubik-Italic.ttf in Resources */,
+				94338CF229CA4DE200867C1A /* Fonts in Resources */,
 				EF3E3292AEF44F6F913D4722 /* Rubik-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

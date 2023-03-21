@@ -22,13 +22,13 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 
 // TODO:
-// - After selecting an exercise, show popup with start rating feedback
+// - After selecting an exercise, show popup with start rating feedback - DONE
 // - Have a seperate rating oracle that is trained on the start rating feedback
 // - add a tab or popup with all exercises details
 // - add a tab or popup with oracle details:
-//      - features used
-//      - current weights
-// - add exerciseCounts to exercises
+//      - features used - DONE
+//      - current weights - DONE
+// - add exerciseCounts to exercises - DONE
 // - add all the exercises and all the features
 // - allow user to select features to be used by the model - DONE
 // - add onehotencoded features for the exercise - DONE
@@ -81,6 +81,7 @@ export function RoomOracle() {
     }
 
     const updateExerciseCount = (newTrainingData: ITrainingData[]) => {
+        console.log(newTrainingData)
         newTrainingData.forEach((trainingData) => {
             if (trainingData.label == 1) {
                 console.log("Exercise Name", trainingData.input.exerciseName)
