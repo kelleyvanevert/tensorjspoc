@@ -22,27 +22,24 @@ type RecommendationState = {
 export function RecommendedExercises({context, exercises, softmaxBeta, callback }: Props) {
     const [recommendation, setRecommendation] = useState<RecommendationState>({ recommendations: [], context:context});
     const [selectedExercise, setSelectedExercise] = useState<IExcercise>();
-    const [ratingModalVisible, setRatingModalVisible] = useState(false);
-    const [starRating, setStarRating] = useState(0);
-    
+    const [ratingModalVisible, setRatingModalVisible] = useState(false);    
 
     useEffect(() => {
         const recommendedExercises = sampleRecommendedExercises(exercises, softmaxBeta)
         setRecommendation({ recommendations: recommendedExercises, context: context });
     }, [exercises])
 
-    const submitRecommendation = (noRating:boolean=false) => {
+    const submitRecommendation = (starRating:number) => {
         if (recommendation?.recommendations != undefined) {
             console.log("starRating: " + starRating);
             const trainingData = generateOracleTrainingData(
                 recommendation?.recommendations, 
                 selectedExercise,
                 context,
-                noRating ? -1 : starRating,
+                starRating,
             );
             callback(trainingData);
             setSelectedExercise(undefined);
-            setStarRating(0);
             setRatingModalVisible(false);
         }
     }
@@ -63,19 +60,6 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
         }
     }
 
-    // const renderButton = (exercise: IExcercise) => {
-    //     if (exercise != undefined)
-    //         return <AppButton
-    //             key={exercise.InternalName}
-    //             style={style.button}
-    //             // title is the name of the exercise with probability in brackets:
-    //             title={exercise.DisplayName + " (p=" + Number(exercise.Probability).toFixed(3) + ")"}
-    //             onPress={() => { submitRecommendation(exercise) }}></AppButton>
-    //     else {
-    //         return <Text>Undefined</Text>;
-    //     }
-    // }
-
     return (
         <View>
             <Text style={style.title}>Recommendations:</Text>
@@ -90,8 +74,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                 title='None of the above'
                 onPress={() => {
                     setSelectedExercise(undefined);
-                    setStarRating(0);
-                    submitRecommendation();
+                    submitRecommendation(-1);
                 }}></AppButton>
 
             <Modal
@@ -105,21 +88,18 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                             starSize={40}
                             disabled={false}
                             maxStars={5}
-                            rating={starRating}
-                            selectedStar={(rating) => { setStarRating(rating) }}
+                            rating={0}
+                            selectedStar={(rating:number) => { 
+                                submitRecommendation(rating)
+                            }}
                             fullStarColor={BaseColors.orange}
                         />
-                        <TouchableOpacity
-                            style={style.modalButton}
-                            onPress={() => { submitRecommendation() }}>
-                            <Text style={style.modalButtonText}>Submit</Text>
-                        </TouchableOpacity>
+
                         <TouchableOpacity
                             style={style.modalButton}
                             onPress={() => { 
-                                setStarRating(-1);
-                                submitRecommendation(true) 
-                                }
+                                submitRecommendation(-1) 
+                            }
                             }>
                             <Text style={style.modalButtonText}>No rating</Text>
                         </TouchableOpacity>
