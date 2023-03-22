@@ -18,8 +18,12 @@ export function ExerciseScores({ recommendations }: Props) {
                 <View style={styles.item}>
                     <Text style={styles.title}>{item.DisplayName}</Text>
                     <View style={styles.scoreContainer}>
-                        <Text style={styles.label}>Score:</Text>
-                        <Text style={styles.score}>{Math.round((item.Score || 0) * 100)}</Text>
+                        <Text style={styles.label}>Click:</Text>
+                        <Text style={styles.score}>{Math.round((item.ClickScore || 0) * 100)}</Text>
+                    </View>
+                    <View style={styles.scoreContainer}>
+                        <Text style={styles.label}>Rating:</Text>
+                        <Text style={styles.score}>{Math.round((item.RatingScore || 0) * 50) / 10}</Text>
                     </View>
                     <View style={styles.probaContainer}>
                         <Text style={styles.label}>Proba:</Text>

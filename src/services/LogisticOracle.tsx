@@ -24,12 +24,14 @@ export class LogisticOracle {
   iterations: number;
   addIntercept: boolean;
   useInversePropensityWeighting: boolean;
+  useInversePropensityWeightingPositiveOnly: boolean;
   theta: number[];
 
   allInputFeatures: string[];
   interactionFeatures: string[];
   features: string[];
   nFeatures: number;
+  targetLabel: string = 'clicked';
 
   constructor(
     contextFeatures: string[] = [],
@@ -38,12 +40,15 @@ export class LogisticOracle {
     learningRate = 0.1,
     iterations = 1,
     addIntercept = true,
-    useInversePropensityWeighting = true,
+    useInversePropensityWeighting = false,
+    useInversePropensityWeightingPositiveOnly = false,
+    targetLabel: string = 'clicked',
     theta?: number[]
   ) {
     this.contextFeatures = contextFeatures;
     this.exerciseFeatures = exerciseFeatures;
     this.exerciseNames = exerciseNames;
+    this.targetLabel = targetLabel
     this.addIntercept = addIntercept;
 
     this.allInputFeatures = [...this.contextFeatures, ...this.exerciseFeatures];
@@ -63,6 +68,7 @@ export class LogisticOracle {
     this.learningRate = learningRate;
     this.iterations = iterations;
     this.useInversePropensityWeighting = useInversePropensityWeighting;
+    this.useInversePropensityWeightingPositiveOnly = useInversePropensityWeightingPositiveOnly
   }
 
   generateFeatures(): string[] {
@@ -267,21 +273,24 @@ export class LogisticOracle {
       trainingData.input.exerciseFeatures,
       trainingData.input.exerciseName,
     );
-    let y = [trainingData.label];
+    let y = [(trainingData as any)[this.targetLabel]];
+    if (y[0] != undefined) {
+      let weight = 1;
+      if (useInversePropensityWeighting) {
+        weight = 1 / (trainingData.probability || 1);
+      } else if ((this.useInversePropensityWeightingPositiveOnly) && (trainingData.clicked == 1)) {
+        weight = 1 / (trainingData.probability || 1);
+      }
 
-    let weight = 1;
-    if ((useInversePropensityWeighting) && (trainingData.label == 1)) {
-      weight = 1 / Math.sqrt(trainingData.probability || 1);
-    }
-
-    for (let i = 0; i < iterations; i++) {
-      let pred = this.sigmoid(
-        math.evaluate(`X * theta`, { X, theta: this.theta })
-      );
-      this.theta = math.evaluate(
-        `theta - weight * learningRate / 1 * ((pred - y)' * X)'`,
-        { theta: this.theta, weight, learningRate, pred, y, X }
-      );
+      for (let i = 0; i < iterations; i++) {
+        let pred = this.sigmoid(
+          math.evaluate(`X * theta`, { X, theta: this.theta })
+        );
+        this.theta = math.evaluate(
+          `theta - weight * learningRate / 1 * ((pred - y)' * X)'`,
+          { theta: this.theta, weight, learningRate, pred, y, X }
+        );
+      }
     }
   }
 

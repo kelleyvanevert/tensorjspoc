@@ -29,7 +29,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
         setRecommendation({ recommendations: recommendedExercises, context: context });
     }, [exercises])
 
-    const submitRecommendation = (starRating:number) => {
+    const submitRecommendation = (starRating:number | undefined) => {
         if (recommendation?.recommendations != undefined) {
             console.log("starRating: " + starRating);
             const trainingData = generateOracleTrainingData(
@@ -98,7 +98,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                         <TouchableOpacity
                             style={style.modalButton}
                             onPress={() => { 
-                                submitRecommendation(-1) 
+                                submitRecommendation(undefined) 
                             }
                             }>
                             <Text style={style.modalButtonText}>No rating</Text>

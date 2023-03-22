@@ -6,8 +6,8 @@ export interface ITrainingData {
         exerciseName: string;
         contextFeatures: IContext;
         exerciseFeatures: IExcerciseFeatures;
-        starRating: number;
     }
-    label: number;
+    clicked: number;
+    stars: number | undefined;
     probability : number | undefined;
 }

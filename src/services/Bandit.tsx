@@ -3,7 +3,8 @@ import { LogisticOracle } from './LogisticOracle';
 import { getSoftmaxSample, getCosineDistance } from './Sampling'
 
 export function calculateScoresAndSortExercises(
-    oracle: LogisticOracle,
+    clickOracle: LogisticOracle,
+    ratingOracle: LogisticOracle,
     context: IContext, 
     exercises: IExcercise[], 
     softmaxBeta: number
@@ -12,10 +13,11 @@ export function calculateScoresAndSortExercises(
     let SoftmaxNumerators = []
     for (let index = 0; index < exercises.length; index++) {
         const exercise = exercises[index];
-        exercise.Score = oracle.predictProba(context, exercise.Features, exercise.InternalName);
+        exercise.ClickScore = clickOracle.predictProba(context, exercise.Features, exercise.InternalName);
+        exercise.RatingScore = ratingOracle.predictProba(context, exercise.Features, exercise.InternalName);
         // copy the score to PenalizedScore because the sampler may have side effects on the score
-        exercise.PenalizedScore = exercise.Score;
-        SoftmaxNumerators.push(Math.exp(softmaxBeta * exercise.Score || 0));
+        exercise.PenalizedScore = exercise.ClickScore;
+        SoftmaxNumerators.push(Math.exp(softmaxBeta * exercise.ClickScore || 0));
         sortedExercises.push(exercise)
     }
     let SoftmaxDenominator = SoftmaxNumerators.reduce((a, b) => a + b, 0);
@@ -24,9 +26,9 @@ export function calculateScoresAndSortExercises(
         exercise.Probability = SoftmaxNumerators[index] / SoftmaxDenominator;
     }
 
-    sortedExercises = sortedExercises.sort((a, b) => (b.Score || 0) - (a.Score || 0));
+    sortedExercises = sortedExercises.sort((a, b) => (b.ClickScore || 0) - (a.ClickScore || 0));
     
-    console.log("theta -> ", oracle.getThetaMap())
+    console.log("theta -> ", clickOracle.getThetaMap())
     return sortedExercises;
 }
 
@@ -57,7 +59,7 @@ export function generateOracleTrainingData(
     recommendedExercises: IExcercise[],
     selected: IExcercise | undefined,
     context: IContext,
-    starRating: number,
+    starRating: number | undefined,
     ) : ITrainingData[] {
     let trainingData: ITrainingData[] = []
     // console.log("generateOracleTrainingData", recommendedExercises, selected, context, starRating)
@@ -67,9 +69,12 @@ export function generateOracleTrainingData(
                 exerciseName: recommendedExercises[index].InternalName,
                 contextFeatures: context,
                 exerciseFeatures: recommendedExercises[index].Features,
-                starRating: recommendedExercises[index].InternalName == selected?.InternalName ? starRating : -1,
             },
-            label: recommendedExercises[index].InternalName == selected?.InternalName ? 1 : 0,
+            clicked: recommendedExercises[index].InternalName == selected?.InternalName ? 1 : 0,
+            stars: (
+                recommendedExercises[index].InternalName == selected?.InternalName ? 
+                ((starRating == undefined) ? starRating : starRating / 5) : undefined
+            ),
             probability: recommendedExercises[index].Probability,
         })
     }

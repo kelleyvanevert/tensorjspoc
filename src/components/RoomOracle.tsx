@@ -53,16 +53,30 @@ export function RoomOracle() {
             'mood_boost',
             'self_compassion'
         ]);
-    const [oracle, setOracle] = useState<LogisticOracle>(new LogisticOracle(
+    const [clickOracle, setClickOracle] = useState<LogisticOracle>(new LogisticOracle(
             contextFeatures, //contextFeatures
             exerciseFeatures, //exerciseFeatures
             exerciseNames, //exerciseNames
             0.05, //learningRate
             1, //iterations
             true, //addIntercept
-            true, //useInversePropensityWeighting
+            false, //useInversePropensityWeighting
+            true, //useInversePropensityWeightingPositiveOnly
+            'clicked' // targetLabel
         )
     );
+    const [ratingOracle, setRatingOracle] = useState<LogisticOracle>(new LogisticOracle(
+        contextFeatures, //contextFeatures
+        exerciseFeatures, //exerciseFeatures
+        exerciseNames, //exerciseNames
+        0.05, //learningRate
+        1, //iterations
+        true, //addIntercept
+        true, //useInversePropensityWeighting
+        false, //useInversePropensityWeightingPositiveOnly
+        'stars', // targetLabel
+    )
+);
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
     
@@ -75,7 +89,7 @@ export function RoomOracle() {
         setContext(newContext);
         const updatedContext = { ...context, ...newContext };
         const sortedExercises = calculateScoresAndSortExercises(
-            oracle, updatedContext, exercises, softmaxBeta
+            clickOracle, ratingOracle, updatedContext, exercises, softmaxBeta
         )
         setModelRecommendations(sortedExercises);
     }
@@ -83,7 +97,7 @@ export function RoomOracle() {
     const updateExerciseCount = (newTrainingData: ITrainingData[]) => {
         console.log(newTrainingData)
         newTrainingData.forEach((trainingData) => {
-            if (trainingData.label == 1) {
+            if (trainingData.clicked == 1) {
                 console.log("Exercise Name", trainingData.input.exerciseName)
                 const exercise = exercises.find((exercise) => exercise.InternalName === trainingData.input.exerciseName);
                 if (exercise) {
@@ -92,7 +106,6 @@ export function RoomOracle() {
                     } else {
                         exercise.SelectedCount += 1;
                     }
-                    console.log("Exercise Count", exercise, exercise.SelectedCount)
                 }
             }
         });
@@ -100,15 +113,16 @@ export function RoomOracle() {
     
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
-        oracle.fitMultiple(newTrainingData, learningRate, undefined, undefined);
-        
+        clickOracle.fitMultiple(newTrainingData, learningRate, undefined, undefined);
+        ratingOracle.fitMultiple(newTrainingData, learningRate, undefined, undefined);
+        console.log("ratingOracle theta", ratingOracle.getThetaMap())
         recalculateRecommendations(context);
         updateExerciseCount(newTrainingData);        
     }
 
     const onLearningRateChange = (value: number) => {
         setLearningRate(value);
-        oracle.setlearningRate(value);
+        clickOracle.setlearningRate(value);
     }
 
     const onSoftmaxBetaChange = (value: number) => {
@@ -119,14 +133,14 @@ export function RoomOracle() {
     const onSelectedContextItemsChange = (value: string[]) => {
         console.log(value)
         setContextFeatures(value);
-        oracle.updateFeatures(value, oracle.exerciseFeatures);
+        clickOracle.updateFeatures(value, clickOracle.exerciseFeatures);
         recalculateRecommendations(context);
     }
 
     const onSelectedExerciseItemsChange = (value: string[]) => {
         console.log(value)
         setExerciseFeatures(value);
-        oracle.updateFeatures(oracle.contextFeatures, value);
+        clickOracle.updateFeatures(clickOracle.contextFeatures, value);
         recalculateRecommendations(context);
     }
     
@@ -188,7 +202,7 @@ export function RoomOracle() {
 
             {/* Slider for softmaxBeta */}
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{marginRight: 10}}>Softmax Beta:</Text>
+            <Text style={{marginRight: 10}}>Exploration:</Text>
             <Slider
                 style={{width: 200}}
                 minimumValue={0.5}
@@ -228,7 +242,7 @@ export function RoomOracle() {
             />
 
             <Text style={style.title}>Algorithm JSON payload</Text>
-            <Text>{oracle.toJSON()}</Text>
+            <Text>{clickOracle.toJSON()}</Text>
 
         </View >
     );

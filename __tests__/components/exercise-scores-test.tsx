@@ -13,7 +13,7 @@ describe("exercise-scores compoment", () => {
     it('should render a recommendation with display name as test and value as 0', () => {
         const recommendation: IExcercise[] = [{
             DisplayName: 'test',
-            Score: 0,
+            ClickScore: 0,
             InternalName: '',
             Features: {
                 mood_boost: 0,

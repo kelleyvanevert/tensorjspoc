@@ -5,7 +5,8 @@ export interface IExcercise {
     InternalName: string;
     Features: IExcerciseFeatures;
     SelectedCount?: number;
-    Score?: number | undefined;
+    ClickScore?: number | undefined;
+    RatingScore?: number | undefined;
     Probability?: number | undefined;
     PenalizedScore?: number | undefined;
     PenalizedProbability?: number | undefined;
