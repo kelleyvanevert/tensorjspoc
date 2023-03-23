@@ -18,7 +18,7 @@ describe("exercise-scores compoment", () => {
             Features: {
                 mood_boost: 0,
                 mood_value: 0,
-                deffuse: 0,
+                diffuse: 0,
                 feeling_angry: 0,
                 feeling_stressed: 0,
                 five_seven_mins: 0,

@@ -15,4 +15,5 @@ export const BaseColors = {
 
   lightRed: '#FFC6C6',
   orange: '#FFA500',
+  darkgrey: '#333333',
 };

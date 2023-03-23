@@ -7,7 +7,8 @@ export interface IExcercise {
     SelectedCount?: number;
     ClickScore?: number | undefined;
     RatingScore?: number | undefined;
+    AggregateScore?: number | undefined;
     Probability?: number | undefined;
-    PenalizedScore?: number | undefined;
-    PenalizedProbability?: number | undefined;
+    // PenalizedScore?: number | undefined;
+    // PenalizedProbability?: number | undefined;
 }

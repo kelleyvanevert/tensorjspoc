@@ -23,7 +23,8 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 // TODO:
 // - After selecting an exercise, show popup with start rating feedback - DONE
-// - Have a seperate rating oracle that is trained on the start rating feedback
+// - Have a seperate rating oracle that is trained on the start rating feedback - DONE
+// - average out the click and rating score for each exercise
 // - add a tab or popup with all exercises details
 // - add a tab or popup with oracle details:
 //      - features used - DONE
@@ -37,46 +38,50 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 export function RoomOracle() {
     const [exercises, setExercises] = useState<IExcercise[]>(Exercises)
     const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
-    const [learningRate, setLearningRate] = useState<number>(0.05);
-    const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
-    const [contextFeatures, setContextFeatures] = useState<string[]>(
+    const [clickLearningRate, setClickLearningRate] = useState<number>(0.01);
+    const [ratingLearningRate, setRatingLearningRate] = useState<number>(2.0);
+    const [ClickContextFeatures, setClickContextFeatures] = useState<string[]>(
         ['happy', 'sad', ]);
-    const [exerciseFeatures, setExerciseFeatures] = useState<string[]>(
+    const [ClickExerciseFeatures, setClickExerciseFeatures] = useState<string[]>(
         [ 
             'three_five_mins',
             'five_seven_mins',
             'seven_ten_mins',
-            'deffuse',
+            'diffuse',
             'zoom_out',
             'feeling_stressed',
             'feeling_angry',
             'mood_boost',
             'self_compassion'
         ]);
+    const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>([]);
+    const [RatingExerciseFeatures, setRatingExerciseFeatures] = useState<string[]>([]);
     const [clickOracle, setClickOracle] = useState<LogisticOracle>(new LogisticOracle(
-            contextFeatures, //contextFeatures
-            exerciseFeatures, //exerciseFeatures
+            ClickContextFeatures, //contextFeatures
+            ClickExerciseFeatures, //exerciseFeatures
             exerciseNames, //exerciseNames
-            0.05, //learningRate
+            clickLearningRate, //learningRate
             1, //iterations
             true, //addIntercept
-            false, //useInversePropensityWeighting
-            true, //useInversePropensityWeightingPositiveOnly
+            true, //useInversePropensityWeighting
+            false, //useInversePropensityWeightingPositiveOnly
             'clicked' // targetLabel
         )
     );
     const [ratingOracle, setRatingOracle] = useState<LogisticOracle>(new LogisticOracle(
-        contextFeatures, //contextFeatures
-        exerciseFeatures, //exerciseFeatures
+        RatingContextFeatures, //contextFeatures
+        RatingExerciseFeatures, //exerciseFeatures
         exerciseNames, //exerciseNames
-        0.05, //learningRate
+        ratingLearningRate, //learningRate
         1, //iterations
         true, //addIntercept
-        true, //useInversePropensityWeighting
+        false, //useInversePropensityWeighting
         false, //useInversePropensityWeightingPositiveOnly
         'stars', // targetLabel
-    )
-);
+        )
+    );
+    const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
+    const [ratingWeight, setRatingWeight] = useState<number>(0.5);
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
     
@@ -89,7 +94,7 @@ export function RoomOracle() {
         setContext(newContext);
         const updatedContext = { ...context, ...newContext };
         const sortedExercises = calculateScoresAndSortExercises(
-            clickOracle, ratingOracle, updatedContext, exercises, softmaxBeta
+            clickOracle, ratingOracle, updatedContext, exercises, softmaxBeta, ratingWeight
         )
         setModelRecommendations(sortedExercises);
     }
@@ -113,16 +118,49 @@ export function RoomOracle() {
     
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
-        clickOracle.fitMultiple(newTrainingData, learningRate, undefined, undefined);
-        ratingOracle.fitMultiple(newTrainingData, learningRate, undefined, undefined);
+        clickOracle.fitMultiple(newTrainingData, clickLearningRate, undefined, undefined);
+        ratingOracle.fitMultiple(newTrainingData, ratingLearningRate, undefined, undefined);
         console.log("ratingOracle theta", ratingOracle.getThetaMap())
         recalculateRecommendations(context);
         updateExerciseCount(newTrainingData);        
     }
 
-    const onLearningRateChange = (value: number) => {
-        setLearningRate(value);
+    const onClickLearningRateChange = (value: number) => {
+        setClickLearningRate(value);
         clickOracle.setlearningRate(value);
+    }
+
+    const onRatingLearningRateChange = (value: number) => {
+        setRatingLearningRate(value);
+        ratingOracle.setlearningRate(value);
+    }
+
+    const onSelectedClickContextItemsChange = (value: string[]) => {
+        console.log(value)
+        setClickContextFeatures(value);
+        clickOracle.updateFeatures(value, clickOracle.exerciseFeatures);
+        recalculateRecommendations(context);
+    }
+
+    const onSelectedRatingContextItemsChange = (value: string[]) => {
+        console.log(value)
+        setRatingContextFeatures(value);
+        ratingOracle.updateFeatures(value, ratingOracle.exerciseFeatures);
+        recalculateRecommendations(context);
+    }
+
+    const onSelectedClickExerciseItemsChange = (value: string[]) => {
+        console.log(value)
+        setClickExerciseFeatures(value);
+        clickOracle.updateFeatures(clickOracle.contextFeatures, value);
+        recalculateRecommendations(context);
+    }
+
+    const onSelectedRatingExerciseItemsChange = (value: string[]) => {
+        console.log(value)
+        setRatingExerciseFeatures(value);
+        ratingOracle.updateFeatures(ratingOracle.contextFeatures, value);
+        recalculateRecommendations(context);
     }
 
     const onSoftmaxBetaChange = (value: number) => {
@@ -130,17 +168,8 @@ export function RoomOracle() {
         recalculateRecommendations(context);
     }
 
-    const onSelectedContextItemsChange = (value: string[]) => {
-        console.log(value)
-        setContextFeatures(value);
-        clickOracle.updateFeatures(value, clickOracle.exerciseFeatures);
-        recalculateRecommendations(context);
-    }
-
-    const onSelectedExerciseItemsChange = (value: string[]) => {
-        console.log(value)
-        setExerciseFeatures(value);
-        clickOracle.updateFeatures(clickOracle.contextFeatures, value);
+    const onRatingWeightChange = (value: number) => {
+        setRatingWeight(value);
         recalculateRecommendations(context);
     }
     
@@ -186,6 +215,7 @@ export function RoomOracle() {
             <ExerciseScores recommendations={modelRecommendations || []} />
 
             <Text style={style.title}>Configure Algorithm</Text>
+            <Text style={style.subtitle}>ClickOracle</Text>
             {/* Slider for learningRate */}
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Text style={{marginRight: 10}}>Learning Rate:</Text>
@@ -194,27 +224,11 @@ export function RoomOracle() {
                 minimumValue={0.01}
                 maximumValue={0.5}
                 step={0.01}
-                value={learningRate}
-                onValueChange={onLearningRateChange}
+                value={clickLearningRate}
+                onSlidingComplete={onClickLearningRateChange}
             />
-            <Text style={{marginLeft: 10}}>{learningRate.toFixed(2)}</Text>
+            <Text style={{marginLeft: 10}}>{clickLearningRate.toFixed(2)}</Text>
             </View>
-
-            {/* Slider for softmaxBeta */}
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{marginRight: 10}}>Exploration:</Text>
-            <Slider
-                style={{width: 200}}
-                minimumValue={0.5}
-                maximumValue={10}
-                step={0.5}
-                value={softmaxBeta}
-                onValueChange={onSoftmaxBetaChange}
-            />
-            <Text style={{marginLeft: 10}}>{softmaxBeta.toFixed(1)}</Text>
-            </View>
-
-
 
             <SectionedMultiSelect
                 items={contextItems}
@@ -225,8 +239,8 @@ export function RoomOracle() {
                 single={false}
                 showDropDowns={false}
                 readOnlyHeadings={true}
-                onSelectedItemsChange={onSelectedContextItemsChange}
-                selectedItems={contextFeatures}
+                onSelectedItemsChange={onSelectedClickContextItemsChange}
+                selectedItems={ClickContextFeatures}
             />
             <SectionedMultiSelect
                 items={exerciseItems}
@@ -237,12 +251,90 @@ export function RoomOracle() {
                 single={false}
                 showDropDowns={false}
                 readOnlyHeadings={true}
-                onSelectedItemsChange={onSelectedExerciseItemsChange}
-                selectedItems={exerciseFeatures}
+                onSelectedItemsChange={onSelectedClickExerciseItemsChange}
+                selectedItems={ClickExerciseFeatures}
             />
 
+            <Text style={style.subtitle}>RatingOracle</Text>
+
+            {/* Slider for learningRate */}
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={{marginRight: 10}}>Learning Rate:</Text>
+            <Slider
+                style={{width: 200}}
+                minimumValue={0.01}
+                maximumValue={10.0}
+                step={0.01}
+                value={ratingLearningRate}
+                onSlidingComplete={onRatingLearningRateChange}
+            />
+            <Text style={{marginLeft: 10}}>{ratingLearningRate.toFixed(2)}</Text>
+            </View>
+
+            <SectionedMultiSelect
+                items={contextItems}
+                IconRenderer={Icon}
+                uniqueKey="name"
+                subKey="children"
+                selectText="Select context features..."
+                single={false}
+                showDropDowns={false}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={onSelectedRatingContextItemsChange}
+                selectedItems={RatingContextFeatures}
+            />
+            <SectionedMultiSelect
+                items={exerciseItems}
+                IconRenderer={Icon}
+                uniqueKey="name"
+                subKey="children"
+                selectText="Select exercise features..."
+                single={false}
+                showDropDowns={false}
+                readOnlyHeadings={true}
+                onSelectedItemsChange={onSelectedRatingExerciseItemsChange}
+                selectedItems={RatingExerciseFeatures}
+            />
+            <Text style={style.subtitle}>Recommender</Text>
+
+            {/* Slider for softmaxBeta */}
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={{marginRight: 10}}>Exploration:</Text>
+            <Slider
+                style={{width: 200}}
+                minimumValue={0.5}
+                maximumValue={10}
+                step={0.5}
+                value={softmaxBeta}
+                onSlidingComplete={onSoftmaxBetaChange}
+            />
+            <Text style={{marginLeft: 10}}>{softmaxBeta.toFixed(1)}</Text>
+            </View>
+
+            {/* Slider for ratingWeight */}
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <Text style={{marginRight: 10}}>Rating weight:</Text>
+            <Slider
+                style={{width: 200}}
+                minimumValue={0.0}
+                maximumValue={1.0}
+                step={0.01}
+                value={ratingWeight}
+                onValueChange={setRatingWeight}
+                //only update on release:
+                onSlidingComplete={onRatingWeightChange}
+            />
+            <Text style={{marginLeft: 10}}>{ratingWeight.toFixed(2)}</Text>
+            </View>
+
             <Text style={style.title}>Algorithm JSON payload</Text>
+            <Text style={style.subtitle}>CLickOracle</Text>
+
             <Text>{clickOracle.toJSON()}</Text>
+
+            <Text style={style.subtitle}>RatingOracle</Text>
+
+            <Text>{ratingOracle.toJSON()}</Text>
 
         </View >
     );
@@ -256,6 +348,14 @@ const style = StyleSheet.create({
         color: BaseColors.deepblue,
         marginBottom: 18,
         marginTop:10,
+    },
+    subtitle: {
+        fontSize: 16,
+        lineHeight: 20,
+        fontFamily: 'Rubik-Bold',
+        color: BaseColors.darkgrey,
+        marginBottom: 10,
+        marginTop:8,
     },
     button: {
         marginBottom: 10

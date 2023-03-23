@@ -79,18 +79,19 @@ export function getCosineDistance (exercises:IExcercises[], exercise: IExcercise
     return result
 }
 
+
 export function getSoftmaxSample(
     exercises: IExcercise[], 
     softmaxBeta: number = 2,
  ) : {exercise: IExcercise, index: number} {
-    const scores = exercises.map(s => s.PenalizedScore);
+    const scores = exercises.map(exercise => exercise.AggregateScore);
     if (scores == undefined) {
         throw "Fatal error. Scores was undefined while computing recommendation."
     }
     const probabilities = p_ConvertToProbabilityDistribution(scores as number[], softmaxBeta);
-    for (let i = 0; i < exercises.length; i++) {
-        exercises[i].PenalizedProbability = probabilities[i];
-    }
+    // for (let i = 0; i < exercises.length; i++) {
+    //     exercises[i].PenalizedProbability = probabilities[i];
+    // }
     const recommendedExIndex = p_SampledIndexFromProbabilityDistribution(probabilities);
     //set probability of each exercise in exercise equal to the probability in probabilities:
     
