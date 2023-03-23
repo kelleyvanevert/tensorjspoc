@@ -21,20 +21,6 @@ import { LogisticOracle} from '../services/LogisticOracle';
 import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 
-// TODO:
-// - After selecting an exercise, show popup with start rating feedback - DONE
-// - Have a seperate rating oracle that is trained on the start rating feedback - DONE
-// - average out the click and rating score for each exercise - DONE
-// - add a tab or popup with all exercises details
-// - add a tab or popup with oracle details:
-//      - features used - DONE
-//      - current weights - DONE
-// - add exerciseCounts to exercises - DONE
-// - add all the exercises and all the features
-// - allow user to select features to be used by the model - DONE
-// - add onehotencoded features for the exercise - DONE
-
-
 export function RoomOracle() {
     const [exercises, setExercises] = useState<IExcercise[]>(Exercises)
     const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
@@ -176,7 +162,14 @@ export function RoomOracle() {
     const renderExercise = ({ item }: { item: IExcercise }) => (
         <View style={style.exercise}>
           <Text style={style.exerciseName}>{item.DisplayName}</Text>
-          <Text>{JSON.stringify(item.Features)}</Text>
+          <View style={style.exerciseFeatures}>
+            {Object.entries(item.Features).map(([key, value]) => (
+              <View style={style.exerciseFeature} key={key}>
+                <Text style={style.exerciseFeatureName}>{key}:</Text>
+                <Text style={style.exerciseFeatureValue}>{value}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       );
     
@@ -379,7 +372,7 @@ const style = StyleSheet.create({
         marginBottom: 10
     },
     exercise: {
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingVertical: 10,
@@ -390,5 +383,18 @@ const style = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
       },
+    exerciseFeatures: {
+        marginTop: 8,
+    },
+    exerciseFeature: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    exerciseFeatureName: {
+        fontWeight: 'bold',
+        marginRight: 4,
+    },
+    exerciseFeatureValue: {},
 })
     
