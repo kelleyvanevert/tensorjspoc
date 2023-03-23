@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text} from 'react-native';
+import { StyleSheet, View, Text, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Slider from '@react-native-community/slider';
@@ -24,7 +24,7 @@ import { calculateScoresAndSortExercises } from '../services/Bandit';
 // TODO:
 // - After selecting an exercise, show popup with start rating feedback - DONE
 // - Have a seperate rating oracle that is trained on the start rating feedback - DONE
-// - average out the click and rating score for each exercise
+// - average out the click and rating score for each exercise - DONE
 // - add a tab or popup with all exercises details
 // - add a tab or popup with oracle details:
 //      - features used - DONE
@@ -172,6 +172,13 @@ export function RoomOracle() {
         setRatingWeight(value);
         recalculateRecommendations(context);
     }
+
+    const renderExercise = ({ item }: { item: IExcercise }) => (
+        <View style={style.exercise}>
+          <Text style={style.exerciseName}>{item.DisplayName}</Text>
+          <Text>{JSON.stringify(item.Features)}</Text>
+        </View>
+      );
     
     const contextItems = [
         {
@@ -336,6 +343,17 @@ export function RoomOracle() {
 
             <Text>{ratingOracle.toJSON()}</Text>
 
+            <Text style={style.title}>Exercises details</Text>
+
+            <FlatList
+                data={Exercises}
+                renderItem={renderExercise}
+                keyExtractor={(item) => item.InternalName}
+            />
+
+            {/* <Text>{JSON.stringify(Exercises, null, 2)}</Text> */}
+
+
         </View >
     );
 };
@@ -359,6 +377,18 @@ const style = StyleSheet.create({
     },
     button: {
         marginBottom: 10
-    }
+    },
+    exercise: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+      },
+    exerciseName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+      },
 })
     
