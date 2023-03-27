@@ -8,6 +8,6 @@ export interface ITrainingData {
         exerciseFeatures: IExcerciseFeatures;
     }
     clicked: number;
-    stars: number | undefined;
+    rating: number | undefined;
     probability : number | undefined;
 }

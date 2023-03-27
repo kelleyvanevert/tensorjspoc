@@ -10,7 +10,7 @@ exports[`exercise-scores compoment should render a recommendation with display n
         "InternalName": "",
         "Score": 0,
         "Value": {
-          "diffuse": 0,
+          "defuse": 0,
           "feeling_angry": 0,
           "feeling_stressed": 0,
           "five_seven_mins": 0,

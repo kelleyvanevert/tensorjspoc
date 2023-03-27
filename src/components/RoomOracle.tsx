@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, Switch, View, Text, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Slider from '@react-native-community/slider';
 import { BaseColors } from "./colors";
+
+// TODO:
+// [ ] add toggles for interactions
+// [ ] add toggles for inverse propensity weighting
+// [ ] add rule based recommendation option
 
 import { 
     ITrainingData, 
@@ -14,10 +19,11 @@ import {
     IContext, 
     generateContext
 } from '../interfaces';
+
 import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
-import { LogisticOracle} from '../services/LogisticOracle';
+import { LogisticOracle, LogisticOracleFromJSON} from '../services/LogisticOracle';
 import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 
@@ -25,7 +31,10 @@ export function RoomOracle() {
     const [exercises, setExercises] = useState<IExcercise[]>(Exercises)
     const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
     const [clickLearningRate, setClickLearningRate] = useState<number>(0.01);
-    const [ratingLearningRate, setRatingLearningRate] = useState<number>(2.0);
+    const [clickAddIntercept, setClickAddIntercept] = useState<boolean>(true);
+    const [clickContextExerciseInteractions, setClickContextExerciseInteractions] = useState<boolean>(true);
+    const [clickContextExerciseFeatureInteractions, setClickContextExerciseFeatureInteractions] = useState<boolean>(true);
+    
     const [ClickContextFeatures, setClickContextFeatures] = useState<string[]>(
         ['happy', 'sad', ]);
     const [ClickExerciseFeatures, setClickExerciseFeatures] = useState<string[]>(
@@ -33,45 +42,67 @@ export function RoomOracle() {
             'three_five_mins',
             'five_seven_mins',
             'seven_ten_mins',
-            'diffuse',
+            'defuse',
             'zoom_out',
             'feeling_stressed',
             'feeling_angry',
             'mood_boost',
-            'self_compassion'
+            'self_compassion',
+            'relax',
+            'energize',
+            'feeling_anxious',
+            'grounding',
+            'feeling_blue',
+            'focus',
+            'shift_perspective',
+            'introspect',
+            'breathing',
+            'article',
         ]);
-    const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>([]);
-    const [RatingExerciseFeatures, setRatingExerciseFeatures] = useState<string[]>([]);
     const [clickOracle, setClickOracle] = useState<LogisticOracle>(new LogisticOracle(
             ClickContextFeatures, //contextFeatures
             ClickExerciseFeatures, //exerciseFeatures
             exerciseNames, //exerciseNames
             clickLearningRate, //learningRate
             1, //iterations
-            true, //addIntercept
+            clickAddIntercept, //addIntercept
+            clickContextExerciseInteractions, // contextExerciseInteractions
+            clickContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
             true, //useInversePropensityWeighting
             false, //useInversePropensityWeightingPositiveOnly
             'clicked' // targetLabel
         )
     );
+    
+    const [ratingLearningRate, setRatingLearningRate] = useState<number>(2.0);
+    const [ratingAddIntercept, setRatingAddIntercept] = useState<boolean>(true);
+    const [ratingContextExerciseInteractions, setRatingContextExerciseInteractions] = useState<boolean>(true);
+    const [ratingContextExerciseFeatureInteractions, setRatingContextExerciseFeatureInteractions] = useState<boolean>(false);
+    const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>([]);
+    const [RatingExerciseFeatures, setRatingExerciseFeatures] = useState<string[]>([]);
+    
     const [ratingOracle, setRatingOracle] = useState<LogisticOracle>(new LogisticOracle(
         RatingContextFeatures, //contextFeatures
         RatingExerciseFeatures, //exerciseFeatures
         exerciseNames, //exerciseNames
         ratingLearningRate, //learningRate
         1, //iterations
-        true, //addIntercept
+        ratingAddIntercept, //addIntercept
+        ratingContextExerciseInteractions, // contextExerciseInteractions
+        ratingContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
         false, //useInversePropensityWeighting
         false, //useInversePropensityWeightingPositiveOnly
-        'stars', // targetLabel
+        'rating', // targetLabel
         )
     );
     const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
-    const [ratingWeight, setRatingWeight] = useState<number>(0.5);
+    const [ratingWeight, setRatingWeight] = useState<number>(0.2);
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
     
     useEffect(() => {        
+        setRatingOracle(LogisticOracleFromJSON(ratingOracle.toJSON()));
+        setClickOracle(LogisticOracleFromJSON(clickOracle.toJSON()));
         recalculateRecommendations(context);
         setTrainingData([])
     }, []);
@@ -104,48 +135,132 @@ export function RoomOracle() {
     
     const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
-        clickOracle.fitMultiple(newTrainingData, clickLearningRate, undefined, undefined);
-        ratingOracle.fitMultiple(newTrainingData, ratingLearningRate, undefined, undefined);
-        console.log("ratingOracle theta", ratingOracle.getThetaMap())
+        clickOracle.fitMany(newTrainingData, clickLearningRate, undefined, undefined);
+        ratingOracle.fitMany(newTrainingData, ratingLearningRate, undefined, undefined);
+        console.log("ratingOracle weights", ratingOracle.getWeightsMap())
         recalculateRecommendations(context);
         updateExerciseCount(newTrainingData);        
     }
 
     const onClickLearningRateChange = (value: number) => {
         setClickLearningRate(value);
-        clickOracle.setlearningRate(value);
+        clickOracle.learningRate = value;
+    }
+
+    const onSelectedClickContextItemsChange = (newContextFeatures: string[]) => {
+        setClickContextFeatures(newContextFeatures);
+        clickOracle.setFeaturesAndUpdateWeights(
+            newContextFeatures, 
+            clickOracle.exerciseFeatures,
+            clickOracle.exerciseNames,
+            clickOracle.addIntercept,
+            clickOracle.contextExerciseInteractions,
+            clickOracle.contextExerciseFeatureInteractions,
+            clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onSelectedClickExerciseItemsChange = (newExerciseFeatures: string[]) => {
+        setClickExerciseFeatures(newExerciseFeatures);
+        clickOracle.setFeaturesAndUpdateWeights(
+            clickOracle.contextFeatures, 
+            newExerciseFeatures,
+            clickOracle.exerciseNames,
+            clickOracle.addIntercept,
+            clickOracle.contextExerciseInteractions,
+            clickOracle.contextExerciseFeatureInteractions,
+            clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onClickExerciseInteractionsChange = (contextExerciseInteractions: boolean) => {
+        setClickContextExerciseInteractions(contextExerciseInteractions);
+        clickOracle.setFeaturesAndUpdateWeights(
+            clickOracle.contextFeatures, 
+            clickOracle.exerciseFeatures,
+            clickOracle.exerciseNames,
+            clickOracle.addIntercept,
+            contextExerciseInteractions,
+            clickOracle.contextExerciseFeatureInteractions,
+            clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onClickExerciseFeaturesInteractionsChange = (contextExerciseFeatureInteractions: boolean) => {
+        setClickContextExerciseFeatureInteractions(contextExerciseFeatureInteractions);
+        clickOracle.setFeaturesAndUpdateWeights(
+            clickOracle.contextFeatures, 
+            clickOracle.exerciseFeatures,
+            clickOracle.exerciseNames,
+            clickOracle.addIntercept,
+            clickOracle.contextExerciseInteractions,
+            contextExerciseFeatureInteractions,
+            clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
     }
 
     const onRatingLearningRateChange = (value: number) => {
         setRatingLearningRate(value);
-        ratingOracle.setlearningRate(value);
+        ratingOracle.learningRate = value;
     }
 
-    const onSelectedClickContextItemsChange = (value: string[]) => {
-        console.log(value)
-        setClickContextFeatures(value);
-        clickOracle.updateFeatures(value, clickOracle.exerciseFeatures);
+    const onSelectedRatingContextItemsChange = (newContextFeatures: string[]) => {
+        setRatingContextFeatures(newContextFeatures);
+        ratingOracle.setFeaturesAndUpdateWeights(
+            newContextFeatures, 
+            ratingOracle.exerciseFeatures,
+            ratingOracle.exerciseNames,
+            ratingOracle.addIntercept,
+            ratingOracle.contextExerciseInteractions,
+            ratingOracle.contextExerciseFeatureInteractions,
+            ratingOracle.getWeightsHash(),
+        );
         recalculateRecommendations(context);
     }
 
-    const onSelectedRatingContextItemsChange = (value: string[]) => {
-        console.log(value)
-        setRatingContextFeatures(value);
-        ratingOracle.updateFeatures(value, ratingOracle.exerciseFeatures);
+    const onSelectedRatingExerciseItemsChange = (newExerciseFeatures: string[]) => {
+        setRatingExerciseFeatures(newExerciseFeatures);
+        ratingOracle.setFeaturesAndUpdateWeights(
+            ratingOracle.contextFeatures, 
+            newExerciseFeatures,
+            ratingOracle.exerciseNames,
+            ratingOracle.addIntercept,
+            ratingOracle.contextExerciseInteractions,
+            ratingOracle.contextExerciseFeatureInteractions,
+            ratingOracle.getWeightsHash(),
+            );
         recalculateRecommendations(context);
     }
 
-    const onSelectedClickExerciseItemsChange = (value: string[]) => {
-        console.log(value)
-        setClickExerciseFeatures(value);
-        clickOracle.updateFeatures(clickOracle.contextFeatures, value);
+    const onRatingExerciseInteractionsChange = (contextExerciseInteractions: boolean) => {
+        setRatingContextExerciseInteractions(contextExerciseInteractions);
+        ratingOracle.setFeaturesAndUpdateWeights(
+            ratingOracle.contextFeatures, 
+            ratingOracle.exerciseFeatures,
+            ratingOracle.exerciseNames,
+            ratingOracle.addIntercept,
+            contextExerciseInteractions,
+            ratingOracle.contextExerciseFeatureInteractions,
+            ratingOracle.getWeightsHash(),
+            );
         recalculateRecommendations(context);
     }
 
-    const onSelectedRatingExerciseItemsChange = (value: string[]) => {
-        console.log(value)
-        setRatingExerciseFeatures(value);
-        ratingOracle.updateFeatures(ratingOracle.contextFeatures, value);
+    const onRatingExerciseFeaturesInteractionsChange = (contextExerciseFeatureInteractions: boolean) => {
+        setRatingContextExerciseFeatureInteractions(contextExerciseFeatureInteractions);
+        ratingOracle.setFeaturesAndUpdateWeights(
+            ratingOracle.contextFeatures, 
+            ratingOracle.exerciseFeatures,
+            ratingOracle.exerciseNames,
+            ratingOracle.addIntercept,
+            ratingOracle.contextExerciseInteractions,
+            contextExerciseFeatureInteractions,
+            ratingOracle.getWeightsHash(),
+            );
         recalculateRecommendations(context);
     }
 
@@ -163,15 +278,21 @@ export function RoomOracle() {
         <View style={style.exercise}>
           <Text style={style.exerciseName}>{item.DisplayName}</Text>
           <View style={style.exerciseFeatures}>
-            {Object.entries(item.Features).map(([key, value]) => (
-              <View style={style.exerciseFeature} key={key}>
-                <Text style={style.exerciseFeatureName}>{key}:</Text>
-                <Text style={style.exerciseFeatureValue}>{value}</Text>
-              </View>
-            ))}
+            <View style={style.exerciseFeatureRow}>
+              {Object.entries(item.Features).map(([key, value]) => (
+                // Only render feature if value is equal to 1
+                value === 1 && (
+                  <View style={style.exerciseFeature} key={key}>
+                    <Text style={style.exerciseFeatureName}>{key}:</Text>
+                    <Text style={style.exerciseFeatureValue}>{value}</Text>
+                  </View>
+                )
+              ))}
+            </View>
           </View>
         </View>
       );
+      
     
     const contextItems = [
         {
@@ -211,7 +332,7 @@ export function RoomOracle() {
                 })()
             }
 
-            <Text style={style.title}>Exercise Scores</Text>
+            <Text style={style.title}>All exercises ranked by probability:</Text>
             <ExerciseScores recommendations={modelRecommendations || []} />
 
             <Text style={style.title}>Configure Algorithm</Text>
@@ -228,6 +349,22 @@ export function RoomOracle() {
                 onSlidingComplete={onClickLearningRateChange}
             />
             <Text style={{marginLeft: 10}}>{clickLearningRate.toFixed(2)}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View>
+                    <Text style={{marginRight: 10}}>Context-Exercise Interactions:</Text>
+                    <Switch
+                        onValueChange={onClickExerciseInteractionsChange}
+                        value={clickContextExerciseInteractions}
+                    />
+                </View>
+                <View>
+                    <Text style={{marginRight: 10}}>Context-Feature Interactions:</Text>
+                    <Switch
+                        onValueChange={onClickExerciseFeaturesInteractionsChange}
+                        value={clickContextExerciseFeatureInteractions}
+                    />
+                </View>
             </View>
 
             <SectionedMultiSelect
@@ -269,6 +406,23 @@ export function RoomOracle() {
                 onSlidingComplete={onRatingLearningRateChange}
             />
             <Text style={{marginLeft: 10}}>{ratingLearningRate.toFixed(2)}</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View >
+                    <Text style={{marginRight: 10}}>Context-Exercise Interactions:</Text>
+                    <Switch
+                        onValueChange={onRatingExerciseInteractionsChange}
+                        value={ratingContextExerciseInteractions}
+                    />
+                </View>
+                <View>
+                    <Text style={{marginRight: 10}}>Context-Feature Interactions:</Text>
+                    <Switch
+                        onValueChange={onRatingExerciseFeaturesInteractionsChange}
+                        value={ratingContextExerciseFeatureInteractions}
+                    />
+                </View>
             </View>
 
             <SectionedMultiSelect
@@ -342,6 +496,7 @@ export function RoomOracle() {
                 data={Exercises}
                 renderItem={renderExercise}
                 keyExtractor={(item) => item.InternalName}
+                contentContainerStyle={style.exerciseList}
             />
 
             {/* <Text>{JSON.stringify(Exercises, null, 2)}</Text> */}
@@ -390,11 +545,28 @@ const style = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 4,
+        marginRight: 12,
     },
     exerciseFeatureName: {
         fontWeight: 'bold',
         marginRight: 4,
     },
     exerciseFeatureValue: {},
+    exerciseList: {
+        paddingHorizontal: 16,
+      },
+    exerciseBox: {
+        flex: 1,
+        margin: 4,
+        padding: 8,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        elevation: 2,
+      },
+    exerciseFeatureRow: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+      },
 })
     

@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
 import { BaseColors } from "./colors";
 import StarRating from "react-native-star-rating";
 import { IExcercise, ITrainingData } from "../interfaces";
-import { generateOracleTrainingData, sampleRecommendedExercises } from "../services/Bandit";
+import { generateOracleTrainingDataFromSelection, sampleRecommendations } from "../services/Bandit";
 import { AppButton } from "./AppButton";
 import { IContext } from "../interfaces";
 
@@ -25,14 +25,14 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
     const [ratingModalVisible, setRatingModalVisible] = useState(false);    
 
     useEffect(() => {
-        const recommendedExercises = sampleRecommendedExercises(exercises, softmaxBeta)
+        const recommendedExercises = sampleRecommendations(exercises, softmaxBeta)
         setRecommendation({ recommendations: recommendedExercises, context: context });
     }, [exercises])
 
     const submitRecommendation = (starRating:number | undefined) => {
         if (recommendation?.recommendations != undefined) {
             console.log("starRating: " + starRating);
-            const trainingData = generateOracleTrainingData(
+            const trainingData = generateOracleTrainingDataFromSelection(
                 recommendation?.recommendations, 
                 selectedExercise,
                 context,
@@ -62,7 +62,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
 
     return (
         <View>
-            <Text style={style.title}>Recommendations:</Text>
+            <Text style={style.title}>Your Recommendations:</Text>
             {
                 recommendation.recommendations.map((recommendation) => {
                     return renderButton(recommendation)
