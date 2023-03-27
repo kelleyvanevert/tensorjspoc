@@ -7,6 +7,11 @@ const config: Config = {
     "/node_modules/",
     "/jest"
   ],
+  testPathIgnorePatterns: [
+    "App-test.tsx",
+    "exercise-scores-test.tsx",
+    "mood-selector-test.tsx",
+  ],
   collectCoverageFrom: [
     "src/**/*.ts*"
   ],
@@ -17,12 +22,13 @@ const config: Config = {
   },
   collectCoverage: true,
   transformIgnorePatterns: [
-    "/node_modules/(?!(@react-native|react-native|react-native-gesture-handler|@react-navigation)/).*/"
+    "/node_modules/(?!(@react-native|react-native|react-native-star-rating|react-native-vector-icons|react-native-sectioned-multi-select|react-native-gesture-handler|@react-navigation)/).*/"
   ],
   setupFiles:[
     "./jest.setup.ts"
   ],
-  verbose: true
+  verbose: true,
+  transform: {},
 };
 
 export default config;

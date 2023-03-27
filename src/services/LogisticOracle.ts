@@ -56,6 +56,8 @@ export class LogisticOracle {
     targetLabel: string = 'label',
     weights: Object = {},
   ) {
+
+    console.log("contextExerciseInteractions", contextExerciseInteractions)
     this.setFeaturesAndUpdateWeights(
       contextFeatures, 
       exerciseFeatures, 
@@ -127,29 +129,31 @@ export class LogisticOracle {
   }
 
   setFeaturesAndUpdateWeights(
-      contextFeatures: string[] = [], 
-      exerciseFeatures: string[] = [],
-      exerciseNames: string[] = [],
-      addIntercept: boolean = true,
-      contextExerciseInteractions: boolean = false,
-      contextExerciseFeatureInteractions: boolean = false,
+      contextFeatures?: string[], 
+      exerciseFeatures?: string[],
+      exerciseNames?: string[],
+      addIntercept?: boolean,
+      contextExerciseInteractions?: boolean,
+      contextExerciseFeatureInteractions?: boolean,
       weights: Object = {},
       ): void {
-    this.contextFeatures = contextFeatures;
-    this.exerciseFeatures = exerciseFeatures;
-    this.exerciseNames = exerciseNames;
-    this.addIntercept = addIntercept;
-    this.contextExerciseInteractions = contextExerciseInteractions
-    this.contextExerciseFeatureInteractions = contextExerciseFeatureInteractions
-
+    this.contextFeatures = contextFeatures ?? this.contextFeatures;
+    this.exerciseFeatures = exerciseFeatures ?? this.exerciseFeatures;
+    this.exerciseNames = exerciseNames ?? this.exerciseNames;
+    this.addIntercept = addIntercept ?? this.addIntercept;
+    this.contextExerciseInteractions = contextExerciseInteractions ?? this.contextExerciseInteractions;
+    this.contextExerciseFeatureInteractions = contextExerciseFeatureInteractions ?? this.contextExerciseFeatureInteractions;
+    
     this.allInputFeatures = [...this.contextFeatures, ...this.exerciseFeatures];
     this.interactionFeatures = this.generateInteractionFeatures()
     this.features = this.generateFeatures();
     this.nFeatures = this.calculateNFeatures();
-    this.weights = this.updateWeights(weights);
+    const combinedWeights = {...this.getWeightsHash(), ...weights}
+    this.weights = this.updateWeights(combinedWeights);
   }
 
   getWeightsHash() : Record<string, number> {
+    if (this.weights == undefined) {return {}}
     const result = {};
     if (this.addIntercept) {
       (result as any) ['intercept'] = this.weights[0];
@@ -208,6 +212,15 @@ export class LogisticOracle {
     return inputsHash;
   }
 
+  hashContainsAllKeys(hash: { [key: string]: any }, keys: string[]): boolean {
+    for (let i = 0; i < keys.length; i++) {
+      if (!hash.hasOwnProperty(keys[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   calculateInteractionFeatures(inputsHash: Record<string, number>): Record<string, number> {
     if (this.contextExerciseInteractions) {
       for (let i = 0; i < this.contextFeatures.length; i++) {
@@ -226,15 +239,6 @@ export class LogisticOracle {
       }
     }
     return inputsHash;
-  }
-
-  hashContainsAllKeys(hash: { [key: string]: any }, keys: string[]): boolean {
-    for (let i = 0; i < keys.length; i++) {
-      if (!hash.hasOwnProperty(keys[i])) {
-        return false;
-      }
-    }
-    return true;
   }
 
   getOrderedInputsArray(
@@ -267,6 +271,19 @@ export class LogisticOracle {
 
   sigmoid(z: number) {
     return math.evaluate(`1 ./ (1 + e.^-z)`, {z});
+  }
+
+  predictLogit(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {
+    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs, exerciseName);
+    
+    let logit = math.evaluate(`X * weights`, { X, weights: this.weights })[0];
+    return logit;
+  }
+
+  predictProba(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {    
+    let logit = this.predictLogit(contextInputs, exerciseInputs, exerciseName);
+    let proba = this.sigmoid(logit);
+    return proba;
   }
 
   fit(
@@ -324,16 +341,5 @@ export class LogisticOracle {
     }
   }
 
-  predictLogit(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {
-    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs, exerciseName);
-    
-    let logit = math.evaluate(`X * weights`, { X, weights: this.weights })[0];
-    return logit;
-  }
-
-  predictProba(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {    
-    let logit = this.predictLogit(contextInputs, exerciseInputs, exerciseName);
-    let proba = this.sigmoid(logit);
-    return proba;
-  }
+  
 }

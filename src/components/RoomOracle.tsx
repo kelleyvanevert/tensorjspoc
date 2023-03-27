@@ -6,7 +6,7 @@ import Slider from '@react-native-community/slider';
 import { BaseColors } from "./colors";
 
 // TODO:
-// [ ] add toggles for interactions
+// [x] add toggles for interactions
 // [ ] add toggles for inverse propensity weighting
 // [ ] add rule based recommendation option
 
@@ -101,8 +101,6 @@ export function RoomOracle() {
     const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
     
     useEffect(() => {        
-        setRatingOracle(LogisticOracleFromJSON(ratingOracle.toJSON()));
-        setClickOracle(LogisticOracleFromJSON(clickOracle.toJSON()));
         recalculateRecommendations(context);
         setTrainingData([])
     }, []);
