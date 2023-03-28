@@ -8,9 +8,6 @@ const config: Config = {
     "/jest"
   ],
   testPathIgnorePatterns: [
-    "App-test.tsx",
-    "exercise-scores-test.tsx",
-    "mood-selector-test.tsx",
   ],
   collectCoverageFrom: [
     "src/**/*.ts*"

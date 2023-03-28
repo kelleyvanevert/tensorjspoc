@@ -16,21 +16,40 @@ export function weightedHarmonicMean(numbers: number[], weights: number[]): numb
     return sumWeights / sumWeightedValues;
   }
 
-export const ConvertScoresToProbabilityDistribution = (scores: number[], softmaxBeta: number): number[] => {
-    let probabilities: number[] = []
-    let softmaxDenomenator = 0
-    const softmaxNumerators: number[] = []
+  export const ConvertScoresToProbabilityDistribution = (scores: number[], softmaxBeta: number): number[] => {
+    if (scores.length === 0) {
+      throw new Error('scores array must not be empty');
+    }
+    if (softmaxBeta <= 0) {
+      throw new Error('softmaxBeta must be greater than zero');
+    }
+  
+    const maxScore = Math.max(...scores);
+    if (maxScore === -Infinity) {
+      throw new Error('scores array must contain at least one finite number');
+    }
+  
+    let probabilities: number[] = [];
+    let softmaxDenominator = 0;
+    const softmaxNumerators: number[] = [];
     for (let i = 0; i < scores.length; i++) {
-        let softmaxNumerator = Math.exp(softmaxBeta * scores[i]);
-        softmaxDenomenator += softmaxNumerator
-        softmaxNumerators.push(softmaxNumerator);
+      const score = scores[i];
+      if (!Number.isFinite(score)) {
+        throw new Error(`score at index ${i} must be a finite number`);
+      }
+  
+      const softmaxNumerator = Math.exp(softmaxBeta * (score - maxScore));
+      softmaxDenominator += softmaxNumerator;
+      softmaxNumerators.push(softmaxNumerator);
     }
-
+  
     for (let i = 0; i < softmaxNumerators.length; i++) {
-        probabilities.push(softmaxNumerators[i] / softmaxDenomenator)
+      probabilities.push(softmaxNumerators[i] / softmaxDenominator);
     }
+    
     return probabilities;
-}
+  }
+
 
 export const SampleFromProbabilityDistribution = (probs: number[]): number => {
     const sum = probs.reduce((a, b) => a + b, 0); // [1,2,3,4] = cumulative sum ie. 1+2+3+4=10
@@ -49,17 +68,23 @@ export const SampleFromProbabilityDistribution = (probs: number[]): number => {
     return -1;
 }
 
-export const CosineSimilarity = (A: number[], B: number[]) => {
-    var dotproduct = 0;
-    var mA = 0;
-    var mB = 0;
-    for (let i = 0; i < A.length; i++) { // here you missed the i++
-        dotproduct += (A[i] * B[i]);
-        mA += (A[i] * A[i]);
-        mB += (B[i] * B[i]);
+export const CosineSimilarity = (A: number[], B: number[]): number => {
+    if (A.length !== B.length) {
+      throw new Error("Arrays must have the same length");
     }
-    mA = Math.sqrt(mA);
-    mB = Math.sqrt(mB);
-    var similarity = (dotproduct) / ((mA) * (mB)) // here you needed extra brackets
+    if (A.length === 0) {
+      return 0;
+    }
+    let dotProduct = 0;
+    let magA = 0;
+    let magB = 0;
+    for (let i = 0; i < A.length; i++) {
+      dotProduct += A[i] * B[i];
+      magA += A[i] * A[i];
+      magB += B[i] * B[i];
+    }
+    magA = Math.sqrt(magA);
+    magB = Math.sqrt(magB);
+    const similarity = dotProduct / (magA * magB);
     return similarity;
-}
+  };

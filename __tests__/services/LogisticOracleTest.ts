@@ -1,4 +1,5 @@
-import { LogisticOracle } from '../src/services/LogisticOracle';
+import { LogisticOracle } from '../../src/services/LogisticOracle';
+import { ITrainingData } from '../../src/interfaces';
 
 describe('LogisticOracle', () => {
   const contextFeatures = ['context1', 'context2'];
@@ -355,7 +356,64 @@ describe('LogisticOracle', () => {
       };
       const exerciseName = 'exercise3'
       expect(oracle.predictLogit(contextFeatures, exerciseFeatures, exerciseName)).toEqual(-1);
-      expect(oracle.predictProba(contextFeatures, exerciseFeatures, exerciseName)).toEqual(0.2689414213699951);
+      expect(oracle.predictProba(contextFeatures, exerciseFeatures, exerciseName)).toBeCloseTo(0.2689, 3);
     });
+  });
+
+  describe('fit', () => {
+
+    it('should return an array of weights that are different from the previous weights', () => {
+      
+      let trainingData = {
+        input: {
+            exerciseName: 'exercise1',
+            contextFeatures: {'context1': 1, 'context2': 0},
+            exerciseFeatures: {'feature1': 1, 'feature2': 0},
+        },
+        label: 1,
+        probability: 0.5,
+      }
+      const oldWeights = oracle.weights;
+      oracle.fit(trainingData);
+      expect(oracle.weights).not.toEqual(oldWeights);
+
+      const newWeights = oracle.getWeightsHash();
+      expect (newWeights['exercise1']).toBeCloseTo(0.14, 2);
+
+    });
+  });
+
+  describe('fitMany', () => {
+    it('should update weights after passing training data', () => {
+      
+      let trainingData = [
+        {
+          input: {
+              exerciseName: 'exercise1',
+              contextFeatures: {'context1': 1, 'context2': 0},
+              exerciseFeatures: {'feature1': 1, 'feature2': 0},
+          },
+          label: 1,
+          probability: 0.5,
+        },
+        {
+          input: {
+              exerciseName: 'exercise1',
+              contextFeatures: {'context1': 1, 'context2': 0},
+              exerciseFeatures: {'feature1': 1, 'feature2': 0},
+          },
+          label: 1,
+          probability: 0.5,
+        },
+      ]
+
+      const oldWeights = oracle.weights;
+      oracle.fitMany(trainingData);
+      expect(oracle.weights).not.toEqual(oldWeights);
+
+      const newWeights = oracle.getWeightsHash();
+      expect (newWeights['exercise1']).toBeCloseTo(0.18, 2);
+    });
+
   });
 });

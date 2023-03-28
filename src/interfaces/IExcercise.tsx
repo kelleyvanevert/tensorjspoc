@@ -9,6 +9,4 @@ export interface IExcercise {
     RatingScore?: number | undefined;
     AggregateScore?: number | undefined;
     Probability?: number | undefined;
-    // PenalizedScore?: number | undefined;
-    // PenalizedProbability?: number | undefined;
 }

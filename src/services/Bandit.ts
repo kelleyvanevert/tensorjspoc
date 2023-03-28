@@ -1,9 +1,14 @@
 import { IContext, IExcercise, ITrainingData } from '../interfaces';
 import { LogisticOracle } from './LogisticOracle';
-import { weightedHarmonicMean, ConvertScoresToProbabilityDistribution, SampleFromProbabilityDistribution } from './MathService';
+import { 
+    weightedHarmonicMean, 
+    ConvertScoresToProbabilityDistribution, 
+    SampleFromProbabilityDistribution,
+    CosineSimilarity,
+} from './MathService';
 
 
-function calculateAggregateScore(exercise: IExcercise, ratingWeight: number = 0.5) {
+export function calculateAggregateScore(exercise: IExcercise, ratingWeight: number = 0.5) {
     if ((exercise.ClickScore == undefined) && (exercise.RatingScore != undefined)) {    
         return exercise.RatingScore;
     } else if ((exercise.ClickScore != undefined) && (exercise.RatingScore == undefined)) { 
@@ -18,7 +23,7 @@ function calculateAggregateScore(exercise: IExcercise, ratingWeight: number = 0.
     }
 }
 
-const CastOrderedFeatureToNumArray = (exercise_feature: IExcerciseFeatures): number[] => {
+export const CastOrderedFeatureToNumArray = (exercise_feature: IExcerciseFeatures): number[] => {
     const result: number[] = [];
     const features = Object.keys(exercise_feature);
     features.sort((a: string, b: string) => (a.localeCompare(b)))
@@ -29,7 +34,7 @@ const CastOrderedFeatureToNumArray = (exercise_feature: IExcerciseFeatures): num
     return result
 }
 
-export function getCosineDistance (exercises:IExcercises[], exercise: IExcercise
+export function getCosineDistance (exercises:IExcercise[], exercise: IExcercise
     ): { exercise: IExcercise, distance: number }[] {
     let result: { exercise: IExcercise, distance: number }[] = []
     let current_ex_value = CastOrderedFeatureToNumArray(exercise.Features)

@@ -57,7 +57,7 @@ export class LogisticOracle {
     weights: Object = {},
   ) {
 
-    console.log("contextExerciseInteractions", contextExerciseInteractions)
+    // console.log("contextExerciseInteractions", contextExerciseInteractions)
     this.setFeaturesAndUpdateWeights(
       contextFeatures, 
       exerciseFeatures, 

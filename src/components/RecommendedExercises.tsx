@@ -31,7 +31,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
 
     const submitRecommendation = (starRating:number | undefined) => {
         if (recommendation?.recommendations != undefined) {
-            console.log("starRating: " + starRating);
+            // console.log("starRating: " + starRating);
             const trainingData = generateOracleTrainingDataFromSelection(
                 recommendation?.recommendations, 
                 selectedExercise,

@@ -115,10 +115,10 @@ export function RoomOracle() {
     }
 
     const updateExerciseCount = (newTrainingData: ITrainingData[]) => {
-        console.log(newTrainingData)
+        // console.log(newTrainingData)
         newTrainingData.forEach((trainingData) => {
             if (trainingData.clicked == 1) {
-                console.log("Exercise Name", trainingData.input.exerciseName)
+                // console.log("Exercise Name", trainingData.input.exerciseName)
                 const exercise = exercises.find((exercise) => exercise.InternalName === trainingData.input.exerciseName);
                 if (exercise) {
                     if (exercise.SelectedCount === undefined) {
@@ -135,7 +135,7 @@ export function RoomOracle() {
         setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
         clickOracle.fitMany(newTrainingData, clickLearningRate, undefined, undefined);
         ratingOracle.fitMany(newTrainingData, ratingLearningRate, undefined, undefined);
-        console.log("ratingOracle weights", ratingOracle.getWeightsMap())
+        // console.log("ratingOracle weights", ratingOracle.getWeightsMap())
         recalculateRecommendations(context);
         updateExerciseCount(newTrainingData);        
     }
