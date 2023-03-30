@@ -1,6 +1,8 @@
 let math = require('mathjs');
 import { ITrainingData } from '../interfaces';
 
+type WeightsHash = {[feature: string]: number};
+type FeaturesHash = {[feature: string]: number};
 
 export class Oracle {
   contextFeatures: string[];
@@ -33,8 +35,18 @@ export class Oracle {
     useInversePropensityWeighting = false,
     useInversePropensityWeightingPositiveOnly = false,
     targetLabel: string = 'label',
-    weights: Object = {},
+    weights: WeightsHash = {},
   ) {
+    if (!Array.isArray(contextFeatures) || !Array.isArray(exerciseFeatures) || !Array.isArray(exerciseNames)) {
+      throw new Error("Context features, exercise features, and exercise names must be arrays.");
+    }
+    if (typeof learningRate !== 'number' || typeof iterations !== 'number' || typeof addIntercept !== 'boolean') {
+      throw new Error("Learning rate, iterations, and add intercept must be numbers or booleans.");
+    }
+    if (typeof contextExerciseInteractions !== 'boolean' || typeof contextExerciseFeatureInteractions !== 'boolean' ||
+        typeof useInversePropensityWeighting !== 'boolean' || typeof useInversePropensityWeightingPositiveOnly !== 'boolean') {
+      throw new Error("Context-exercise interactions, context-exercise feature interactions, inverse propensity weighting, and inverse propensity weighting positive only must be booleans.");
+    }
 
     this.setFeaturesAndUpdateWeights(
       contextFeatures, 
@@ -125,7 +137,7 @@ export class Oracle {
       .flat();
   }
 
-  updateWeights(newWeights: Object = {}): number[] {
+  updateWeights(newWeights: WeightsHash = {}): number[] {
     this.weights = this.zeroWeights(this.nFeatures);
     if (this.addIntercept) {
       this.weights[0] = (newWeights as any)['intercept'] || this.weights[0];
@@ -147,7 +159,7 @@ export class Oracle {
       addIntercept?: boolean,
       contextExerciseInteractions?: boolean,
       contextExerciseFeatureInteractions?: boolean,
-      weights: Object = {},
+      weights: WeightsHash  = {},
       ): void {
     this.contextFeatures = contextFeatures ?? this.contextFeatures;
     this.exerciseFeatures = exerciseFeatures ?? this.exerciseFeatures;
@@ -164,15 +176,15 @@ export class Oracle {
     this.weights = this.updateWeights(combinedWeights);
   }
 
-  getWeightsHash() : Record<string, number> {
-    if (this.weights == undefined) {return {}}
-    const result = {};
+  getWeightsHash() : WeightsHash {
+    let result: WeightsHash = {};
+    if (this.weights == undefined) {return result}
     if (this.addIntercept) {
-      (result as any) ['intercept'] = this.weights[0];
+      result['intercept'] = this.weights[0];
     }
     if (this.features !== undefined) {
       this.features.forEach((key: string, i: number) => {
-        (result as any)[key] = this.weights[i + 1];
+        result[key] = this.weights[i + 1];
       });
     }
     return result;
@@ -193,10 +205,8 @@ export class Oracle {
     return result;
   }
 
-  
-
   addExerciseNameFeatures(
-    inputsHash: Record<string, number>, 
+    inputsHash: FeaturesHash, 
     exercisename: string |undefined = undefined
     ): Record<string, number> {
     for (let i = 0; i < this.exerciseNames.length; i++) {
@@ -209,7 +219,7 @@ export class Oracle {
     return inputsHash;
   }
 
-  hashContainsAllKeys(hash: { [key: string]: any }, keys: string[]): boolean {
+  hashContainsAllKeys(hash: FeaturesHash, keys: string[]): boolean {
     for (let i = 0; i < keys.length; i++) {
       if (!hash.hasOwnProperty(keys[i])) {
         return false;
@@ -218,7 +228,7 @@ export class Oracle {
     return true;
   }
 
-  calculateInteractionFeatures(inputsHash: Record<string, number>): Record<string, number> {
+  calculateInteractionFeatures(inputsHash: FeaturesHash): FeaturesHash {
     if (this.contextExerciseInteractions) {
       for (let i = 0; i < this.contextFeatures.length; i++) {
         for (let j = 0; j < this.exerciseNames.length; j++) {
@@ -239,8 +249,8 @@ export class Oracle {
   }
 
   getOrderedInputsArray(
-    contextInputs: Record<string, number>, 
-    exerciseInputs: Record<string, number>,
+    contextInputs: FeaturesHash, 
+    exerciseInputs: FeaturesHash,
     exerciseName: string | undefined = undefined,
     ): number[][] {
     let inputsHash: Record<string, number> = {...contextInputs, ...exerciseInputs};
@@ -270,16 +280,15 @@ export class Oracle {
     return math.evaluate(`1 ./ (1 + e.^-z)`, {z});
   }
 
-  predictLogit(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {
-    let X = this.getOrderedInputsArray(contextInputs, exerciseInputs, exerciseName);
-    
-    let logit = math.evaluate(`X * weights`, { X, weights: this.weights })[0];
+  predictLogit(contextInputs: FeaturesHash, exerciseInputs: FeaturesHash, exerciseName: string | undefined): number {
+    const X = this.getOrderedInputsArray(contextInputs, exerciseInputs, exerciseName);
+    const logit = math.evaluate(`X * weights`, { X, weights: this.weights })[0];
     return logit;
   }
 
   predictProba(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {    
-    let logit = this.predictLogit(contextInputs, exerciseInputs, exerciseName);
-    let proba = this.sigmoid(logit);
+    const logit = this.predictLogit(contextInputs, exerciseInputs, exerciseName);
+    const proba = this.sigmoid(logit);
     return proba;
   }
 
@@ -338,5 +347,4 @@ export class Oracle {
     }
   }
 
-  
 }
