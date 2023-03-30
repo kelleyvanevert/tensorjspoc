@@ -160,10 +160,26 @@ export function sampleRecommendations(
     softmaxBeta: number,
 ) : IExercise[]
 {
+    if (!Array.isArray(exercises)) {
+        throw new TypeError('Exercises must be an array.');
+    }
+    if (exercises.length === 0) {
+        throw new Error('Exercises array is empty.');
+    }
+    if (!exercises.every((exercise) => typeof exercise === 'object' && exercise !== null && 'AggregateScore' in exercise)) {
+        throw new TypeError('Exercises array must contain objects with AggregateScore field.');
+    }
+    if (typeof softmaxBeta !== 'number') {
+        throw new TypeError('SoftmaxBeta must be a number.');
+    }
+    
     const exercisesCopy = exercises.slice()
     let recommendedExercises: IExercise[] = []
     for (let index = 0; index < 3; index++) {
         const sample = sampleExercise(exercisesCopy, softmaxBeta);
+        if (!sample.exercise) {
+            throw new Error('Failed to sample an exercise.');
+        }
         recommendedExercises[index] = sample.exercise; // set i-th recommendation
         
         exercisesCopy.splice(sample.index, 1); // remove the recent recommended item
@@ -184,23 +200,39 @@ export function generateOracleTrainingDataFromSelection(
     context: IContext,
     starRating: number | undefined,
     ) : ITrainingData[] {
-    let trainingData: ITrainingData[] = []
-    // console.log("generateOracleTrainingData", recommendedExercises, selected, context, starRating)
-    for (let index = 0; index < recommendedExercises.length; index++) {
-        trainingData.push({
-            input: {
-                exerciseName: recommendedExercises[index].InternalName,
-                contextFeatures: context,
-                exerciseFeatures: recommendedExercises[index].Features,
-            },
-            clicked: recommendedExercises[index].InternalName == selected?.InternalName ? 1 : 0,
-            rating: (
-                recommendedExercises[index].InternalName == selected?.InternalName ? 
-                ((starRating == undefined) ? starRating : starRating / 5) : undefined
-            ),
-            probability: recommendedExercises[index].Probability,
-        })
+    if (!Array.isArray(recommendedExercises)) {
+        throw new TypeError('Recommended exercises must be an array.');
     }
+    if (recommendedExercises.length === 0) {
+        throw new Error('Recommended exercises array is empty.');
+    }
+    if (!recommendedExercises.every((exercise) => typeof exercise === 'object' && exercise !== null && 'InternalName' in exercise && 'Features' in exercise && 'Probability' in exercise)) {
+        throw new TypeError('Recommended exercises array must contain objects with InternalName, Features and Probability fields.');
+    }
+    if (selected !== undefined && !('InternalName' in selected && 'Features' in selected)) {
+        throw new TypeError('Selected exercise must be an object with InternalName and Features fields.');
+    }
+    if (starRating !== undefined && (typeof starRating !== 'number' || starRating < 1 || starRating > 5)) {
+        throw new TypeError('Star rating must be a number between 1 and 5.');
+    }
+    let trainingData: ITrainingData[] = []
+    for (let index = 0; index < recommendedExercises.length; index++) {
+        const recommendedExercise = recommendedExercises[index];
+        if (!recommendedExercise) {
+          throw new Error(`Failed to generate training data for recommended exercise at index ${index}.`);
+        }
+    
+        const input = {
+          exerciseName: recommendedExercise.InternalName,
+          contextFeatures: context,
+          exerciseFeatures: recommendedExercise.Features,
+        };
+        const clicked = recommendedExercise.InternalName === selected?.InternalName ? 1 : 0;
+        const rating = clicked ? starRating !== undefined ? starRating / 5 : undefined : undefined;
+        const probability = recommendedExercise.Probability;
+    
+        trainingData.push({ input, clicked, rating, probability });
+      }
     return trainingData;
 }
 
