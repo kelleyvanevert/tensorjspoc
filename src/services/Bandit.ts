@@ -130,17 +130,25 @@ export function sampleExercise(
     exercises: IExercise[], 
     softmaxBeta: number = 2,
  ) : {exercise: IExercise, index: number} {
+    if (!Array.isArray(exercises)) {
+        throw new Error('Exercises must be an array.');
+    }
+    if (exercises.length === 0) {
+        throw new Error('Exercises array is empty.');
+    }
+    if (!exercises.every((exercise) => typeof exercise === 'object' && exercise !== null && 'AggregateScore' in exercise)) {
+        throw new Error('Exercises array must contain AggregateScore field.');
+    }
     const scores = exercises.map(exercise => exercise.AggregateScore);
-    if (scores == undefined) {
-        throw "Fatal error. Scores was undefined while computing recommendation."
+    if (!scores || scores.some((score) => typeof score !== 'number')) {
+        throw new Error('Invalid scores. Scores must be an array of numbers.');
     }
     const probabilities = ConvertScoresToProbabilityDistribution(scores as number[], softmaxBeta);
-    // for (let i = 0; i < exercises.length; i++) {
-    //     exercises[i].PenalizedProbability = probabilities[i];
-    // }
+    if (probabilities.length === 0) {
+        throw new Error('Probabilities array is empty.');
+      }
     const recommendedExIndex = SampleFromProbabilityDistribution(probabilities);
-    //set probability of each exercise in exercise equal to the probability in probabilities:
-    
+
     return { 
         exercise: exercises[recommendedExIndex], 
         index: recommendedExIndex, 
