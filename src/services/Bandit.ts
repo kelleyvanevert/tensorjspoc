@@ -46,15 +46,32 @@ export const CastOrderedFeatureToNumArray = (exercise_feature: IExerciseFeatures
 
 export function getCosineDistance (exercises:IExercise[], exercise: IExercise
     ): { exercise: IExercise, distance: number }[] {
-    let result: { exercise: IExercise, distance: number }[] = []
-    let current_ex_value = CastOrderedFeatureToNumArray(exercise.Features)
+    if (!Array.isArray(exercises)) {
+        throw new Error('Exercises must be an array.');
+    }
+    if (!exercise || typeof exercise !== 'object' || !('Features' in exercise)) {
+        throw new Error('Exercise object must contain Features field.');
+    }
+    if (exercises.length === 0) {
+        return [];
+      }
+    const currentExValue = CastOrderedFeatureToNumArray(exercise.Features);
+      if (currentExValue.length === 0) {
+        throw new Error('Exercise feature array is empty.');
+      }
+    const result: { exercise: IExercise, distance: number }[] = []
     exercises.forEach((ex) => {
-        const ex_value = CastOrderedFeatureToNumArray(ex.Features)
-        const distance = CosineSimilarity(current_ex_value, ex_value)
-        result.push({
-            exercise: ex,
-            distance: distance
-        })
+        if (ex && typeof ex === 'object' && 'Features' in ex) {
+            const exValue = CastOrderedFeatureToNumArray(ex.Features);
+            if (exValue.length === 0) {
+              return;
+            }
+            const distance = CosineSimilarity(currentExValue, exValue);
+            result.push({
+              exercise: ex,
+              distance: distance
+            });
+          }
     })
 
     result.sort((a, b) => (a.distance - b.distance));
@@ -69,12 +86,30 @@ export function calculateScoresAndSortExercises(
     softmaxBeta: number,
     ratingWeight: number = 0.5,
     ) :IExercise[] {
+    if (!(clickOracle instanceof Oracle) || !(ratingOracle instanceof Oracle)) {
+        throw new Error('ClickOracle and RatingOracle must be instances of the Oracle class.');
+        }
+    if (!Array.isArray(exercises)) {
+        throw new Error('Exercises must be an array.');
+    }
+    if (exercises.length === 0) {return [];}
     let sortedExercises: IExercise[] = [];
-    let SoftmaxNumerators = []
+    let SoftmaxNumerators: number[] = []
     for (let index = 0; index < exercises.length; index++) {
         const exercise = exercises[index];
-        exercise.ClickScore = clickOracle.predictProba(context, exercise.Features, exercise.InternalName);
-        exercise.RatingScore = ratingOracle.predictProba(context, exercise.Features, exercise.InternalName);
+        const clickScore = clickOracle.predictProba(context, exercise.Features, exercise.InternalName);
+        
+        const ratingScore = ratingOracle.predictProba(context, exercise.Features, exercise.InternalName);
+        if (clickScore === undefined || typeof clickScore !== 'number') {
+            exercise.ClickScore = 0;
+        } else {
+            exercise.ClickScore = clickScore;
+        }
+        if (ratingScore === undefined || typeof ratingScore !== 'number') {
+            exercise.RatingScore = 0;
+        } else {
+            exercise.RatingScore = ratingScore;
+        }
         exercise.AggregateScore = calculateAggregateScore(exercise, ratingWeight);
         SoftmaxNumerators.push(Math.exp(softmaxBeta * (exercise.AggregateScore || 0)));
         sortedExercises.push(exercise)
@@ -86,8 +121,7 @@ export function calculateScoresAndSortExercises(
     }
 
     sortedExercises = sortedExercises.sort((a, b) => (b.AggregateScore || 0) - (a.AggregateScore || 0));
-    
-    console.log("weights -> ", clickOracle.getWeightsMap())
+    // console.log("weights -> ", clickOracle.getWeightsMap())
     return sortedExercises;
 }
 
