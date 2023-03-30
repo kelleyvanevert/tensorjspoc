@@ -253,8 +253,7 @@ export class Oracle {
     exerciseInputs: FeaturesHash,
     exerciseName: string | undefined = undefined,
     ): number[][] {
-    let inputsHash: Record<string, number> = {...contextInputs, ...exerciseInputs};
-    // console.log("getOrderedInputsArray inputsHash:", inputsHash, exerciseInputs);
+    let inputsHash: FeatureHash = {...contextInputs, ...exerciseInputs};
     if (!this.hashContainsAllKeys(inputsHash, this.allInputFeatures)) {
         // throw error with missing features:
         const missingFeatures: string[] = [];
@@ -298,15 +297,9 @@ export class Oracle {
     iterations: number | undefined,
     useInversePropensityWeighting: boolean | undefined,
   ) {
-    if (learningRate == undefined) {
-      learningRate = this.learningRate;
-    }
-    if (iterations == undefined) {
-      iterations = this.iterations;
-    }
-    if (useInversePropensityWeighting == undefined) {
-      useInversePropensityWeighting = this.useInversePropensityWeighting;
-    }
+    learningRate = learningRate ?? this.learningRate;
+    iterations = iterations ?? this.iterations;
+    useInversePropensityWeighting = useInversePropensityWeighting ?? this.useInversePropensityWeighting;
 
     let X = this.getOrderedInputsArray(
       trainingData.input.contextFeatures,
@@ -314,6 +307,7 @@ export class Oracle {
       trainingData.input.exerciseName,
     );
     let y = [(trainingData as any)[this.targetLabel]];
+    
     if (y[0] != undefined) {
       let sampleWeight = 1;
       if (useInversePropensityWeighting) {
