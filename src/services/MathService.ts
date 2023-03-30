@@ -16,7 +16,7 @@ export function weightedHarmonicMean(numbers: number[], weights: number[]): numb
     return sumWeights / sumWeightedValues;
   }
 
-  export const ConvertScoresToProbabilityDistribution = (scores: number[], softmaxBeta: number): number[] => {
+export const ConvertScoresToProbabilityDistribution = (scores: number[], softmaxBeta: number): number[] => {
     if (scores.length === 0) {
       throw new Error('scores array must not be empty');
     }
@@ -52,11 +52,16 @@ export function weightedHarmonicMean(numbers: number[], weights: number[]): numb
 
 
 export const SampleFromProbabilityDistribution = (probs: number[]): number => {
+    if (probs.length === 0) {
+        throw new Error('probs array must not be empty');
+    }
+    
     const sum = probs.reduce((a, b) => a + b, 0); // [1,2,3,4] = cumulative sum ie. 1+2+3+4=10
     if (sum <= 0) {
         throw Error('probs must sum to a value greater than zero')
     }
     const normalized = probs.map(prob => prob / sum) // [1,2,3,4] = transform ie. [0.111, 0.234, 0.114, 0.578]
+    
     const sample = Math.random() // 0.4
     let total = 0
     for (let i = 0; i < normalized.length; i++) {
@@ -69,6 +74,9 @@ export const SampleFromProbabilityDistribution = (probs: number[]): number => {
 }
 
 export const CosineSimilarity = (A: number[], B: number[]): number => {
+    if (!Array.isArray(A) || !Array.isArray(B) || !A.every(Number.isFinite) || !B.every(Number.isFinite)) {
+        throw new TypeError("Invalid input. Both A and B should be arrays of finite numbers.");
+    }
     if (A.length !== B.length) {
       throw new Error("Arrays must have the same length");
     }
