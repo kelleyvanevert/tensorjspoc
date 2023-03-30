@@ -9,6 +9,12 @@ import {
 
 
 export function calculateAggregateScore(exercise: IExercise, ratingWeight: number = 0.5) {
+    if (!exercise || typeof exercise !== 'object' || !('ClickScore' in exercise) || !('RatingScore' in exercise)) {
+        throw new Error('Exercise object must contain ClickScore and RatingScore fields.');
+      }
+    if (typeof ratingWeight !== 'number') {
+        throw new Error('Rating weight must be a number.');
+      }
     if ((exercise.ClickScore == undefined) && (exercise.RatingScore != undefined)) {    
         return exercise.RatingScore;
     } else if ((exercise.ClickScore != undefined) && (exercise.RatingScore == undefined)) { 
@@ -24,15 +30,19 @@ export function calculateAggregateScore(exercise: IExercise, ratingWeight: numbe
 }
 
 export const CastOrderedFeatureToNumArray = (exercise_feature: IExerciseFeatures): number[] => {
-    const result: number[] = [];
-    const features = Object.keys(exercise_feature);
-    features.sort((a: string, b: string) => (a.localeCompare(b)))
-    for (let index = 0; index < features.length; index++) {
-        const element = features[index];
-        result.push(exercise_feature[element as keyof typeof exercise_feature]);
+    if (!exercise_feature || typeof exercise_feature !== 'object') {
+      throw new Error('Exercise feature must be an object.');
     }
-    return result
-}
+    const keys = Object.keys(exercise_feature);
+    if (!keys.every(key => typeof exercise_feature[key as keyof typeof exercise_feature] === 'number')) {
+      throw new Error('Exercise feature object must contain only numeric values.');
+    }
+    if (keys.length === 0) {
+      return [];
+    }
+    const sortedKeys = keys.slice().sort();
+    return sortedKeys.map(key => exercise_feature[key as keyof typeof exercise_feature]);
+  }
 
 export function getCosineDistance (exercises:IExercise[], exercise: IExercise
     ): { exercise: IExercise, distance: number }[] {
