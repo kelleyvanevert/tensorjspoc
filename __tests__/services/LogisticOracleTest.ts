@@ -1,4 +1,4 @@
-import { LogisticOracle } from '../../src/services/LogisticOracle';
+import { Oracle } from '../../src/services/Oracle';
 import { ITrainingData } from '../../src/interfaces';
 
 describe('LogisticOracle', () => {
@@ -21,10 +21,10 @@ describe('LogisticOracle', () => {
     feature2: 0.4, 
   };
 
-  let oracle: LogisticOracle;
+  let oracle: Oracle;
 
   beforeEach(() => {
-    oracle = new LogisticOracle(
+    oracle = new Oracle(
       contextFeatures,
       exerciseFeatures,
       exerciseNames,

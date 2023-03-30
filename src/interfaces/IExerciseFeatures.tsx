@@ -1,6 +1,6 @@
 import { YesNo } from "./YesNo";
 
-export interface IExcerciseFeatures {
+export interface IExerciseFeatures {
     three_five_mins: YesNo;
     five_seven_mins: YesNo;
     seven_ten_mins: YesNo;
@@ -20,5 +20,9 @@ export interface IExcerciseFeatures {
     introspect: YesNo;
     breathing: YesNo;
     article: YesNo;
+    ACT: YesNo;
+    Mindfulness: YesNo;
+    Relaxation: YesNo;
+    PositivePsychology: YesNo;
     [key: string]: number;
 }

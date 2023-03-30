@@ -6,9 +6,9 @@ import { ITrainingData } from '../interfaces';
 // - [x] add interactions between contextFeatures and exerciseNames
 // - [ ] update interactions with bools
 
-export function LogisticOracleFromJSON(json: string): LogisticOracle {
+export function OracleFromJSON(json: string): Oracle {
   let data = JSON.parse(json);
-  return new LogisticOracle(
+  return new Oracle(
     data.contextFeatures,
     data.exerciseFeatures,
     data.exerciseNames,
@@ -23,7 +23,7 @@ export function LogisticOracleFromJSON(json: string): LogisticOracle {
   );
 }
 
-export class LogisticOracle {
+export class Oracle {
   contextFeatures: string[];
   exerciseFeatures: string[];
   exerciseNames: string[];

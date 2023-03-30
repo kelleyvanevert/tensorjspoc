@@ -1,5 +1,5 @@
 export * from './IContext'
-export * from './IExcercise'
+export * from './IExercise'
 export * from './IExerciseFeatures'
 export * from './ITrainingData'
 export * from './YesNo'

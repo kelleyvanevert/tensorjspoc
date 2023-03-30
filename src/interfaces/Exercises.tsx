@@ -1,7 +1,7 @@
-import { IExcercise } from "./IExcercise";
+import { IExercise } from "./IExercise";
 import { YesNo } from "./YesNo";
 
-export const Exercises: IExcercise[] = [
+export const Exercises: IExercise[] = [
     {
         InternalName: 'articles_act',
         DisplayName: 'Article ACT',
@@ -25,6 +25,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.Yes,
+            ACT: YesNo.Yes,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -50,6 +54,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.Yes,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -75,6 +83,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.Yes,
         },
     },
     {
@@ -100,6 +112,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.Yes,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -125,6 +141,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.Yes,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.Yes,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -150,6 +170,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.Yes,
+            PositivePsychology: YesNo.No,
         },
     },
     // {
@@ -200,6 +224,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -225,6 +253,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.Yes,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -250,6 +282,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.Yes,
         },
     },
     {
@@ -275,6 +311,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.Yes,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -300,6 +340,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.Yes,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -325,6 +369,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.Yes,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -350,6 +398,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.Yes,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -375,6 +427,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.Yes,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -400,6 +456,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.Yes,
             article: YesNo.Yes,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.Yes,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -425,6 +485,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.Yes,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -450,6 +514,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.Yes,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -475,6 +543,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.Yes,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.Yes,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -500,6 +572,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.Yes,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.Yes,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -525,6 +601,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.Yes,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.Yes,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -550,6 +630,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     {
@@ -575,6 +659,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.Yes,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.Yes,
         },
     },
     {
@@ -600,6 +688,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.Yes,
         },
     },
     {
@@ -625,6 +717,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.No,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.No,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.Yes,
         },
     },
     {
@@ -650,6 +746,10 @@ export const Exercises: IExcercise[] = [
             introspect: YesNo.No,
             breathing: YesNo.Yes,
             article: YesNo.No,
+            ACT: YesNo.No,
+            Mindfulness: YesNo.Yes,
+            Relaxation: YesNo.No,
+            PositivePsychology: YesNo.No,
         },
     },
     

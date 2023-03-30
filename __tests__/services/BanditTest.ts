@@ -7,8 +7,8 @@ import {
     generateOracleTrainingDataFromSelection,
     getCosineDistance
 } from '../../src/services/Bandit';
-import { LogisticOracle } from '../../src/services/LogisticOracle';
-import { IContext, IExcercise, ITrainingData, YesNo } from '../../src/interfaces';
+import { Oracle } from '../../src/services/Oracle';
+import { IContext, IExercise, ITrainingData, YesNo } from '../../src/interfaces';
 
 describe('calculateAggregateScore', () => {
     test('returns ClickScore if only ClickScore is defined', () => {
@@ -118,7 +118,7 @@ describe('calculateAggregateScore', () => {
       },
     ];
   
-    const clickOracle = new LogisticOracle(
+    const clickOracle = new Oracle(
         ['context1'],
         ['feature1', 'feature2'],
         ['exerciseA', 'exerciseB'],
@@ -127,7 +127,7 @@ describe('calculateAggregateScore', () => {
         {'feature1':1, 'feature2':1},
     )
 
-    const ratingOracle = new LogisticOracle(
+    const ratingOracle = new Oracle(
         ['context1'],
         ['feature1', 'feature2'],
         ['exerciseA', 'exerciseB'],
@@ -262,7 +262,7 @@ describe('sampleExercise', () => {
 
 
 describe('sampleRecommendations', () => {
-    const exercises: IExcercise[] = [
+    const exercises: IExercise[] = [
         {
             DisplayName: 'Exercise 1',
             InternalName: 'ex1',
@@ -378,7 +378,7 @@ describe('sampleRecommendations', () => {
 });
 
 describe('generateOracleTrainingDataFromSelection', () => {
-    const recommendedExercises: IExcercise[] = [
+    const recommendedExercises: IExercise[] = [
         {
             DisplayName: 'Exercise 1',
             InternalName: 'ex1',
@@ -470,7 +470,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
             Probability: 0.5,
         }
     ];
-    const selected: IExcercise = recommendedExercises[1];
+    const selected: IExercise = recommendedExercises[1];
     const context: IContext = {
         happy: 1,
         sad: 0,
@@ -611,7 +611,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
 
 
     describe('getCosineDistance', () => {
-      const exercises: IExcercise[] = [
+      const exercises: IExercise[] = [
         {
           DisplayName: 'Exercise 1',
           InternalName: 'Exercise1',

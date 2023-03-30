@@ -1,11 +1,11 @@
-import { IExcerciseFeatures } from "./IExerciseFeatures";
+import { IExerciseFeatures } from "./IExerciseFeatures";
 import { IContext } from "./IContext";
 
 export interface ITrainingData {
     input: {
         exerciseName: string;
         contextFeatures: IContext;
-        exerciseFeatures: IExcerciseFeatures;
+        exerciseFeatures: IExerciseFeatures;
     }
     clicked: number;
     rating: number | undefined;

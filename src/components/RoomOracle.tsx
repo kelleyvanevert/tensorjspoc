@@ -12,7 +12,7 @@ import { BaseColors } from "./colors";
 
 import { 
     ITrainingData, 
-    IExcercise, 
+    IExercise, 
     Exercises,
     exerciseNames, 
     Moods, 
@@ -23,12 +23,12 @@ import {
 import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
-import { LogisticOracle, LogisticOracleFromJSON} from '../services/LogisticOracle';
+import { Oracle, OracleFromJSON} from '../services/Oracle';
 import { calculateScoresAndSortExercises } from '../services/Bandit';
 
 
 export function RoomOracle() {
-    const [exercises, setExercises] = useState<IExcercise[]>(Exercises)
+    const [exercises, setExercises] = useState<IExercise[]>(Exercises)
     const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
     const [clickLearningRate, setClickLearningRate] = useState<number>(0.01);
     const [clickAddIntercept, setClickAddIntercept] = useState<boolean>(true);
@@ -58,8 +58,12 @@ export function RoomOracle() {
             'introspect',
             'breathing',
             'article',
+            'ACT',
+            'Mindfulness',
+            'Relaxation',
+            'PositivePsychology',
         ]);
-    const [clickOracle, setClickOracle] = useState<LogisticOracle>(new LogisticOracle(
+    const [clickOracle, setClickOracle] = useState<Oracle>(new Oracle(
             ClickContextFeatures, //contextFeatures
             ClickExerciseFeatures, //exerciseFeatures
             exerciseNames, //exerciseNames
@@ -78,10 +82,16 @@ export function RoomOracle() {
     const [ratingAddIntercept, setRatingAddIntercept] = useState<boolean>(true);
     const [ratingContextExerciseInteractions, setRatingContextExerciseInteractions] = useState<boolean>(true);
     const [ratingContextExerciseFeatureInteractions, setRatingContextExerciseFeatureInteractions] = useState<boolean>(false);
-    const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>([]);
-    const [RatingExerciseFeatures, setRatingExerciseFeatures] = useState<string[]>([]);
+    const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>(
+        ['happy', 'sad', ]);
+    const [RatingExerciseFeatures, setRatingExerciseFeatures] = useState<string[]>([
+        'ACT',
+        'Mindfulness',
+        'Relaxation',
+        'PositivePsychology',
+    ]);
     
-    const [ratingOracle, setRatingOracle] = useState<LogisticOracle>(new LogisticOracle(
+    const [ratingOracle, setRatingOracle] = useState<Oracle>(new Oracle(
         RatingContextFeatures, //contextFeatures
         RatingExerciseFeatures, //exerciseFeatures
         exerciseNames, //exerciseNames
@@ -98,7 +108,7 @@ export function RoomOracle() {
     const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
     const [ratingWeight, setRatingWeight] = useState<number>(0.2);
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
-    const [modelRecommendations, setModelRecommendations] = useState<IExcercise[]>()
+    const [modelRecommendations, setModelRecommendations] = useState<IExercise[]>()
     
     useEffect(() => {        
         recalculateRecommendations(context);
@@ -272,7 +282,7 @@ export function RoomOracle() {
         recalculateRecommendations(context);
     }
 
-    const renderExercise = ({ item }: { item: IExcercise }) => (
+    const renderExercise = ({ item }: { item: IExercise }) => (
         <View style={style.exercise}>
           <Text style={style.exerciseName}>{item.DisplayName}</Text>
           <View style={style.exerciseFeatures}>

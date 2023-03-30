@@ -1,5 +1,5 @@
-import { IContext, IExcercise, ITrainingData } from '../interfaces';
-import { LogisticOracle } from './LogisticOracle';
+import { IContext, IExercise, IExerciseFeatures, ITrainingData } from '../interfaces';
+import { Oracle } from './Oracle';
 import { 
     weightedHarmonicMean, 
     ConvertScoresToProbabilityDistribution, 
@@ -8,7 +8,7 @@ import {
 } from './MathService';
 
 
-export function calculateAggregateScore(exercise: IExcercise, ratingWeight: number = 0.5) {
+export function calculateAggregateScore(exercise: IExercise, ratingWeight: number = 0.5) {
     if ((exercise.ClickScore == undefined) && (exercise.RatingScore != undefined)) {    
         return exercise.RatingScore;
     } else if ((exercise.ClickScore != undefined) && (exercise.RatingScore == undefined)) { 
@@ -23,7 +23,7 @@ export function calculateAggregateScore(exercise: IExcercise, ratingWeight: numb
     }
 }
 
-export const CastOrderedFeatureToNumArray = (exercise_feature: IExcerciseFeatures): number[] => {
+export const CastOrderedFeatureToNumArray = (exercise_feature: IExerciseFeatures): number[] => {
     const result: number[] = [];
     const features = Object.keys(exercise_feature);
     features.sort((a: string, b: string) => (a.localeCompare(b)))
@@ -34,9 +34,9 @@ export const CastOrderedFeatureToNumArray = (exercise_feature: IExcerciseFeature
     return result
 }
 
-export function getCosineDistance (exercises:IExcercise[], exercise: IExcercise
-    ): { exercise: IExcercise, distance: number }[] {
-    let result: { exercise: IExcercise, distance: number }[] = []
+export function getCosineDistance (exercises:IExercise[], exercise: IExercise
+    ): { exercise: IExercise, distance: number }[] {
+    let result: { exercise: IExercise, distance: number }[] = []
     let current_ex_value = CastOrderedFeatureToNumArray(exercise.Features)
     exercises.forEach((ex) => {
         const ex_value = CastOrderedFeatureToNumArray(ex.Features)
@@ -52,14 +52,14 @@ export function getCosineDistance (exercises:IExcercise[], exercise: IExcercise
 }
 
 export function calculateScoresAndSortExercises(
-    clickOracle: LogisticOracle,
-    ratingOracle: LogisticOracle,
+    clickOracle: Oracle,
+    ratingOracle: Oracle,
     context: IContext, 
-    exercises: IExcercise[], 
+    exercises: IExercise[], 
     softmaxBeta: number,
     ratingWeight: number = 0.5,
-    ) :IExcercise[] {
-    let sortedExercises: IExcercise[] = [];
+    ) :IExercise[] {
+    let sortedExercises: IExercise[] = [];
     let SoftmaxNumerators = []
     for (let index = 0; index < exercises.length; index++) {
         const exercise = exercises[index];
@@ -83,9 +83,9 @@ export function calculateScoresAndSortExercises(
 
 
 export function sampleExercise(
-    exercises: IExcercise[], 
+    exercises: IExercise[], 
     softmaxBeta: number = 2,
- ) : {exercise: IExcercise, index: number} {
+ ) : {exercise: IExercise, index: number} {
     const scores = exercises.map(exercise => exercise.AggregateScore);
     if (scores == undefined) {
         throw "Fatal error. Scores was undefined while computing recommendation."
@@ -104,12 +104,12 @@ export function sampleExercise(
 }
 
 export function sampleRecommendations(
-    exercises: IExcercise[],
+    exercises: IExercise[],
     softmaxBeta: number,
-) : IExcercise[]
+) : IExercise[]
 {
     const exercisesCopy = exercises.slice()
-    let recommendedExercises: IExcercise[] = []
+    let recommendedExercises: IExercise[] = []
     for (let index = 0; index < 3; index++) {
         const sample = sampleExercise(exercisesCopy, softmaxBeta);
         recommendedExercises[index] = sample.exercise; // set i-th recommendation
@@ -127,8 +127,8 @@ export function sampleRecommendations(
 }
 
 export function generateOracleTrainingDataFromSelection(
-    recommendedExercises: IExcercise[],
-    selected: IExcercise | undefined,
+    recommendedExercises: IExercise[],
+    selected: IExercise | undefined,
     context: IContext,
     starRating: number | undefined,
     ) : ITrainingData[] {

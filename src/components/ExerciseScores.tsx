@@ -1,11 +1,11 @@
 import React from 'react';
 import { StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { IExcercise } from '../interfaces';
+import { IExercise } from '../interfaces';
 import { BaseColors } from './colors';
 
 type Props = {
-    recommendations: IExcercise[]
+    recommendations: IExercise[]
 }
 
 export function ExerciseScores({ recommendations }: Props) {

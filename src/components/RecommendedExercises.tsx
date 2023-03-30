@@ -2,26 +2,26 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
 import { BaseColors } from "./colors";
 import StarRating from "react-native-star-rating";
-import { IExcercise, ITrainingData } from "../interfaces";
+import { IExercise, ITrainingData } from "../interfaces";
 import { generateOracleTrainingDataFromSelection, sampleRecommendations } from "../services/Bandit";
 import { AppButton } from "./AppButton";
 import { IContext } from "../interfaces";
 
 type Props = {
     context: IContext;
-    exercises: IExcercise[]
+    exercises: IExercise[]
     softmaxBeta: number;
     callback: (exercise: ITrainingData[]) => void;
 }
 
 type RecommendationState = {
-    recommendations: IExcercise[],
+    recommendations: IExercise[],
     context: IContext;
 }
 
 export function RecommendedExercises({context, exercises, softmaxBeta, callback }: Props) {
     const [recommendation, setRecommendation] = useState<RecommendationState>({ recommendations: [], context:context});
-    const [selectedExercise, setSelectedExercise] = useState<IExcercise>();
+    const [selectedExercise, setSelectedExercise] = useState<IExercise>();
     const [ratingModalVisible, setRatingModalVisible] = useState(false);    
 
     useEffect(() => {
@@ -44,7 +44,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
         }
     }
 
-    const renderButton = (exercise: IExcercise) => {
+    const renderButton = (exercise: IExercise) => {
         if (exercise != undefined)
             return <AppButton
                 key={exercise.InternalName}

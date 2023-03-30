@@ -1,9 +1,9 @@
-import { IExcerciseFeatures } from './IExerciseFeatures';
+import { IExerciseFeatures } from './IExerciseFeatures';
 
-export interface IExcercise {
+export interface IExercise {
     DisplayName: string;
     InternalName: string;
-    Features: IExcerciseFeatures;
+    Features: IExerciseFeatures;
     SelectedCount?: number;
     ClickScore?: number | undefined;
     RatingScore?: number | undefined;
