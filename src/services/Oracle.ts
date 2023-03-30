@@ -2,27 +2,6 @@ let math = require('mathjs');
 import { ITrainingData } from '../interfaces';
 
 
-// TODO:
-// - [x] add interactions between contextFeatures and exerciseNames
-// - [ ] update interactions with bools
-
-export function OracleFromJSON(json: string): Oracle {
-  let data = JSON.parse(json);
-  return new Oracle(
-    data.contextFeatures,
-    data.exerciseFeatures,
-    data.exerciseNames,
-    data.learningRate,
-    data.iterations,
-    data.addIntercept,
-    data.contextExerciseInteractions,
-    data.contextExerciseFeatureInteractionse,
-    data.useInversePropensityWeighting,
-    data.useInversePropensityWeightingPositiveOnly,
-    data.weights
-  );
-}
-
 export class Oracle {
   contextFeatures: string[];
   exerciseFeatures: string[];
@@ -57,7 +36,6 @@ export class Oracle {
     weights: Object = {},
   ) {
 
-    // console.log("contextExerciseInteractions", contextExerciseInteractions)
     this.setFeaturesAndUpdateWeights(
       contextFeatures, 
       exerciseFeatures, 
@@ -72,6 +50,40 @@ export class Oracle {
     this.iterations = iterations;
     this.useInversePropensityWeighting = useInversePropensityWeighting;
     this.useInversePropensityWeightingPositiveOnly = useInversePropensityWeightingPositiveOnly
+  }
+
+  toJSON(): string {
+    return JSON.stringify({
+      contextFeatures: this.contextFeatures,
+      exerciseFeatures: this.exerciseFeatures,
+      exerciseNames: this.exerciseNames,      
+      learningRate: this.learningRate,
+      iterations: this.iterations,
+      addIntercept: this.addIntercept,
+      contextExerciseInteractions: this.contextExerciseInteractions,
+      contextExerciseFeatureInteractions: this.contextExerciseFeatureInteractions,
+      useInversePropensityWeighting: this.useInversePropensityWeighting,
+      useInversePropensityWeightingPositiveOnly: this.useInversePropensityWeightingPositiveOnly,
+      features: this.features,
+      weights: this.getWeightsHash(),
+    });
+  }
+
+  static fromJSON(json: string): Oracle {
+    let data = JSON.parse(json);
+    return new Oracle(
+      data.contextFeatures,
+      data.exerciseFeatures,
+      data.exerciseNames,
+      data.learningRate,
+      data.iterations,
+      data.addIntercept,
+      data.contextExerciseInteractions,
+      data.contextExerciseFeatureInteractionse,
+      data.useInversePropensityWeighting,
+      data.useInversePropensityWeightingPositiveOnly,
+      data.weights
+    );
   }
 
   generateFeatures(): string[] {
@@ -181,22 +193,7 @@ export class Oracle {
     return result;
   }
 
-  toJSON(): string {
-    return JSON.stringify({
-      contextFeatures: this.contextFeatures,
-      exerciseFeatures: this.exerciseFeatures,
-      exerciseNames: this.exerciseNames,      
-      learningRate: this.learningRate,
-      iterations: this.iterations,
-      addIntercept: this.addIntercept,
-      contextExerciseInteractions: this.contextExerciseInteractions,
-      contextExerciseFeatureInteractions: this.contextExerciseFeatureInteractions,
-      useInversePropensityWeighting: this.useInversePropensityWeighting,
-      useInversePropensityWeightingPositiveOnly: this.useInversePropensityWeightingPositiveOnly,
-      features: this.features,
-      weights: this.getWeightsHash(),
-    });
-  }
+  
 
   addExerciseNameFeatures(
     inputsHash: Record<string, number>, 
