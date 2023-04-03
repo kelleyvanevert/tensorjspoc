@@ -8,7 +8,7 @@ type Props = {
     scoredExercises: IScoredExercise[]
 }
 
-export function ExerciseScores({ scoredExercises }: Props) {
+export function ScoredExercisesList({ scoredExercises }: Props) {
     return (
         <FlatList
             data={scoredExercises || []}

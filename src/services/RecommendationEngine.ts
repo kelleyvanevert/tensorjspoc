@@ -63,6 +63,10 @@ export class RecommendationEngine implements IRecommendationEngine {
         }
     }
 
+    toJSON(): string {
+        return JSON.stringify(this.getRecommendationEngineState());
+    }
+
     setExercises(exercises: IExerciseData) {
         this.exercises = exercises.reduce((acc, obj) => {
             (acc as any)[obj.ExerciseId] = obj;
@@ -192,18 +196,31 @@ export class RecommendationEngine implements IRecommendationEngine {
         return trainingData;
     }
 
-    onCloseRecommendations(recommendation: IRecommendation): void {
-        const trainingData = this._generateClickTrainingData(recommendation);
-        this.clickOracle.fitMany(trainingData);
-    }
+    onCloseRecommendations(recommendation: IRecommendation): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                const trainingData = this._generateClickTrainingData(recommendation);
+                this.clickOracle.fitMany(trainingData);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        });
+      }
 
     onChooseRecommendedExercise(
         recommendation: IRecommendation,
         exerciseId: string,
-      ): void {
-        const trainingData = this._generateClickTrainingData(recommendation, exerciseId);
-        console.log("onChooseRecommendedExercise", trainingData)
-        this.clickOracle.fitMany(trainingData)
+      ): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                const trainingData = this._generateClickTrainingData(recommendation, exerciseId);
+                this.clickOracle.fitMany(trainingData);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+      });
       }
     
     onEvaluateExercise(
@@ -211,10 +228,17 @@ export class RecommendationEngine implements IRecommendationEngine {
         evaluationTimeContext: IContext,
         exerciseId: string,
         evaluation: IEvaluation,
-      ) : void {
-        const context = possibleRecommendationContext ?? evaluationTimeContext;
-        const trainingData = this._generateEvaluationTrainingData(context, exerciseId, evaluation);
-        this.ratingOracle.fit(trainingData);
-      }
+      ) : Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                const context = possibleRecommendationContext ?? evaluationTimeContext;
+                const trainingData = this._generateEvaluationTrainingData(context, exerciseId, evaluation);
+                this.ratingOracle.fit(trainingData);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+      });
+    }
     
 }

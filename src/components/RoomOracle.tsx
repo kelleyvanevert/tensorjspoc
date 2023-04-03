@@ -20,7 +20,7 @@ import {
 } from '../interfaces';
 
 import { ContextComponent } from './ContextComponent';
-import { ExerciseScores } from './ExerciseScores';
+import { ScoredExercisesList } from './ScoredExercisesList';
 import { RecommendedExercises } from './RecommendedExercises';
 import { Oracle } from '../services/Oracle';
 import { RecommendationEngine } from '../services/RecommendationEngine';
@@ -344,7 +344,7 @@ export function RoomOracle() {
             }
 
             <Text style={style.title}>All exercises ranked by probability:</Text>
-            <ExerciseScores scoredExercises={scoredExercises || []} />
+            <ScoredExercisesList scoredExercises={scoredExercises || []} />
 
             <Text style={style.title}>Configure Algorithm</Text>
             <Text style={style.subtitle}>ClickOracle</Text>
@@ -402,6 +402,10 @@ export function RoomOracle() {
                 onSelectedItemsChange={onSelectedClickExerciseItemsChange}
                 selectedItems={ClickExerciseFeatures}
             />
+
+            <Text style={style.subtitle}>JSON payload</Text>
+
+            <Text>{clickOracle.toJSON()}</Text>
 
             <Text style={style.subtitle}>RatingOracle</Text>
 
@@ -464,7 +468,7 @@ export function RoomOracle() {
 
             {/* Slider for softmaxBeta */}
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Text style={{marginRight: 10}}>Exploration:</Text>
+            <Text style={{marginRight: 10}}>Exploitation:</Text>
             <Slider
                 style={{width: 200}}
                 minimumValue={0.5}
@@ -491,13 +495,9 @@ export function RoomOracle() {
             />
             <Text style={{marginLeft: 10}}>{ratingWeight.toFixed(2)}</Text>
             </View>
+            
 
-            <Text style={style.title}>Algorithm JSON payload</Text>
-            <Text style={style.subtitle}>CLickOracle</Text>
-
-            <Text>{clickOracle.toJSON()}</Text>
-
-            <Text style={style.subtitle}>RatingOracle</Text>
+            <Text style={style.subtitle}>JSON payload</Text>
 
             <Text>{ratingOracle.toJSON()}</Text>
 
@@ -510,7 +510,7 @@ export function RoomOracle() {
                 contentContainerStyle={style.exerciseList}
             />
 
-            {/* <Text>{JSON.stringify(Exercises, null, 2)}</Text> */}
+            <Text> {engine.toJSON()}</Text>
 
 
         </View >

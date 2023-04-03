@@ -26,6 +26,7 @@ export interface IRecommendationEngine {
   ratingWeight: number;
   nRecommendations: number;
 
+  // static methods (including constructor) are not allowed in interfaces:
   // new (
   //   clickOracle: Oracle,
   //   ratingOracle: Oracle,
@@ -36,21 +37,24 @@ export interface IRecommendationEngine {
   //   ) : IRecommendationEngineInstance;
 
   // fromRecommendationEngineState(state: IRecommendationEngineState, exercises: IExerciseData): void;
+  
   getRecommendationEngineState(): IRecommendationEngineState;
+  toJSON(): string;
   
   makeRecommendation(context: IContext): IRecommendation;
+  scoreExercises(context: IContext): IScoredExercise[];
+  getRecommendedExercises(recommendation: IRecommendation): IExercise[];
 
-  onCloseRecommendations(recommendation: IRecommendation): void;
-  onChooseRecommendedExercise(recommendation: IRecommendation, exerciseId: string): void;
+  onCloseRecommendations(recommendation: IRecommendation): Promise<void>;
+  onChooseRecommendedExercise(recommendation: IRecommendation, exerciseId: string): Promise<void>;
   onEvaluateExercise(
     possibleRecommendationContext: null | IContext,
     evaluationTimeContext: IContext,
     exerciseId: string,
     evaluation: IEvaluation,
-  ): void;
+  ): Promise<void>;
 
-  scoreExercises(context: IContext): IScoredExercise[];
-  getRecommendedExercises(recommendation: IRecommendation): IExercise[];
+  
 }
 
 // // Contextual information, provided by the app to the recommendation engine
