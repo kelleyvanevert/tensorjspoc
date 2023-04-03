@@ -4,7 +4,7 @@
 
 import { IRecommendation } from "./IRecommendation";
 import { IContext } from "./IContext";
-import { IExercise, IExerciseData } from "./IExercise";
+import { IExercise, IExerciseData, IScoredExercise } from "./IExercise";
 import { IOracleState } from "./IOracleState";
 import { IEvaluation } from "./IEvaluation";
 
@@ -20,6 +20,11 @@ export type IRecommendationEngineState = {
 };
 
 export interface IRecommendationEngine {
+  clickOracle: Oracle;
+  ratingOracle: Oracle;
+  softmaxBeta: number;
+  ratingWeight: number;
+  nRecommendations: number;
 
   // new (
   //   clickOracle: Oracle,
@@ -43,6 +48,9 @@ export interface IRecommendationEngine {
     exerciseId: string,
     evaluation: IEvaluation,
   ): void;
+
+  scoreExercises(context: IContext): IScoredExercise[];
+  getRecommendedExercises(recommendation: IRecommendation): IExercise[];
 }
 
 // // Contextual information, provided by the app to the recommendation engine

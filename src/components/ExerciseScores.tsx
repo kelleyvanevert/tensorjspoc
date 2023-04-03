@@ -1,22 +1,22 @@
 import React from 'react';
 import { StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { IExercise } from '../interfaces';
+import { IScoredExercise } from '../interfaces';
 import { BaseColors } from './colors';
 
 type Props = {
-    recommendations: IExercise[]
+    scoredExercises: IScoredExercise[]
 }
 
-export function ExerciseScores({ recommendations }: Props) {
+export function ExerciseScores({ scoredExercises }: Props) {
     return (
         <FlatList
-            data={recommendations || []}
-            keyExtractor={(item) => item.InternalName}
+            data={scoredExercises || []}
+            keyExtractor={(item) => item.ExerciseId}
             style={styles.list}
             renderItem={({ item }) => (
                 <View style={styles.item}>
-                    <Text style={styles.title}>{item.DisplayName}</Text>
+                    <Text style={styles.title}>{item.ExerciseName}</Text>
                     <View style={styles.scoreContainer}>
                         <Text style={styles.label}>Click:</Text>
                         <Text style={styles.score}>{Math.round((item.ClickScore || 0) * 100)}</Text>

@@ -1,4 +1,4 @@
-import { IExercise } from "../interfaces/IExercise";
+import { IExercise, IScoredExercise } from "../interfaces/IExercise";
 import { IContext } from "../interfaces/IContext";
 import { IRecommendation, IRecommendedExercise } from "../interfaces/IRecommendation";
 import { IExerciseData } from "../interfaces/IExercise";
@@ -65,7 +65,7 @@ export class RecommendationEngine implements IRecommendationEngine {
 
     setExercises(exercises: IExerciseData) {
         this.exercises = exercises.reduce((acc, obj) => {
-            (acc as any)[obj.InternalName] = obj;
+            (acc as any)[obj.ExerciseId] = obj;
             return acc;
           }, {});
         return this.exercises;
@@ -78,13 +78,40 @@ export class RecommendationEngine implements IRecommendationEngine {
         return sampleIndex;
     }
 
+    scoreExercises(context: IContext) : IScoredExercise[] {
+        let scoredExercises: IScoredExercise[] = [];
+
+        for (const exerciseId in this.exercises) {
+            const exercise = this.exercises[exerciseId];
+            const clickScore = this.clickOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
+            const ratingScore = this.ratingOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
+            const aggregateScore = weightedHarmonicMean(
+                [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
+            );
+            const softmaxNumerator = Math.exp(this.softmaxBeta * aggregateScore)
+            scoredExercises.push({
+                ExerciseName: exercise.ExerciseName,
+                ExerciseId: exerciseId,
+                ClickScore: clickScore,
+                RatingScore: ratingScore,
+                AggregateScore: aggregateScore,
+                Probability: softmaxNumerator,
+                SelectedCount: exercise.SelectedCount,
+            })
+        }
+        let SoftmaxDenominator = scoredExercises.reduce((a, b) => a + b.Probability, 0);
+        scoredExercises = scoredExercises.map(ex => ({...ex, ...{Probability: ex.Probability / SoftmaxDenominator}}))
+        const sortedExercises = scoredExercises.sort((a, b) => b.AggregateScore - a.AggregateScore);
+        return sortedExercises;
+    }
+
     makeRecommendation(context: IContext) {
         let scoredExercises: IRecommendedExercise[] = [];
 
         for (const exerciseId in this.exercises) {
             const exercise = this.exercises[exerciseId];
-            const clickScore = this.clickOracle.predictProba(context, exercise.Features, exercise.InternalName);
-            const ratingScore = this.ratingOracle.predictProba(context, exercise.Features, exercise.InternalName);
+            const clickScore = this.clickOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
+            const ratingScore = this.ratingOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
                 [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
             );
@@ -115,6 +142,13 @@ export class RecommendationEngine implements IRecommendationEngine {
         return recommendation
     }
 
+    scoreAllExercises(context: IContext) {
+    }
+
+    getRecommendedExercises(recommendation: IRecommendation) : IExercise[] {
+        return recommendation.recommendedExercises.map(ex => this.exercises[ex.exerciseId]);
+    }
+
     private _generateClickTrainingData(recommendation: IRecommendation, selectedExerciseId:string|undefined=undefined) : ITrainingData[] {
         let trainingData: ITrainingData[] = []
         for (let index = 0; index < recommendation.recommendedExercises.length; index++) {
@@ -128,12 +162,15 @@ export class RecommendationEngine implements IRecommendationEngine {
               contextFeatures: recommendation.context,
               exerciseFeatures: recommendedExercise.Features,
             };
-            const clicked = recommendedExercise.InternalName === selectedExerciseId ? 1 : 0;
+            
+            const clicked = recommendedExercise.ExerciseId === selectedExerciseId ? 1 : 0;
+            console.log("clicked", clicked, recommendedExercise.ExerciseId, selectedExerciseId)
             const rating = undefined;
             const probability = recommendation.recommendedExercises[index].probability;
     
             trainingData.push({ input, clicked, rating, probability });
           }
+          console.log("_generateClickTrainingData", JSON.stringify(trainingData))
           return trainingData
     }
 
@@ -147,6 +184,7 @@ export class RecommendationEngine implements IRecommendationEngine {
             contextFeatures: context,
             exerciseFeatures: evaluatedExercise.Features,
         };
+        
         const clicked = undefined;
         const rating = evaluation.liked / 100;
         const probability = 1;
@@ -164,6 +202,7 @@ export class RecommendationEngine implements IRecommendationEngine {
         exerciseId: string,
       ): void {
         const trainingData = this._generateClickTrainingData(recommendation, exerciseId);
+        console.log("onChooseRecommendedExercise", trainingData)
         this.clickOracle.fitMany(trainingData)
       }
     

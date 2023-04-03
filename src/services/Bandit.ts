@@ -97,9 +97,9 @@ export function calculateScoresAndSortExercises(
     let SoftmaxNumerators: number[] = []
     for (let index = 0; index < exercises.length; index++) {
         const exercise = exercises[index];
-        const clickScore = clickOracle.predictProba(context, exercise.Features, exercise.InternalName);
+        const clickScore = clickOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
         
-        const ratingScore = ratingOracle.predictProba(context, exercise.Features, exercise.InternalName);
+        const ratingScore = ratingOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
         if (clickScore === undefined || typeof clickScore !== 'number') {
             exercise.ClickScore = 0;
         } else {
@@ -186,8 +186,8 @@ export function sampleRecommendations(
 
         // const distance = getCosineDistance(exercisesCopy, sample.exercise); // calculate distance between curr and all "remaining" exercises
         // const mostSimilarItemToSelectedExercise = distance[distance.length - 1]
-        // // console.log("Sample -> ", sample.exercise.DisplayName, "\nRemoved Similar -> ", mostSimilarItemToSelectedExercise.exercise.InternalName)
-        // let indexToRemove = exercisesCopy.findIndex(s => s.InternalName == mostSimilarItemToSelectedExercise.exercise.InternalName)
+        // // console.log("Sample -> ", sample.exercise.ExerciseName, "\nRemoved Similar -> ", mostSimilarItemToSelectedExercise.exercise.ExerciseId)
+        // let indexToRemove = exercisesCopy.findIndex(s => s.ExerciseId == mostSimilarItemToSelectedExercise.exercise.ExerciseId)
         // exercisesCopy.splice(indexToRemove, 1)
         // remove the last selected value and shrink size by 1
     }
@@ -206,11 +206,11 @@ export function generateOracleTrainingDataFromSelection(
     if (recommendedExercises.length === 0) {
         throw new Error('Recommended exercises array is empty.');
     }
-    if (!recommendedExercises.every((exercise) => typeof exercise === 'object' && exercise !== null && 'InternalName' in exercise && 'Features' in exercise && 'Probability' in exercise)) {
-        throw new TypeError('Recommended exercises array must contain objects with InternalName, Features and Probability fields.');
+    if (!recommendedExercises.every((exercise) => typeof exercise === 'object' && exercise !== null && 'ExerciseId' in exercise && 'Features' in exercise && 'Probability' in exercise)) {
+        throw new TypeError('Recommended exercises array must contain objects with ExerciseId, Features and Probability fields.');
     }
-    if (selected !== undefined && !('InternalName' in selected && 'Features' in selected)) {
-        throw new TypeError('Selected exercise must be an object with InternalName and Features fields.');
+    if (selected !== undefined && !('ExerciseId' in selected && 'Features' in selected)) {
+        throw new TypeError('Selected exercise must be an object with ExerciseId and Features fields.');
     }
     if (starRating !== undefined && (typeof starRating !== 'number' || starRating < 1 || starRating > 5)) {
         throw new TypeError('Star rating must be a number between 1 and 5.');
@@ -223,11 +223,11 @@ export function generateOracleTrainingDataFromSelection(
         }
     
         const input = {
-          exerciseName: recommendedExercise.InternalName,
+          exerciseName: recommendedExercise.ExerciseId,
           contextFeatures: context,
           exerciseFeatures: recommendedExercise.Features,
         };
-        const clicked = recommendedExercise.InternalName === selected?.InternalName ? 1 : 0;
+        const clicked = recommendedExercise.ExerciseId === selected?.ExerciseId ? 1 : 0;
         const rating = clicked ? starRating !== undefined ? starRating / 5 : undefined : undefined;
         const probability = recommendedExercise.Probability;
     

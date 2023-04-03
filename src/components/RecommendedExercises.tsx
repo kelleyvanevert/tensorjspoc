@@ -2,55 +2,40 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
 import { BaseColors } from "./colors";
 import StarRating from "react-native-star-rating";
-import { IExercise, ITrainingData } from "../interfaces";
-import { generateOracleTrainingDataFromSelection, sampleRecommendations } from "../services/Bandit";
+import { IExercise } from "../interfaces";
 import { AppButton } from "./AppButton";
-import { IContext } from "../interfaces";
+import { IRecommendation } from "../interfaces";
 
 type Props = {
-    context: IContext;
-    exercises: IExercise[]
-    softmaxBeta: number;
-    callback: (exercise: ITrainingData[]) => void;
+    recommendation: IRecommendation;
+    recommendedExercises: IExercise[];
+    callback: (recommendation: IRecommendation, exerciseId: string | undefined, rating: number | undefined) => void;
 }
 
-type RecommendationState = {
-    recommendations: IExercise[],
-    context: IContext;
-}
 
-export function RecommendedExercises({context, exercises, softmaxBeta, callback }: Props) {
-    const [recommendation, setRecommendation] = useState<RecommendationState>({ recommendations: [], context:context});
+export function RecommendedExercises({recommendation, recommendedExercises, callback}: Props) {
+    const [oldRecommendation, setOldRecommendation] = useState<IRecommendation>(recommendation);
     const [selectedExercise, setSelectedExercise] = useState<IExercise>();
     const [ratingModalVisible, setRatingModalVisible] = useState(false);    
 
     useEffect(() => {
-        const recommendedExercises = sampleRecommendations(exercises, softmaxBeta)
-        setRecommendation({ recommendations: recommendedExercises, context: context });
-    }, [exercises])
+        
+    }, [recommendation, recommendedExercises])
 
     const submitRecommendation = (starRating:number | undefined) => {
-        if (recommendation?.recommendations != undefined) {
-            // console.log("starRating: " + starRating);
-            const trainingData = generateOracleTrainingDataFromSelection(
-                recommendation?.recommendations, 
-                selectedExercise,
-                context,
-                starRating,
-            );
-            callback(trainingData);
-            setSelectedExercise(undefined);
-            setRatingModalVisible(false);
-        }
+        // console.log("submitRecommendation", oldRecommendation, recommendation)
+        callback(oldRecommendation, selectedExercise?.ExerciseId, starRating);
+        setSelectedExercise(undefined);
+        setRatingModalVisible(false);
+        setOldRecommendation(recommendation);
     }
 
     const renderButton = (exercise: IExercise) => {
         if (exercise != undefined)
             return <AppButton
-                key={exercise.InternalName}
+                key={exercise.ExerciseId}
                 style={style.button}
-                // title is the name of the exercise with probability in brackets:
-                title={exercise.DisplayName + " (p=" + Number(exercise.Probability).toFixed(3) + ")"}
+                title={exercise.ExerciseName}
                 onPress={() => {
                     setSelectedExercise(exercise);
                     setRatingModalVisible(true);
@@ -64,7 +49,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
         <View>
             <Text style={style.title}>Your Recommendations:</Text>
             {
-                recommendation.recommendations.map((recommendation) => {
+                recommendedExercises.map((recommendation) => {
                     return renderButton(recommendation)
                 })
             }
@@ -74,7 +59,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                 title='None of the above'
                 onPress={() => {
                     setSelectedExercise(undefined);
-                    submitRecommendation(-1);
+                    submitRecommendation(undefined);
                 }}></AppButton>
 
             <Modal
@@ -83,7 +68,7 @@ export function RecommendedExercises({context, exercises, softmaxBeta, callback 
                 transparent={true}>
                 <View style={style.modalContainer}>
                     <View style={style.modalContent}>
-                        <Text style={style.modalTitle}>Rate {selectedExercise?.DisplayName}</Text>
+                        <Text style={style.modalTitle}>Rate {selectedExercise?.ExerciseName}</Text>
                         <StarRating
                             starSize={40}
                             disabled={false}

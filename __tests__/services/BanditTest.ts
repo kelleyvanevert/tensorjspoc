@@ -101,16 +101,16 @@ describe('calculateAggregateScore', () => {
     
     const exercises = [
       {
-        DisplayName: 'Exercise A',
-        InternalName: 'exerciseA',
+        ExerciseName: 'Exercise A',
+        ExerciseId: 'exerciseA',
         Features: {
           feature1: 1,  
           feature2: 1,
         },
       },
       {
-        DisplayName: 'Exercise B',
-        InternalName: 'exerciseB',
+        ExerciseName: 'Exercise B',
+        ExerciseId: 'exerciseB',
         Features: {
             feature1: 0,  
             feature2: 0,
@@ -152,8 +152,8 @@ describe('calculateAggregateScore', () => {
       });
   
       // Verify that exercises are sorted by AggregateScore in descending order
-      expect(sortedExercises[0].InternalName).toEqual('exerciseA');
-      expect(sortedExercises[1].InternalName).toEqual('exerciseB');
+      expect(sortedExercises[0].ExerciseId).toEqual('exerciseA');
+      expect(sortedExercises[1].ExerciseId).toEqual('exerciseB');
     });
 
 });
@@ -161,8 +161,8 @@ describe('calculateAggregateScore', () => {
 describe('sampleExercise', () => {
     const exercises = [
         {
-          DisplayName: 'Exercise 1',
-          InternalName: 'exercise1',
+          ExerciseName: 'Exercise 1',
+          ExerciseId: 'exercise1',
           Features: {
             three_five_mins: 1,
             five_seven_mins: 0,
@@ -191,8 +191,8 @@ describe('sampleExercise', () => {
           Probability: 0.3,
         },
         {
-          DisplayName: 'Exercise 2',
-          InternalName: 'exercise2',
+          ExerciseName: 'Exercise 2',
+          ExerciseId: 'exercise2',
           Features: {
             three_five_mins: 0,
             five_seven_mins: 1,
@@ -221,8 +221,8 @@ describe('sampleExercise', () => {
           Probability: 0.2,
         },
         {
-          DisplayName: 'Exercise 3',
-          InternalName: 'exercise3',
+          ExerciseName: 'Exercise 3',
+          ExerciseId: 'exercise3',
           Features: {
             three_five_mins: 1,
             five_seven_mins: 1,
@@ -264,8 +264,8 @@ describe('sampleExercise', () => {
 describe('sampleRecommendations', () => {
     const exercises: IExercise[] = [
         {
-            DisplayName: 'Exercise 1',
-            InternalName: 'ex1',
+            ExerciseName: 'Exercise 1',
+            ExerciseId: 'ex1',
             Features: {
                 three_five_mins: 1,
                 five_seven_mins: 0,
@@ -294,8 +294,8 @@ describe('sampleRecommendations', () => {
             Probability: 0.5,
         },
         {
-            DisplayName: 'Exercise 2',
-            InternalName: 'ex2',
+            ExerciseName: 'Exercise 2',
+            ExerciseId: 'ex2',
             Features: {
                 three_five_mins: 0,
                 five_seven_mins: 1,
@@ -324,8 +324,8 @@ describe('sampleRecommendations', () => {
             Probability: 0.5,
         },
         {
-            DisplayName: 'Exercise 3',
-            InternalName: 'ex3',
+            ExerciseName: 'Exercise 3',
+            ExerciseId: 'ex3',
             Features: {
                 three_five_mins: 1,
                 five_seven_mins: 0,
@@ -370,7 +370,7 @@ describe('sampleRecommendations', () => {
     it('should not recommend the same exercise more than once', () => {
         let recommendedExercises = sampleRecommendations(exercises, 2);
         console.log("recommendedExercises exercises", exercises, recommendedExercises);
-        const selectedExerciseNames = recommendedExercises.map(ex => ex.InternalName);
+        const selectedExerciseNames = recommendedExercises.map(ex => ex.ExerciseId);
         const uniqueExerciseNames = new Set(selectedExerciseNames);
         expect(uniqueExerciseNames.size).toEqual(3);
     });
@@ -380,8 +380,8 @@ describe('sampleRecommendations', () => {
 describe('generateOracleTrainingDataFromSelection', () => {
     const recommendedExercises: IExercise[] = [
         {
-            DisplayName: 'Exercise 1',
-            InternalName: 'ex1',
+            ExerciseName: 'Exercise 1',
+            ExerciseId: 'ex1',
             Features: {
                 three_five_mins: 1,
                 five_seven_mins: 0,
@@ -410,8 +410,8 @@ describe('generateOracleTrainingDataFromSelection', () => {
             Probability: 0.5,
         },
         {
-            DisplayName: 'Exercise 2',
-            InternalName: 'ex2',
+            ExerciseName: 'Exercise 2',
+            ExerciseId: 'ex2',
             Features: {
                 three_five_mins: 0,
                 five_seven_mins: 1,
@@ -440,8 +440,8 @@ describe('generateOracleTrainingDataFromSelection', () => {
             Probability: 0.5,
         },
         {
-            DisplayName: 'Exercise 3',
-            InternalName: 'ex3',
+            ExerciseName: 'Exercise 3',
+            ExerciseId: 'ex3',
             Features: {
                 three_five_mins: 1,
                 five_seven_mins: 0,
@@ -613,8 +613,8 @@ describe('generateOracleTrainingDataFromSelection', () => {
     describe('getCosineDistance', () => {
       const exercises: IExercise[] = [
         {
-          DisplayName: 'Exercise 1',
-          InternalName: 'Exercise1',
+          ExerciseName: 'Exercise 1',
+          ExerciseId: 'Exercise1',
           Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -638,8 +638,8 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
         },
         {
-          DisplayName: 'Exercise 2',
-          InternalName: 'Exercise2',
+          ExerciseName: 'Exercise 2',
+          ExerciseId: 'Exercise2',
           Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
@@ -663,8 +663,8 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
         },
         {
-          DisplayName: 'Exercise 3',
-          InternalName: 'Exercise3',
+          ExerciseName: 'Exercise 3',
+          ExerciseId: 'Exercise3',
           Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,

@@ -5,31 +5,30 @@ import SectionedMultiSelect from 'react-native-sectioned-multi-select';
 import Slider from '@react-native-community/slider';
 import { BaseColors } from "./colors";
 
-// TODO:
-// [x] add toggles for interactions
-// [ ] add toggles for inverse propensity weighting
-// [ ] add rule based recommendation option
 
 import { 
-    ITrainingData, 
     IExercise, 
     Exercises,
     exerciseNames, 
     Moods, 
     IContext, 
-    generateContext
+    generateContext,
+    IRecommendation,
+    IEvaluation,
+    IScoredExercise,
+    IRecommendationEngine
 } from '../interfaces';
 
 import { ContextComponent } from './ContextComponent';
 import { ExerciseScores } from './ExerciseScores';
 import { RecommendedExercises } from './RecommendedExercises';
-import { Oracle, OracleFromJSON} from '../services/Oracle';
-import { calculateScoresAndSortExercises } from '../services/Bandit';
+import { Oracle } from '../services/Oracle';
+import { RecommendationEngine } from '../services/RecommendationEngine';
 
 
 export function RoomOracle() {
     const [exercises, setExercises] = useState<IExercise[]>(Exercises)
-    const [trainingData, setTrainingData] = useState<ITrainingData[]>([]);
+
     const [clickLearningRate, setClickLearningRate] = useState<number>(0.01);
     const [clickAddIntercept, setClickAddIntercept] = useState<boolean>(true);
     const [clickContextExerciseInteractions, setClickContextExerciseInteractions] = useState<boolean>(true);
@@ -42,17 +41,17 @@ export function RoomOracle() {
             'three_five_mins',
             'five_seven_mins',
             'seven_ten_mins',
-            'defuse',
-            'zoom_out',
-            'feeling_stressed',
-            'feeling_angry',
+            // 'defuse',
+            // 'zoom_out',
+            // 'feeling_stressed',
+            // 'feeling_angry',
             'mood_boost',
             'self_compassion',
             'relax',
             'energize',
-            'feeling_anxious',
+            // 'feeling_anxious',
             'grounding',
-            'feeling_blue',
+            // 'feeling_blue',
             'focus',
             'shift_perspective',
             'introspect',
@@ -106,202 +105,22 @@ export function RoomOracle() {
         )
     );
     const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
+
     const [ratingWeight, setRatingWeight] = useState<number>(0.2);
+
+    const [engine, setEngine] = useState<IRecommendationEngine> (new RecommendationEngine(
+        clickOracle,
+        ratingOracle,
+        exercises,
+        softmaxBeta,
+        ratingWeight,
+    ));
+
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
-    const [modelRecommendations, setModelRecommendations] = useState<IExercise[]>()
-    
-    useEffect(() => {        
-        recalculateRecommendations(context);
-        setTrainingData([])
-    }, []);
+    const [scoredExercises, setScoredExercises] = useState<IScoredExercise[]>(engine.scoreExercises(context));
+    const [recommendation, setRecommendation] = useState<IRecommendation>(engine.makeRecommendation(context));
+    const [recommendedExercises, setRecommendedExercises] = useState<IExercise[]>(engine.getRecommendedExercises(recommendation))
 
-    const recalculateRecommendations = (newContext: IContext) => {
-        setContext(newContext);
-        const updatedContext = { ...context, ...newContext };
-        const sortedExercises = calculateScoresAndSortExercises(
-            clickOracle, ratingOracle, updatedContext, exercises, softmaxBeta, ratingWeight
-        )
-        setModelRecommendations(sortedExercises);
-    }
-
-    const updateExerciseCount = (newTrainingData: ITrainingData[]) => {
-        // console.log(newTrainingData)
-        newTrainingData.forEach((trainingData) => {
-            if (trainingData.clicked == 1) {
-                // console.log("Exercise Name", trainingData.input.exerciseName)
-                const exercise = exercises.find((exercise) => exercise.InternalName === trainingData.input.exerciseId);
-                if (exercise) {
-                    if (exercise.SelectedCount === undefined) {
-                        exercise.SelectedCount = 1;
-                    } else {
-                        exercise.SelectedCount += 1;
-                    }
-                }
-            }
-        });
-    }
-    
-    const fitOracleOnTrainingData = (newTrainingData: ITrainingData[]) => {
-        setTrainingData([...trainingData, ...newTrainingData]); // save training data for historical purposes. TODO: May be remove if not needed
-        clickOracle.fitMany(newTrainingData, clickLearningRate, undefined, undefined);
-        ratingOracle.fitMany(newTrainingData, ratingLearningRate, undefined, undefined);
-        // console.log("ratingOracle weights", ratingOracle.getWeightsMap())
-        recalculateRecommendations(context);
-        updateExerciseCount(newTrainingData);        
-    }
-
-    const onClickLearningRateChange = (value: number) => {
-        setClickLearningRate(value);
-        clickOracle.learningRate = value;
-    }
-
-    const onSelectedClickContextItemsChange = (newContextFeatures: string[]) => {
-        setClickContextFeatures(newContextFeatures);
-        clickOracle.setFeaturesAndUpdateWeights(
-            newContextFeatures, 
-            clickOracle.exerciseFeatures,
-            clickOracle.exerciseNames,
-            clickOracle.addIntercept,
-            clickOracle.contextExerciseInteractions,
-            clickOracle.contextExerciseFeatureInteractions,
-            clickOracle.getWeightsHash(),
-            );
-        recalculateRecommendations(context);
-    }
-
-    const onSelectedClickExerciseItemsChange = (newExerciseFeatures: string[]) => {
-        setClickExerciseFeatures(newExerciseFeatures);
-        clickOracle.setFeaturesAndUpdateWeights(
-            clickOracle.contextFeatures, 
-            newExerciseFeatures,
-            clickOracle.exerciseNames,
-            clickOracle.addIntercept,
-            clickOracle.contextExerciseInteractions,
-            clickOracle.contextExerciseFeatureInteractions,
-            clickOracle.getWeightsHash(),
-            );
-        recalculateRecommendations(context);
-    }
-
-    const onClickExerciseInteractionsChange = (contextExerciseInteractions: boolean) => {
-        setClickContextExerciseInteractions(contextExerciseInteractions);
-        clickOracle.setFeaturesAndUpdateWeights(
-            clickOracle.contextFeatures, 
-            clickOracle.exerciseFeatures,
-            clickOracle.exerciseNames,
-            clickOracle.addIntercept,
-            contextExerciseInteractions,
-            clickOracle.contextExerciseFeatureInteractions,
-            clickOracle.getWeightsHash(),
-            );
-        recalculateRecommendations(context);
-    }
-
-    const onClickExerciseFeaturesInteractionsChange = (contextExerciseFeatureInteractions: boolean) => {
-        setClickContextExerciseFeatureInteractions(contextExerciseFeatureInteractions);
-        clickOracle.setFeaturesAndUpdateWeights(
-            clickOracle.contextFeatures, 
-            clickOracle.exerciseFeatures,
-            clickOracle.exerciseNames,
-            clickOracle.addIntercept,
-            clickOracle.contextExerciseInteractions,
-            contextExerciseFeatureInteractions,
-            clickOracle.getWeightsHash(),
-            );
-        recalculateRecommendations(context);
-    }
-
-    const onRatingLearningRateChange = (value: number) => {
-        setRatingLearningRate(value);
-        ratingOracle.learningRate = value;
-    }
-
-    const onSelectedRatingContextItemsChange = (newContextFeatures: string[]) => {
-        setRatingContextFeatures(newContextFeatures);
-        ratingOracle.setFeaturesAndUpdateWeights(
-            newContextFeatures, 
-            ratingOracle.exerciseFeatures,
-            ratingOracle.exerciseNames,
-            ratingOracle.addIntercept,
-            ratingOracle.contextExerciseInteractions,
-            ratingOracle.contextExerciseFeatureInteractions,
-            ratingOracle.getWeightsHash(),
-        );
-        recalculateRecommendations(context);
-    }
-
-    const onSelectedRatingExerciseItemsChange = (newExerciseFeatures: string[]) => {
-        setRatingExerciseFeatures(newExerciseFeatures);
-        ratingOracle.setFeaturesAndUpdateWeights(
-            ratingOracle.contextFeatures, 
-            newExerciseFeatures,
-            ratingOracle.exerciseNames,
-            ratingOracle.addIntercept,
-            ratingOracle.contextExerciseInteractions,
-            ratingOracle.contextExerciseFeatureInteractions,
-            ratingOracle.getWeightsHash(),
-            );
-        recalculateRecommendations(context);
-    }
-
-    const onRatingExerciseInteractionsChange = (contextExerciseInteractions: boolean) => {
-        setRatingContextExerciseInteractions(contextExerciseInteractions);
-        ratingOracle.setFeaturesAndUpdateWeights(
-            ratingOracle.contextFeatures, 
-            ratingOracle.exerciseFeatures,
-            ratingOracle.exerciseNames,
-            ratingOracle.addIntercept,
-            contextExerciseInteractions,
-            ratingOracle.contextExerciseFeatureInteractions,
-            ratingOracle.getWeightsHash(),
-            );
-        recalculateRecommendations(context);
-    }
-
-    const onRatingExerciseFeaturesInteractionsChange = (contextExerciseFeatureInteractions: boolean) => {
-        setRatingContextExerciseFeatureInteractions(contextExerciseFeatureInteractions);
-        ratingOracle.setFeaturesAndUpdateWeights(
-            ratingOracle.contextFeatures, 
-            ratingOracle.exerciseFeatures,
-            ratingOracle.exerciseNames,
-            ratingOracle.addIntercept,
-            ratingOracle.contextExerciseInteractions,
-            contextExerciseFeatureInteractions,
-            ratingOracle.getWeightsHash(),
-            );
-        recalculateRecommendations(context);
-    }
-
-    const onSoftmaxBetaChange = (value: number) => {
-        setSoftmaxBeta(value);
-        recalculateRecommendations(context);
-    }
-
-    const onRatingWeightChange = (value: number) => {
-        setRatingWeight(value);
-        recalculateRecommendations(context);
-    }
-
-    const renderExercise = ({ item }: { item: IExercise }) => (
-        <View style={style.exercise}>
-          <Text style={style.exerciseName}>{item.DisplayName}</Text>
-          <View style={style.exerciseFeatures}>
-            <View style={style.exerciseFeatureRow}>
-              {Object.entries(item.Features).map(([key, value]) => (
-                // Only render feature if value is equal to 1
-                value === 1 && (
-                  <View style={style.exerciseFeature} key={key}>
-                    <Text style={style.exerciseFeatureName}>{key}:</Text>
-                    <Text style={style.exerciseFeatureValue}>{value}</Text>
-                  </View>
-                )
-              ))}
-            </View>
-          </View>
-        </View>
-      );
-      
-    
     const contextItems = [
         {
           name: 'Context Features',
@@ -322,6 +141,191 @@ export function RoomOracle() {
             }),
         }       
       ];
+    
+    useEffect(() => {        
+        recalculateRecommendations(context);
+    }, []);
+
+    const recalculateRecommendations = (newContext: IContext) => {
+        setContext(newContext);
+        const updatedContext = { ...context, ...newContext };
+
+        setScoredExercises(engine.scoreExercises(updatedContext))
+        setRecommendation(engine.makeRecommendation(updatedContext))
+        if (recommendation) {
+            setRecommendedExercises(engine.getRecommendedExercises(recommendation))
+        }
+    }
+
+    const onExerciseSelected = (recommendation2: IRecommendation, exerciseId:string | undefined, starRating:number|undefined) => {
+        console.log("onExerciseSelect" , recommendation2, exerciseId, starRating)
+        if (exerciseId != undefined) {
+            engine.onChooseRecommendedExercise(recommendation2, exerciseId);
+        } else {
+            engine.onCloseRecommendations(recommendation2);
+        }
+        if ((starRating != undefined) && (exerciseId != undefined)) {
+            const evaluation: IEvaluation = {
+                liked: starRating * 20, helpful: starRating * 20,
+            }
+            engine.onEvaluateExercise(recommendation2.context, recommendation2.context, exerciseId, evaluation);
+        }
+        recalculateRecommendations(context);
+    }
+
+    const onClickLearningRateChange = (value: number) => {
+        setClickLearningRate(value);
+        engine.clickOracle.learningRate = value;
+    }
+
+    const onSelectedClickContextItemsChange = (newContextFeatures: string[]) => {
+        setClickContextFeatures(newContextFeatures);
+        engine.clickOracle.setFeaturesAndUpdateWeights(
+            newContextFeatures, 
+            engine.clickOracle.exerciseFeatures,
+            engine.clickOracle.exerciseNames,
+            engine.clickOracle.addIntercept,
+            engine.clickOracle.contextExerciseInteractions,
+            engine.clickOracle.contextExerciseFeatureInteractions,
+            engine.clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onSelectedClickExerciseItemsChange = (newExerciseFeatures: string[]) => {
+        setClickExerciseFeatures(newExerciseFeatures);
+        engine.clickOracle.setFeaturesAndUpdateWeights(
+            engine.clickOracle.contextFeatures, 
+            newExerciseFeatures,
+            engine.clickOracle.exerciseNames,
+            engine.clickOracle.addIntercept,
+            engine.clickOracle.contextExerciseInteractions,
+            engine.clickOracle.contextExerciseFeatureInteractions,
+            engine.clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onClickExerciseInteractionsChange = (contextExerciseInteractions: boolean) => {
+        setClickContextExerciseInteractions(contextExerciseInteractions);
+        engine.clickOracle.setFeaturesAndUpdateWeights(
+            engine.clickOracle.contextFeatures, 
+            engine.clickOracle.exerciseFeatures,
+            engine.clickOracle.exerciseNames,
+            engine.clickOracle.addIntercept,
+            contextExerciseInteractions,
+            engine.clickOracle.contextExerciseFeatureInteractions,
+            engine.clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onClickExerciseFeaturesInteractionsChange = (contextExerciseFeatureInteractions: boolean) => {
+        setClickContextExerciseFeatureInteractions(contextExerciseFeatureInteractions);
+        engine.clickOracle.setFeaturesAndUpdateWeights(
+            engine.clickOracle.contextFeatures, 
+            engine.clickOracle.exerciseFeatures,
+            engine.clickOracle.exerciseNames,
+            engine.clickOracle.addIntercept,
+            engine.clickOracle.contextExerciseInteractions,
+            contextExerciseFeatureInteractions,
+            engine.clickOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onRatingLearningRateChange = (value: number) => {
+        setRatingLearningRate(value);
+        engine.ratingOracle.learningRate = value;
+    }
+
+    const onSelectedRatingContextItemsChange = (newContextFeatures: string[]) => {
+        setRatingContextFeatures(newContextFeatures);
+        engine.ratingOracle.setFeaturesAndUpdateWeights(
+            newContextFeatures, 
+            engine.ratingOracle.exerciseFeatures,
+            engine.ratingOracle.exerciseNames,
+            engine.ratingOracle.addIntercept,
+            engine.ratingOracle.contextExerciseInteractions,
+            engine.ratingOracle.contextExerciseFeatureInteractions,
+            engine.ratingOracle.getWeightsHash(),
+        );
+        recalculateRecommendations(context);
+    }
+
+    const onSelectedRatingExerciseItemsChange = (newExerciseFeatures: string[]) => {
+        setRatingExerciseFeatures(newExerciseFeatures);
+        engine.ratingOracle.setFeaturesAndUpdateWeights(
+            engine.ratingOracle.contextFeatures, 
+            newExerciseFeatures,
+            engine.ratingOracle.exerciseNames,
+            engine.ratingOracle.addIntercept,
+            engine.ratingOracle.contextExerciseInteractions,
+            engine.ratingOracle.contextExerciseFeatureInteractions,
+            engine.ratingOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onRatingExerciseInteractionsChange = (contextExerciseInteractions: boolean) => {
+        setRatingContextExerciseInteractions(contextExerciseInteractions);
+        engine.ratingOracle.setFeaturesAndUpdateWeights(
+            engine.ratingOracle.contextFeatures, 
+            engine.ratingOracle.exerciseFeatures,
+            engine.ratingOracle.exerciseNames,
+            engine.ratingOracle.addIntercept,
+            contextExerciseInteractions,
+            engine.ratingOracle.contextExerciseFeatureInteractions,
+            engine.ratingOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onRatingExerciseFeaturesInteractionsChange = (contextExerciseFeatureInteractions: boolean) => {
+        setRatingContextExerciseFeatureInteractions(contextExerciseFeatureInteractions);
+        engine.ratingOracle.setFeaturesAndUpdateWeights(
+            engine.ratingOracle.contextFeatures, 
+            engine.ratingOracle.exerciseFeatures,
+            engine.ratingOracle.exerciseNames,
+            engine.ratingOracle.addIntercept,
+            engine.ratingOracle.contextExerciseInteractions,
+            contextExerciseFeatureInteractions,
+            engine.ratingOracle.getWeightsHash(),
+            );
+        recalculateRecommendations(context);
+    }
+
+    const onSoftmaxBetaChange = (value: number) => {
+        setSoftmaxBeta(value);
+        engine.softmaxBeta = value;
+        recalculateRecommendations(context);
+    }
+
+    const onRatingWeightChange = (value: number) => {
+        setRatingWeight(value);
+        engine.softmaxBeta = value;
+        recalculateRecommendations(context);
+    }
+
+    const renderExercise = ({ item }: { item: IExercise }) => (
+        <View style={style.exercise}>
+          <Text style={style.exerciseName}>{item.ExerciseName}</Text>
+          <View style={style.exerciseFeatures}>
+            <View style={style.exerciseFeatureRow}>
+              {Object.entries(item.Features).map(([key, value]) => (
+                // Only render feature if value is equal to 1
+                value === 1 && (
+                  <View style={style.exerciseFeature} key={key}>
+                    <Text style={style.exerciseFeatureName}>{key}:</Text>
+                    <Text style={style.exerciseFeatureValue}>{value}</Text>
+                  </View>
+                )
+              ))}
+            </View>
+          </View>
+        </View>
+      );
+      
 
     return (
         <View>
@@ -329,19 +333,18 @@ export function RoomOracle() {
             <ContextComponent callback={recalculateRecommendations} />
             {
                 (() => {
-                    if (modelRecommendations != undefined) {
+                    if ((recommendation != undefined) &&(recommendedExercises != undefined)){
                         return <RecommendedExercises
-                            context={context}
-                            exercises={modelRecommendations}
-                            softmaxBeta={softmaxBeta}
-                            callback={fitOracleOnTrainingData}
+                            recommendation={recommendation}
+                            recommendedExercises={recommendedExercises}
+                            callback={onExerciseSelected}
                         />
                     }
                 })()
             }
 
             <Text style={style.title}>All exercises ranked by probability:</Text>
-            <ExerciseScores recommendations={modelRecommendations || []} />
+            <ExerciseScores scoredExercises={scoredExercises || []} />
 
             <Text style={style.title}>Configure Algorithm</Text>
             <Text style={style.subtitle}>ClickOracle</Text>
@@ -503,7 +506,7 @@ export function RoomOracle() {
             <FlatList
                 data={Exercises}
                 renderItem={renderExercise}
-                keyExtractor={(item) => item.InternalName}
+                keyExtractor={(item) => item.ExerciseId}
                 contentContainerStyle={style.exerciseList}
             />
 

@@ -3,8 +3,8 @@ import { YesNo } from "./YesNo";
 
 export const Exercises: IExercise[] = [
     {
-        InternalName: 'articles_act',
-        DisplayName: 'Article ACT',
+        ExerciseId: 'articles_act',
+        ExerciseName: 'Article ACT',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
@@ -32,8 +32,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'shape_your_thoughts',
-        DisplayName: 'Shape Your Thoughts',
+        ExerciseId: 'shape_your_thoughts',
+        ExerciseName: 'Shape Your Thoughts',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.No,
@@ -61,8 +61,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'self_compassion_break',
-        DisplayName: 'Self Compassion Break',
+        ExerciseId: 'self_compassion_break',
+        ExerciseName: 'Self Compassion Break',
         Features: {
             'three_five_mins': YesNo.Yes,
             'five_seven_mins': YesNo.No,
@@ -90,8 +90,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'body_scan',
-        DisplayName: 'Body Scan',
+        ExerciseId: 'body_scan',
+        ExerciseName: 'Body Scan',
         Features: {
             'three_five_mins': YesNo.No,
             'five_seven_mins': YesNo.No,
@@ -119,8 +119,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'article_mindfulness',
-        DisplayName: 'Article Mindfulness',
+        ExerciseId: 'article_mindfulness',
+        ExerciseName: 'Article Mindfulness',
         Features: {
             'three_five_mins': YesNo.Yes,
             'five_seven_mins': YesNo.No,
@@ -148,8 +148,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'progressive_muscle_relaxation',
-        DisplayName: 'Progressive Muscle Relaxation',
+        ExerciseId: 'progressive_muscle_relaxation',
+        ExerciseName: 'Progressive Muscle Relaxation',
         Features: {
             'three_five_mins': YesNo.No,
             'five_seven_mins': YesNo.No,
@@ -177,8 +177,8 @@ export const Exercises: IExercise[] = [
         },
     },
     // {
-    //     InternalName: 'article_breathing_relaxation',
-    //     DisplayName: 'Article Breathing Relaxation',
+    //     ExerciseId: 'article_breathing_relaxation',
+    //     ExerciseName: 'Article Breathing Relaxation',
     //     Features: {
     //         'three_five_mins': YesNo.Yes,
     //         'five_seven_mins': YesNo.No,
@@ -202,8 +202,8 @@ export const Exercises: IExercise[] = [
     //     },
     // },
     {
-        InternalName: 'compassionate_friend',
-        DisplayName: 'Compassionate Friend',
+        ExerciseId: 'compassionate_friend',
+        ExerciseName: 'Compassionate Friend',
         Features: {
             'three_five_mins': YesNo.No,
             'five_seven_mins': YesNo.No,
@@ -231,8 +231,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'naming_thanking_mind',
-        DisplayName: 'Naming&Thanking mind',
+        ExerciseId: 'naming_thanking_mind',
+        ExerciseName: 'Naming&Thanking mind',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -260,8 +260,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: '3_good_things',
-        DisplayName: '3 Good Things',
+        ExerciseId: '3_good_things',
+        ExerciseName: '3 Good Things',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -289,8 +289,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'labeling',
-        DisplayName: 'Labeling',
+        ExerciseId: 'labeling',
+        ExerciseName: 'Labeling',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -318,8 +318,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'article_self_compassion',
-        DisplayName: 'Article self compassion',
+        ExerciseId: 'article_self_compassion',
+        ExerciseName: 'Article self compassion',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -347,8 +347,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'leaves_on_stream',
-        DisplayName: 'Leaves on a stream',
+        ExerciseId: 'leaves_on_stream',
+        ExerciseName: 'Leaves on a stream',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.No,
@@ -376,8 +376,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'bad_news_radio',
-        DisplayName: 'Bad News Radio',
+        ExerciseId: 'bad_news_radio',
+        ExerciseName: 'Bad News Radio',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -405,8 +405,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'milk_milk_milk',
-        DisplayName: 'Milk Milk Milk',
+        ExerciseId: 'milk_milk_milk',
+        ExerciseName: 'Milk Milk Milk',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -434,8 +434,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'article_breathing_relaxation',
-        DisplayName: 'Article Breathing relaxation',
+        ExerciseId: 'article_breathing_relaxation',
+        ExerciseName: 'Article Breathing relaxation',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -463,8 +463,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'five_senses',
-        DisplayName: 'Five Senses',
+        ExerciseId: 'five_senses',
+        ExerciseName: 'Five Senses',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.No,
@@ -492,8 +492,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'tracking_thought_in_time',
-        DisplayName: 'Tracking thoughts in time',
+        ExerciseId: 'tracking_thought_in_time',
+        ExerciseName: 'Tracking thoughts in time',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -521,8 +521,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'alternate_nostril_breathing',
-        DisplayName: 'Alternate nostril breathing',
+        ExerciseId: 'alternate_nostril_breathing',
+        ExerciseName: 'Alternate nostril breathing',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
@@ -550,8 +550,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'boxed_breathing',
-        DisplayName: 'Boxed Breathing',
+        ExerciseId: 'boxed_breathing',
+        ExerciseName: 'Boxed Breathing',
         Features: {
             three_five_mins: YesNo.Yes,
             five_seven_mins: YesNo.No,
@@ -579,8 +579,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'diaphragmatic_breathing',
-        DisplayName: 'Diaphragmatic Breathing',
+        ExerciseId: 'diaphragmatic_breathing',
+        ExerciseName: 'Diaphragmatic Breathing',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
@@ -608,8 +608,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'talking_to_friend',
-        DisplayName: 'Talking to a friend',
+        ExerciseId: 'talking_to_friend',
+        ExerciseName: 'Talking to a friend',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
@@ -637,8 +637,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'article_positive_psychology',
-        DisplayName: 'Article Positive Psychology',
+        ExerciseId: 'article_positive_psychology',
+        ExerciseName: 'Article Positive Psychology',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
@@ -666,8 +666,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'savouring',
-        DisplayName: 'Savouring',
+        ExerciseId: 'savouring',
+        ExerciseName: 'Savouring',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.No,
@@ -695,8 +695,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'positive_self_talk',
-        DisplayName: 'Positive Self Talk',
+        ExerciseId: 'positive_self_talk',
+        ExerciseName: 'Positive Self Talk',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.No,
@@ -724,8 +724,8 @@ export const Exercises: IExercise[] = [
         },
     },
     {
-        InternalName: 'follow_your_breath',
-        DisplayName: 'Follow Your Breath',
+        ExerciseId: 'follow_your_breath',
+        ExerciseName: 'Follow Your Breath',
         Features: {
             three_five_mins: YesNo.No,
             five_seven_mins: YesNo.Yes,
@@ -755,5 +755,5 @@ export const Exercises: IExercise[] = [
     
 ]
 
-// exerciseNames is a list of all the exercise DisplayNames:
-export const exerciseNames = Exercises.map((exercise) => exercise.InternalName);
+// exerciseNames is a list of all the exercise ExerciseNames:
+export const exerciseNames = Exercises.map((exercise) => exercise.ExerciseId);

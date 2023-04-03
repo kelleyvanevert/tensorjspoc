@@ -1,14 +1,20 @@
 import { IExerciseFeatures } from './IExerciseFeatures';
 
 export interface IExercise {
-    DisplayName: string;
-    InternalName: string;
+    ExerciseName: string;
+    ExerciseId: string;
     Features: IExerciseFeatures;
     SelectedCount?: number;
-    ClickScore?: number | undefined;
-    RatingScore?: number | undefined;
-    AggregateScore?: number | undefined;
-    Probability?: number | undefined;
+}
+
+export interface IScoredExercise {
+    ExerciseName: string;
+    ExerciseId: string;
+    ClickScore: number
+    RatingScore: number;
+    AggregateScore: number;
+    Probability: number;
+    SelectedCount?: number;
 }
 
 export type IExerciseData = IExercise[];
