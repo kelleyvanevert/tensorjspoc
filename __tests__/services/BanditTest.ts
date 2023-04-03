@@ -481,7 +481,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
         const expectedTrainingData: ITrainingData[] = [
           {
             input: {
-              exerciseName: 'ex1',
+              exerciseId: 'ex1',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[0].Features,
             },
@@ -491,7 +491,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
           {
             input: {
-              exerciseName: 'ex2',
+              exerciseId: 'ex2',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[1].Features,
             },
@@ -501,7 +501,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
           {
             input: {
-              exerciseName: 'ex3',
+              exerciseId: 'ex3',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[2].Features,
             },
@@ -524,7 +524,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
         const expectedTrainingData: ITrainingData[] = [
           {
             input: {
-              exerciseName: 'ex1',
+              exerciseId: 'ex1',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[0].Features,
             },
@@ -534,7 +534,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
           {
             input: {
-              exerciseName: 'ex2',
+              exerciseId: 'ex2',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[1].Features,
             },
@@ -544,7 +544,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
           {
             input: {
-              exerciseName: 'ex3',
+              exerciseId: 'ex3',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[2].Features,
             },
@@ -568,7 +568,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
         const expectedTrainingData: ITrainingData[] = [
           {
             input: {
-              exerciseName: 'ex1',
+              exerciseId: 'ex1',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[0].Features,
             },
@@ -578,7 +578,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
           {
             input: {
-              exerciseName: 'ex2',
+              exerciseId: 'ex2',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[1].Features,
             },
@@ -588,7 +588,7 @@ describe('generateOracleTrainingDataFromSelection', () => {
           },
           {
             input: {
-              exerciseName: 'ex3',
+              exerciseId: 'ex3',
               contextFeatures: context,
               exerciseFeatures: recommendedExercises[2].Features,
             },

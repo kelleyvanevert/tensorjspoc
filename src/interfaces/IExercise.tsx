@@ -10,3 +10,5 @@ export interface IExercise {
     AggregateScore?: number | undefined;
     Probability?: number | undefined;
 }
+
+export type IExerciseData = IExercise[];

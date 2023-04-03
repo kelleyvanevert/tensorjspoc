@@ -1,8 +1,6 @@
 let math = require('mathjs');
-import { ITrainingData } from '../interfaces';
+import { IOracleState, WeightsHash, FeaturesHash, ITrainingData } from '../interfaces';
 
-type WeightsHash = {[feature: string]: number};
-type FeaturesHash = {[feature: string]: number};
 
 export class Oracle {
   contextFeatures: string[];
@@ -15,6 +13,7 @@ export class Oracle {
   contextExerciseFeatureInteractions: boolean;
   useInversePropensityWeighting: boolean;
   useInversePropensityWeightingPositiveOnly: boolean;
+  targetLabel: string;
   weights: number[];
 
   allInputFeatures: string[];
@@ -64,8 +63,8 @@ export class Oracle {
     this.useInversePropensityWeightingPositiveOnly = useInversePropensityWeightingPositiveOnly
   }
 
-  toJSON(): string {
-    return JSON.stringify({
+  getOracleState(): IOracleState {
+    return {
       contextFeatures: this.contextFeatures,
       exerciseFeatures: this.exerciseFeatures,
       exerciseNames: this.exerciseNames,      
@@ -76,26 +75,35 @@ export class Oracle {
       contextExerciseFeatureInteractions: this.contextExerciseFeatureInteractions,
       useInversePropensityWeighting: this.useInversePropensityWeighting,
       useInversePropensityWeightingPositiveOnly: this.useInversePropensityWeightingPositiveOnly,
-      features: this.features,
+      targetLabel: this.targetLabel,
       weights: this.getWeightsHash(),
-    });
+    }
+  }
+
+  static fromOracleState(oracleState: IOracleState): Oracle {
+    return new Oracle(
+      oracleState.contextFeatures,
+      oracleState.exerciseFeatures,
+      oracleState.exerciseNames,
+      oracleState.learningRate,
+      oracleState.iterations,
+      oracleState.addIntercept,
+      oracleState.contextExerciseInteractions,
+      oracleState.contextExerciseFeatureInteractions,
+      oracleState.useInversePropensityWeighting,
+      oracleState.useInversePropensityWeightingPositiveOnly,
+      oracleState.targetLabel,
+      oracleState.weights,
+    );
+  }
+
+  toJSON(): string {
+    return JSON.stringify(this.getOracleState());
   }
 
   static fromJSON(json: string): Oracle {
-    let data = JSON.parse(json);
-    return new Oracle(
-      data.contextFeatures,
-      data.exerciseFeatures,
-      data.exerciseNames,
-      data.learningRate,
-      data.iterations,
-      data.addIntercept,
-      data.contextExerciseInteractions,
-      data.contextExerciseFeatureInteractionse,
-      data.useInversePropensityWeighting,
-      data.useInversePropensityWeightingPositiveOnly,
-      data.weights
-    );
+    let oracleState = JSON.parse(json);
+    return Oracle.fromOracleState(oracleState);
   }
 
   generateFeatures(): string[] {
@@ -293,36 +301,29 @@ export class Oracle {
 
   fit(
     trainingData: ITrainingData,
-    learningRate: number | undefined,
-    iterations: number | undefined,
-    useInversePropensityWeighting: boolean | undefined,
   ) {
-    learningRate = learningRate ?? this.learningRate;
-    iterations = iterations ?? this.iterations;
-    useInversePropensityWeighting = useInversePropensityWeighting ?? this.useInversePropensityWeighting;
-
     let X = this.getOrderedInputsArray(
       trainingData.input.contextFeatures,
       trainingData.input.exerciseFeatures,
-      trainingData.input.exerciseName,
+      trainingData.input.exerciseId,
     );
     let y = [(trainingData as any)[this.targetLabel]];
-    
+
     if (y[0] != undefined) {
       let sampleWeight = 1;
-      if (useInversePropensityWeighting) {
+      if (this.useInversePropensityWeighting) {
         sampleWeight = 1 / (trainingData.probability || 1);
       } else if ((this.useInversePropensityWeightingPositiveOnly) && (trainingData.clicked == 1)) {
         sampleWeight = 1 / (trainingData.probability || 1);
       }
 
-      for (let i = 0; i < iterations; i++) {
+      for (let i = 0; i < this.iterations; i++) {
         let pred = this.sigmoid(
           math.evaluate(`X * weights`, { X, weights: this.weights })
         );
         this.weights = math.evaluate(
           `weights - sampleWeight * learningRate / 1 * ((pred - y)' * X)'`,
-          { weights: this.weights, sampleWeight: sampleWeight, learningRate, pred, y, X }
+          { weights: this.weights, sampleWeight: sampleWeight, learningRate: this.learningRate, pred, y, X }
         );
       }
     } else {
@@ -332,12 +333,9 @@ export class Oracle {
 
   fitMany(
     trainingDataList: ITrainingData[], 
-    learningRate: number | undefined,
-    iterations: number | undefined,
-    useInversePropensityWeighting: boolean | undefined,
     ) {
     for (let i = 0; i < trainingDataList.length; i++) {
-      this.fit(trainingDataList[i], learningRate, iterations, useInversePropensityWeighting);
+      this.fit(trainingDataList[i]);
     }
   }
 

@@ -129,7 +129,7 @@ export function RoomOracle() {
         newTrainingData.forEach((trainingData) => {
             if (trainingData.clicked == 1) {
                 // console.log("Exercise Name", trainingData.input.exerciseName)
-                const exercise = exercises.find((exercise) => exercise.InternalName === trainingData.input.exerciseName);
+                const exercise = exercises.find((exercise) => exercise.InternalName === trainingData.input.exerciseId);
                 if (exercise) {
                     if (exercise.SelectedCount === undefined) {
                         exercise.SelectedCount = 1;
