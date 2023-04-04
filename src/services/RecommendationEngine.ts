@@ -146,9 +146,6 @@ export class RecommendationEngine implements IRecommendationEngine {
         return recommendation
     }
 
-    scoreAllExercises(context: IContext) {
-    }
-
     getRecommendedExercises(recommendation: IRecommendation) : IExercise[] {
         return recommendation.recommendedExercises.map(ex => this.exercises[ex.exerciseId]);
     }

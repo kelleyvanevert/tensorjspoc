@@ -26,7 +26,7 @@ import { Oracle } from '../services/Oracle';
 import { RecommendationEngine } from '../services/RecommendationEngine';
 
 
-export function RoomOracle() {
+export function RoomDemoApp() {
     const [exercises, setExercises] = useState<IExercise[]>(Exercises)
 
     const [clickLearningRate, setClickLearningRate] = useState<number>(0.01);
