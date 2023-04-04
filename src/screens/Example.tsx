@@ -4,8 +4,13 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {AppButton} from '../components/AppButton';
 import {BaseColors} from '../components/colors';
 import {MenuBar} from '../components/MenuBar';
-import {Exercises, IRecommendation, IRecommendationEngine} from '../interfaces';
-import {RecommendationEngine} from '../services/RecommendationEngine';
+import {
+  createEngineFromJSON,
+  createEngineWithDefaults,
+  Exercises,
+  IRecommendation,
+  IRecommendationEngine,
+} from '../interfaces';
 
 /** Just using the same test data, this data would come from the Cms in the ROOM app */
 const exercises = Exercises;
@@ -22,13 +27,13 @@ export function ExampleScreen() {
   const [recommendation, setRecommendation] = useState<IRecommendation>();
 
   function createRE() {
-    setRecommendationEngine(RecommendationEngine.createNew(exercises));
+    setRecommendationEngine(createEngineWithDefaults(exercises));
   }
 
   function restoreRE() {
     if (recommendationState) {
       setRecommendationEngine(
-        RecommendationEngine.fromJSON(recommendationState, exercises),
+        createEngineFromJSON(recommendationState, exercises),
       );
     } else {
       console.warn('Create and persist RE first!');
