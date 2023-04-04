@@ -42,7 +42,7 @@ export interface IRecommendationEngine {
   toJSON(): string;
   
   makeRecommendation(context: IContext): IRecommendation;
-  scoreExercises(context: IContext): IScoredExercise[];
+  scoreAllExercises(context: IContext): IScoredExercise[];
   getRecommendedExercises(recommendation: IRecommendation): IExercise[];
 
   onCloseRecommendations(recommendation: IRecommendation): Promise<void>;

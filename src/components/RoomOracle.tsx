@@ -117,7 +117,7 @@ export function RoomOracle() {
     ));
 
     const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
-    const [scoredExercises, setScoredExercises] = useState<IScoredExercise[]>(engine.scoreExercises(context));
+    const [scoredExercises, setScoredExercises] = useState<IScoredExercise[]>(engine.scoreAllExercises(context));
     const [recommendation, setRecommendation] = useState<IRecommendation>(engine.makeRecommendation(context));
     const [recommendedExercises, setRecommendedExercises] = useState<IExercise[]>(engine.getRecommendedExercises(recommendation))
 
@@ -150,7 +150,7 @@ export function RoomOracle() {
         setContext(newContext);
         const updatedContext = { ...context, ...newContext };
 
-        setScoredExercises(engine.scoreExercises(updatedContext))
+        setScoredExercises(engine.scoreAllExercises(updatedContext))
         setRecommendation(engine.makeRecommendation(updatedContext))
         if (recommendation) {
             setRecommendedExercises(engine.getRecommendedExercises(recommendation))

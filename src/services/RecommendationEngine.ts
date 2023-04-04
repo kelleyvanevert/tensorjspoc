@@ -82,7 +82,7 @@ export class RecommendationEngine implements IRecommendationEngine {
         return sampleIndex;
     }
 
-    scoreExercises(context: IContext) : IScoredExercise[] {
+    scoreAllExercises(context: IContext) : IScoredExercise[] {
         let scoredExercises: IScoredExercise[] = [];
 
         for (const exerciseId in this.exercises) {
