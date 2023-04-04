@@ -20,7 +20,6 @@ export class Oracle {
   interactionFeatures: string[];
   features: string[];
   nFeatures: number;
-  targetLabel: string = 'label';
 
   constructor(
     contextFeatures: string[] = [],
@@ -303,8 +302,8 @@ export class Oracle {
     trainingData: ITrainingData,
   ) {
     let X = this.getOrderedInputsArray(
-      trainingData.input.contextFeatures,
-      trainingData.input.exerciseFeatures,
+      trainingData.input.contextFeatures ?? {},
+      trainingData.input.exerciseFeatures ?? {},
       trainingData.input.exerciseId,
     );
     let y = [(trainingData as any)[this.targetLabel]];

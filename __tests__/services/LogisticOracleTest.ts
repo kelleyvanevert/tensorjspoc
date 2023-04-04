@@ -158,7 +158,8 @@ describe('LogisticOracle', () => {
 
   describe('toJSON', () => {
     it('should return a JSON object with the correct properties', () => {
-      expect(oracle.toJSON()).toEqual("{\"contextFeatures\":[\"context1\",\"context2\"],\"exerciseFeatures\":[\"feature1\",\"feature2\"],\"exerciseNames\":[\"exercise1\",\"exercise2\"],\"learningRate\":0.1,\"iterations\":1,\"addIntercept\":true,\"contextExerciseInteractions\":false,\"contextExerciseFeatureInteractions\":true,\"useInversePropensityWeighting\":false,\"useInversePropensityWeightingPositiveOnly\":false,\"features\":[\"exercise1\",\"exercise2\",\"feature1\",\"feature2\",\"context1*feature1\",\"context1*feature2\",\"context2*feature1\",\"context2*feature2\"],\"weights\":{\"intercept\":0,\"exercise1\":0.1,\"exercise2\":0.2,\"feature1\":0.3,\"feature2\":0.4,\"context1*feature1\":0,\"context1*feature2\":0,\"context2*feature1\":0,\"context2*feature2\":0}}");
+      expect(oracle.toJSON()).toEqual(
+      "{\"contextFeatures\":[\"context1\",\"context2\"],\"exerciseFeatures\":[\"feature1\",\"feature2\"],\"exerciseNames\":[\"exercise1\",\"exercise2\"],\"learningRate\":0.1,\"iterations\":1,\"addIntercept\":true,\"contextExerciseInteractions\":false,\"contextExerciseFeatureInteractions\":true,\"useInversePropensityWeighting\":false,\"useInversePropensityWeightingPositiveOnly\":false,\"targetLabel\":\"label\",\"weights\":{\"intercept\":0,\"exercise1\":0.1,\"exercise2\":0.2,\"feature1\":0.3,\"feature2\":0.4,\"context1*feature1\":0,\"context1*feature2\":0,\"context2*feature1\":0,\"context2*feature2\":0}}");
     });
   });
 
@@ -364,9 +365,9 @@ describe('LogisticOracle', () => {
 
     it('should return an array of weights that are different from the previous weights', () => {
       
-      let trainingData = {
+      let trainingData: ITrainingData = {
         input: {
-            exerciseName: 'exercise1',
+            exerciseId: 'exercise1',
             contextFeatures: {'context1': 1, 'context2': 0},
             exerciseFeatures: {'feature1': 1, 'feature2': 0},
         },
@@ -386,10 +387,10 @@ describe('LogisticOracle', () => {
   describe('fitMany', () => {
     it('should update weights after passing training data', () => {
       
-      let trainingData = [
+      let trainingData: ITrainingData[] = [
         {
           input: {
-              exerciseName: 'exercise1',
+              exerciseId: 'exercise1',
               contextFeatures: {'context1': 1, 'context2': 0},
               exerciseFeatures: {'feature1': 1, 'feature2': 0},
           },
@@ -398,7 +399,7 @@ describe('LogisticOracle', () => {
         },
         {
           input: {
-              exerciseName: 'exercise1',
+              exerciseId: 'exercise1',
               contextFeatures: {'context1': 1, 'context2': 0},
               exerciseFeatures: {'feature1': 1, 'feature2': 0},
           },

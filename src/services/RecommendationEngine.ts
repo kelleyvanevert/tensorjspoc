@@ -3,7 +3,7 @@ import { IContext } from "../interfaces/IContext";
 import { IRecommendation, IRecommendedExercise } from "../interfaces/IRecommendation";
 import { IExerciseData } from "../interfaces/IExercise";
 import { IEvaluation } from "../interfaces/IEvaluation";
-import { ITrainingData } from "../interfaces/ITrainingData";
+import { ITrainingData, IExerciseTrainingData } from "../interfaces/ITrainingData";
 import { IRecommendationEngine, IRecommendationEngineState } from "../interfaces/IRecommendationEngine";
 import { Oracle } from "./Oracle";
 
@@ -150,8 +150,8 @@ export class RecommendationEngine implements IRecommendationEngine {
         return recommendation.recommendedExercises.map(ex => this.exercises[ex.exerciseId]);
     }
 
-    private _generateClickTrainingData(recommendation: IRecommendation, selectedExerciseId:string|undefined=undefined) : ITrainingData[] {
-        let trainingData: ITrainingData[] = []
+    private _generateClickTrainingData(recommendation: IRecommendation, selectedExerciseId:string|undefined=undefined) : IExerciseTrainingData[] {
+        let trainingData: IExerciseTrainingData[] = []
         for (let index = 0; index < recommendation.recommendedExercises.length; index++) {
             const exerciseId = recommendation.recommendedExercises[index].exerciseId;
             const recommendedExercise = this.exercises[exerciseId];   
@@ -175,7 +175,7 @@ export class RecommendationEngine implements IRecommendationEngine {
           return trainingData
     }
 
-    private _generateEvaluationTrainingData(context: IContext, exerciseId:string, evaluation:IEvaluation): ITrainingData { 
+    private _generateEvaluationTrainingData(context: IContext, exerciseId:string, evaluation:IEvaluation): IExerciseTrainingData { 
         const evaluatedExercise = this.exercises[exerciseId];   
         if (!evaluatedExercise) {
             throw new Error(`Failed to generate training data for evaluated exercise at index ${exerciseId}.`);
@@ -189,7 +189,7 @@ export class RecommendationEngine implements IRecommendationEngine {
         const clicked = undefined;
         const rating = evaluation.liked / 100;
         const probability = 1;
-        const trainingData: ITrainingData = { input, clicked, rating, probability };
+        const trainingData: IExerciseTrainingData = { input, clicked, rating, probability };
         return trainingData;
     }
 
