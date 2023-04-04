@@ -6,6 +6,7 @@ import { IEvaluation } from "./IEvaluation";
 import { Oracle } from "../services/Oracle";
 
 
+/** @Oege this is a type, not an interface */
 export type IRecommendationEngineState = {
   clickOracleState: IOracleState;
   ratingOracleState: IOracleState;
@@ -15,11 +16,13 @@ export type IRecommendationEngineState = {
 };
 
 export interface IRecommendationEngine {
-  clickOracle: Oracle;
-  ratingOracle: Oracle;
-  softmaxBeta: number;
-  ratingWeight: number;
-  nRecommendations: number;
+  // @Oege these are not part of the interface!
+
+  // clickOracle: Oracle;
+  // ratingOracle: Oracle;
+  // softmaxBeta: number;
+  // ratingWeight: number;
+  // nRecommendations: number;
 
   // static methods (including constructor) are not allowed in interfaces:
   // new (

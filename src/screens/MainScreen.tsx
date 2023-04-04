@@ -1,23 +1,25 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BaseColors } from '../components/colors';
-import { RoomDemoApp } from '../components/RoomDemoApp';
-
+import React, {useState} from 'react';
+import {StyleSheet, View, ScrollView} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {BaseColors} from '../components/colors';
+import {MenuBar} from '../components/MenuBar';
+import {RoomDemoApp} from '../components/RoomDemoApp';
 
 export function MainScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-        <View style={{ height: insets.top + 24 }} />
+    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
+      <View style={{height: insets.top + 24}} />
 
-          <View style={{ marginHorizontal: 24, flexGrow: 1 }}>
-            <RoomDemoApp />
-          </View>
+      <MenuBar />
 
-        <View style={{ height: insets.bottom + 24 }} />
-     </ScrollView>
+      <View style={{marginHorizontal: 24, flexGrow: 1}}>
+        <RoomDemoApp />
+      </View>
+
+      <View style={{height: insets.bottom + 24}} />
+    </ScrollView>
   );
 }
 
