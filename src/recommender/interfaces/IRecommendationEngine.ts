@@ -3,8 +3,8 @@ import {IContext} from './IContext';
 import {IExercise, IExerciseData, IScoredExercise} from './IExercise';
 import {IOracleState} from './IOracleState';
 import {IEvaluation} from './IEvaluation';
-import {RecommendationEngine} from '../services/RecommendationEngine';
-import {Oracle} from '../services/Oracle';
+import {RecommendationEngine} from '../RecommendationEngine';
+import {Oracle} from '../Oracle';
 
 /** @Oege this is a type, not an interface */
 export type IRecommendationEngineState = {

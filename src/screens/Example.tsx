@@ -10,7 +10,7 @@ import {
   Exercises,
   IRecommendation,
   IRecommendationEngine,
-} from '../interfaces';
+} from '../recommender/interfaces';
 
 /** Just using the same test data, this data would come from the Cms in the ROOM app */
 const exercises = Exercises;

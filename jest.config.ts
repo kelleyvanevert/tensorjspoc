@@ -7,6 +7,10 @@ const config: Config = {
     "/node_modules/",
     "/jest"
   ],
+  roots: [
+    "<rootDir>/src/",
+    "<rootDir>/__tests__"
+  ],
   testPathIgnorePatterns: [
   ],
   collectCoverageFrom: [

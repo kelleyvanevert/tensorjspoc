@@ -3,7 +3,7 @@ import {
     ConvertScoresToProbabilityDistribution,
     SampleFromProbabilityDistribution,
     CosineSimilarity,
-} from "../../src/services/MathService";
+} from "../MathService";
 
 describe('weightedHarmonicMean', () => {
     it('should calculate the weighted harmonic mean correctly', () => {

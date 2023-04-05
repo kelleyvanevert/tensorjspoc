@@ -1,14 +1,16 @@
-import { IExercise, IScoredExercise } from "../interfaces/IExercise";
-import { IContext } from "../interfaces/IContext";
-import { IRecommendation, IRecommendedExercise } from "../interfaces/IRecommendation";
-import { IExerciseData } from "../interfaces/IExercise";
-import { IEvaluation } from "../interfaces/IEvaluation";
-import { ITrainingData, IExerciseTrainingData } from "../interfaces/ITrainingData";
-import { IRecommendationEngine, IDemoRecommendationEngine, IRecommendationEngineState } from "../interfaces/IRecommendationEngine";
+import { IExercise, IScoredExercise } from "./interfaces/IExercise";
+import { IContext } from "./interfaces/IContext";
+import { IRecommendation, IRecommendedExercise } from "./interfaces/IRecommendation";
+import { IExerciseData } from "./interfaces/IExercise";
+import { IEvaluation, IExerciseTrainingData } from "./interfaces";
+import { IRecommendationEngine, IDemoRecommendationEngine, IRecommendationEngineState } from "./interfaces/IRecommendationEngine";
+import { 
+    weightedHarmonicMean, 
+    ConvertScoresToProbabilityDistribution, 
+    SampleFromProbabilityDistribution 
+} from "./MathService";
 import { Oracle } from "./Oracle";
 
-
-import { weightedHarmonicMean, ConvertScoresToProbabilityDistribution, SampleFromProbabilityDistribution } from "./MathService";
 
 interface exerciseScore {
     exerciseId: string;
@@ -237,7 +239,6 @@ export class RecommendationEngine implements IRecommendationEngine {
 }
 
 export class DemoRecommendationEngine extends RecommendationEngine implements IDemoRecommendationEngine {
-    
     
     scoreAllExercises(context: IContext) : IScoredExercise[] {
         let scoredExercises: IScoredExercise[] = [];

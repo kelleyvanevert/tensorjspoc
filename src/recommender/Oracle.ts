@@ -1,5 +1,11 @@
 let math = require('mathjs');
-import { IOracleState, WeightsHash, FeaturesHash, ITrainingData } from '../interfaces';
+
+import { 
+  IOracleState, 
+  WeightsHash, 
+  FeaturesHash, 
+  ITrainingData, 
+} from './interfaces';
 
 
 export class Oracle {

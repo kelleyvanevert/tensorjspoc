@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View, Text, Modal, TouchableOpacity } from "react-native";
-import { BaseColors } from "./colors";
 import StarRating from "react-native-star-rating";
-import { IExercise } from "../interfaces";
+
+import { BaseColors } from "./colors";
 import { AppButton } from "./AppButton";
-import { IRecommendation } from "../interfaces";
+
+import { IExercise, IRecommendation } from "../recommender/interfaces";
 
 type Props = {
     recommendation: IRecommendation;

@@ -1,15 +1,10 @@
-import { Oracle } from '../../src/services/Oracle';
-import { RecommendationEngine } from '../../src/services/RecommendationEngine';
-import { IRecommendationEngineState } from '../../src/interfaces/IRecommendationEngine';
-import { IExercise, IScoredExercise } from '../../src/interfaces/IExercise';
-import { IContext } from '../../src/interfaces/IContext';
-import { IRecommendation } from '../../src/interfaces/IRecommendation';
-import { IEvaluation } from '../../src/interfaces/IEvaluation';
-import { IOracleState } from '../../src/interfaces/IOracleState';
-import { IExerciseFeatures } from '../../src/interfaces/IExerciseFeatures';
-import { IExerciseData } from '../../src/interfaces/IExercise';
-import { IExerciseTrainingData } from '../../src/interfaces/ITrainingData';
-import { Exercises } from '../../src/interfaces/Exercises';
+import { Oracle } from '../Oracle';
+import { RecommendationEngine, DemoRecommendationEngine } from '../RecommendationEngine';
+import { IRecommendationEngineState } from '../interfaces/IRecommendationEngine';
+import { IScoredExercise } from '../interfaces/IExercise';
+import { IContext } from '../interfaces/IContext';
+import { Exercises } from '../interfaces/Exercises';
+
 
 describe('RecommendationEngine', () => {
     let clickOracle: Oracle;
@@ -82,6 +77,7 @@ describe('RecommendationEngine', () => {
             };
             expect(recommendationEngine.getRecommendationEngineState()).toEqual(state);
         });
+      });
 
       describe('toJSON', () => {
         it('should return the correct JSON string', () => {
@@ -104,24 +100,74 @@ describe('RecommendationEngine', () => {
             });
             });
       });
+        
+});
+
+describe('DemoRecommendationEngine', () => {
+  let clickOracle: Oracle;
+  let ratingOracle: Oracle;
+  let demoRecommendationEngine: DemoRecommendationEngine;
+
+
+  beforeEach(() => {
+      clickOracle = new Oracle(
+        ['happy'],
+        ['article', 'breathing'],
+        ['articles_act', 'follow_your_breath'],
+        0.1,
+        1,
+        true,
+        true,
+        true,
+        true,
+        false,
+        'click',
+      );
+
+      ratingOracle = new Oracle(
+          [],
+          [],
+          ['articles_act', 'follow_your_breath'],
+          0.1,
+          1,
+          true,
+          true,
+          true,
+          true,
+          false,
+          'click',
+        );
+      // new list of exercises with only exercises with exercideId in ['articles_act', 'follow_your_breath']
+      const filteredExercises = Exercises.filter((exercise) => {
+          return ['articles_act', 'follow_your_breath'].includes(exercise.ExerciseId);
+        });
+
+
+      demoRecommendationEngine = new DemoRecommendationEngine(
+          clickOracle, 
+          ratingOracle, 
+          filteredExercises, 
+          1.0, 
+          0.2, 
+          3)
+      
+    });
 
     describe('scoreAllExercises', () => {
-        it('should return the correct scores', () => {
-            const context: IContext = {
-                happy: 1,
-                sad: 0,
-            };
-            const scoredExercises: IScoredExercise[] = recommendationEngine.scoreAllExercises(context);
-            const expectedScores:IScoredExercise[] = [
-                {"ExerciseId": "articles_act", "ExerciseName": "Article ACT", "AggregateScore": 0.5, "ClickScore": 0.5, "Probability": 0.5, "RatingScore": 0.5, "SelectedCount": undefined}, 
-                {"AggregateScore": 0.5, "ClickScore": 0.5, "ExerciseId": "follow_your_breath", "ExerciseName": "Follow Your Breath", "Probability": 0.5, "RatingScore": 0.5, "SelectedCount": undefined}
-            ];
-            expect(scoredExercises).toEqual(expectedScores);
-        });
-    });
+      it('should return the correct scores', () => {
+          const context: IContext = {
+              happy: 1,
+              sad: 0,
+          };
+          const scoredExercises: IScoredExercise[] = demoRecommendationEngine.scoreAllExercises(context);
+          const expectedScores:IScoredExercise[] = [
+              {"ExerciseId": "articles_act", "ExerciseName": "Article ACT", "AggregateScore": 0.5, "ClickScore": 0.5, "Probability": 0.5, "RatingScore": 0.5, "SelectedCount": undefined}, 
+              {"AggregateScore": 0.5, "ClickScore": 0.5, "ExerciseId": "follow_your_breath", "ExerciseName": "Follow Your Breath", "Probability": 0.5, "RatingScore": 0.5, "SelectedCount": undefined}
+          ];
+          expect(scoredExercises).toEqual(expectedScores);
+      });
+  });
 
+  });
 
-        
-    });
-});
 

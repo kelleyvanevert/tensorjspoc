@@ -17,13 +17,13 @@ import {
     IEvaluation,
     IScoredExercise,
     IDemoRecommendationEngine,
-} from '../interfaces';
+} from '../recommender/interfaces';
 
 import { ContextComponent } from './ContextComponent';
 import { ScoredExercisesList } from './ScoredExercisesList';
 import { RecommendedExercises } from './RecommendedExercises';
-import { Oracle } from '../services/Oracle';
-import { DemoRecommendationEngine } from '../services/RecommendationEngine';
+import { Oracle } from '../recommender/Oracle';
+import { DemoRecommendationEngine } from '../recommender/RecommendationEngine';
 
 
 export function RoomDemoApp() {

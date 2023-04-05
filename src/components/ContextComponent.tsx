@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
-import { Mood, Moods, IContext, generateContext } from "../interfaces";
+
 import { AppButton } from "./AppButton";
 import { BaseColors } from "./colors";
+
+import { Mood, Moods, IContext, generateContext } from "../recommender/interfaces";
 
 
 type Props = {

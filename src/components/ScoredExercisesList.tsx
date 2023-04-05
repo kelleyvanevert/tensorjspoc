@@ -1,8 +1,9 @@
 import React from 'react';
 import { StyleSheet, Text, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { IScoredExercise } from '../interfaces';
 import { BaseColors } from './colors';
+
+import { IScoredExercise } from '../recommender/interfaces';
 
 type Props = {
     scoredExercises: IScoredExercise[]

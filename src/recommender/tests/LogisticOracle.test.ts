@@ -1,5 +1,5 @@
-import { Oracle } from '../../src/services/Oracle';
-import { ITrainingData } from '../../src/interfaces';
+import { Oracle } from '../Oracle';
+import { ITrainingData } from '../interfaces';
 
 describe('LogisticOracle', () => {
   const contextFeatures = ['context1', 'context2'];
