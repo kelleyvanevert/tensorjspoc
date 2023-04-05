@@ -9,7 +9,7 @@ import { BaseColors } from "./colors";
 import { 
     IExercise, 
     Exercises,
-    exerciseNames, 
+    exerciseIds, 
     Moods, 
     IContext, 
     generateContext,
@@ -65,7 +65,7 @@ export function RoomDemoApp() {
     const [clickOracle, setClickOracle] = useState<Oracle>(new Oracle(
             ClickContextFeatures, //contextFeatures
             ClickExerciseFeatures, //exerciseFeatures
-            exerciseNames, //exerciseNames
+            exerciseIds, //exerciseNames
             clickLearningRate, //learningRate
             1, //iterations
             clickAddIntercept, //addIntercept
@@ -93,7 +93,7 @@ export function RoomDemoApp() {
     const [ratingOracle, setRatingOracle] = useState<Oracle>(new Oracle(
         RatingContextFeatures, //contextFeatures
         RatingExerciseFeatures, //exerciseFeatures
-        exerciseNames, //exerciseNames
+        exerciseIds, //exerciseNames
         ratingLearningRate, //learningRate
         1, //iterations
         ratingAddIntercept, //addIntercept
@@ -105,7 +105,6 @@ export function RoomDemoApp() {
         )
     );
     const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
-
     const [ratingWeight, setRatingWeight] = useState<number>(0.2);
 
     const [engine, setEngine] = useState<IDemoRecommendationEngine> (new DemoRecommendationEngine(

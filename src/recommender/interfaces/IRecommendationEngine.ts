@@ -6,7 +6,6 @@ import {IEvaluation} from './IEvaluation';
 import {RecommendationEngine} from '../RecommendationEngine';
 import {Oracle} from '../Oracle';
 
-/** @Oege this is a type, not an interface */
 export type IRecommendationEngineState = {
   clickOracleState: IOracleState;
   ratingOracleState: IOracleState;

@@ -72,7 +72,7 @@ export class Oracle {
     return {
       contextFeatures: this.contextFeatures,
       exerciseFeatures: this.exerciseFeatures,
-      exerciseNames: this.exerciseNames,      
+      exerciseIds: this.exerciseNames,      
       learningRate: this.learningRate,
       iterations: this.iterations,
       addIntercept: this.addIntercept,
@@ -89,7 +89,7 @@ export class Oracle {
     return new Oracle(
       oracleState.contextFeatures,
       oracleState.exerciseFeatures,
-      oracleState.exerciseNames,
+      oracleState.exerciseIds,
       oracleState.learningRate,
       oracleState.iterations,
       oracleState.addIntercept,

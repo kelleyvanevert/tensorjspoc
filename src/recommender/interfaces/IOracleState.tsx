@@ -4,7 +4,7 @@ export type FeaturesHash = {[feature: string]: number};
 export type IOracleState = {
   contextFeatures: string[];
   exerciseFeatures: string[];
-  exerciseNames: string[];
+  exerciseIds: string[];
   learningRate: number;
   iterations: number;
   addIntercept: boolean;
