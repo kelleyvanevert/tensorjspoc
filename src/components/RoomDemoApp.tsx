@@ -16,14 +16,14 @@ import {
     IRecommendation,
     IEvaluation,
     IScoredExercise,
-    IRecommendationEngine
+    IDemoRecommendationEngine,
 } from '../interfaces';
 
 import { ContextComponent } from './ContextComponent';
 import { ScoredExercisesList } from './ScoredExercisesList';
 import { RecommendedExercises } from './RecommendedExercises';
 import { Oracle } from '../services/Oracle';
-import { RecommendationEngine } from '../services/RecommendationEngine';
+import { DemoRecommendationEngine } from '../services/RecommendationEngine';
 
 
 export function RoomDemoApp() {
@@ -108,7 +108,7 @@ export function RoomDemoApp() {
 
     const [ratingWeight, setRatingWeight] = useState<number>(0.2);
 
-    const [engine, setEngine] = useState<IRecommendationEngine> (new RecommendationEngine(
+    const [engine, setEngine] = useState<IDemoRecommendationEngine> (new DemoRecommendationEngine(
         clickOracle,
         ratingOracle,
         exercises,

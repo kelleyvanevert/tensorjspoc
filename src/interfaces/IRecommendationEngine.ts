@@ -4,6 +4,7 @@ import {IExercise, IExerciseData, IScoredExercise} from './IExercise';
 import {IOracleState} from './IOracleState';
 import {IEvaluation} from './IEvaluation';
 import {RecommendationEngine} from '../services/RecommendationEngine';
+import {Oracle} from '../services/Oracle';
 
 /** @Oege this is a type, not an interface */
 export type IRecommendationEngineState = {
@@ -28,33 +29,12 @@ export function createEngineFromJSON(
 }
 
 export interface IRecommendationEngine {
-  // @Oege these are not part of the interface!
-
-  // clickOracle: Oracle;
-  // ratingOracle: Oracle;
-  // softmaxBeta: number;
-  // ratingWeight: number;
-  // nRecommendations: number;
-
-  // static methods (including constructor) are not allowed in interfaces:
-  // new (
-  //   clickOracle: Oracle,
-  //   ratingOracle: Oracle,
-  //   exercises: IExerciseData,
-  //   softmaxBeta: number,
-  //   ratingWeight: number,
-  //   nRecommendations: number,
-  //   ) : IRecommendationEngineInstance;
-
-  // fromRecommendationEngineState(state: IRecommendationEngineState, exercises: IExerciseData): void;
 
   getRecommendationEngineState(): IRecommendationEngineState;
   toJSON(): string;
 
   makeRecommendation(context: IContext): IRecommendation;
-  scoreAllExercises(context: IContext): IScoredExercise[];
-  getRecommendedExercises(recommendation: IRecommendation): IExercise[];
-
+  
   onCloseRecommendations(recommendation: IRecommendation): Promise<void>;
   onChooseRecommendedExercise(
     recommendation: IRecommendation,
@@ -66,4 +46,23 @@ export interface IRecommendationEngine {
     exerciseId: string,
     evaluation: IEvaluation,
   ): Promise<void>;
+}
+
+
+export interface IDemoRecommendationEngine extends IRecommendationEngine {
+  // in the demo we need more access to the internals of the engine and its oracles
+  // so we expose them here
+
+  clickOracle: Oracle;
+  ratingOracle: Oracle;
+  softmaxBeta: number;
+  ratingWeight: number;
+  nRecommendations: number;
+
+  // we also want to display all exercises with their scores
+  scoreAllExercises(context: IContext): IScoredExercise[];
+
+  // and retrieve the recomended exercises inside the recommendation
+  getRecommendedExercises(recommendation: IRecommendation): IExercise[];
+
 }

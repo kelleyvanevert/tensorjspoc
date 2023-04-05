@@ -4,7 +4,7 @@ import { IRecommendation, IRecommendedExercise } from "../interfaces/IRecommenda
 import { IExerciseData } from "../interfaces/IExercise";
 import { IEvaluation } from "../interfaces/IEvaluation";
 import { ITrainingData, IExerciseTrainingData } from "../interfaces/ITrainingData";
-import { IRecommendationEngine, IRecommendationEngineState } from "../interfaces/IRecommendationEngine";
+import { IRecommendationEngine, IDemoRecommendationEngine, IRecommendationEngineState } from "../interfaces/IRecommendationEngine";
 import { Oracle } from "./Oracle";
 
 
@@ -107,32 +107,7 @@ export class RecommendationEngine implements IRecommendationEngine {
         return sampleIndex;
     }
 
-    scoreAllExercises(context: IContext) : IScoredExercise[] {
-        let scoredExercises: IScoredExercise[] = [];
-
-        for (const exerciseId in this.exercises) {
-            const exercise = this.exercises[exerciseId];
-            const clickScore = this.clickOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
-            const ratingScore = this.ratingOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
-            const aggregateScore = weightedHarmonicMean(
-                [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
-            );
-            const softmaxNumerator = Math.exp(this.softmaxBeta * aggregateScore)
-            scoredExercises.push({
-                ExerciseName: exercise.ExerciseName,
-                ExerciseId: exerciseId,
-                ClickScore: clickScore,
-                RatingScore: ratingScore,
-                AggregateScore: aggregateScore,
-                Probability: softmaxNumerator,
-                SelectedCount: exercise.SelectedCount,
-            })
-        }
-        let SoftmaxDenominator = scoredExercises.reduce((a, b) => a + b.Probability, 0);
-        scoredExercises = scoredExercises.map(ex => ({...ex, ...{Probability: ex.Probability / SoftmaxDenominator}}))
-        const sortedExercises = scoredExercises.sort((a, b) => b.AggregateScore - a.AggregateScore);
-        return sortedExercises;
-    }
+    
 
     makeRecommendation(context: IContext) {
         let scoredExercises: IRecommendedExercise[] = [];
@@ -169,10 +144,6 @@ export class RecommendationEngine implements IRecommendationEngine {
             recommendedExercises: recommendedExercises
         }
         return recommendation
-    }
-
-    getRecommendedExercises(recommendation: IRecommendation) : IExercise[] {
-        return recommendation.recommendedExercises.map(ex => this.exercises[ex.exerciseId]);
     }
 
     private _generateClickTrainingData(recommendation: IRecommendation, selectedExerciseId:string|undefined=undefined) : IExerciseTrainingData[] {
@@ -264,3 +235,38 @@ export class RecommendationEngine implements IRecommendationEngine {
     }
     
 }
+
+export class DemoRecommendationEngine extends RecommendationEngine implements IDemoRecommendationEngine {
+    
+    
+    scoreAllExercises(context: IContext) : IScoredExercise[] {
+        let scoredExercises: IScoredExercise[] = [];
+
+        for (const exerciseId in this.exercises) {
+            const exercise = this.exercises[exerciseId];
+            const clickScore = this.clickOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
+            const ratingScore = this.ratingOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
+            const aggregateScore = weightedHarmonicMean(
+                [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
+            );
+            const softmaxNumerator = Math.exp(this.softmaxBeta * aggregateScore)
+            scoredExercises.push({
+                ExerciseName: exercise.ExerciseName,
+                ExerciseId: exerciseId,
+                ClickScore: clickScore,
+                RatingScore: ratingScore,
+                AggregateScore: aggregateScore,
+                Probability: softmaxNumerator,
+                SelectedCount: exercise.SelectedCount,
+            })
+        }
+        let SoftmaxDenominator = scoredExercises.reduce((a, b) => a + b.Probability, 0);
+        scoredExercises = scoredExercises.map(ex => ({...ex, ...{Probability: ex.Probability / SoftmaxDenominator}}))
+        const sortedExercises = scoredExercises.sort((a, b) => b.AggregateScore - a.AggregateScore);
+        return sortedExercises;
+    }
+
+    getRecommendedExercises(recommendation: IRecommendation) : IExercise[] {
+        return recommendation.recommendedExercises.map(ex => this.exercises[ex.exerciseId]);
+    }
+  }
