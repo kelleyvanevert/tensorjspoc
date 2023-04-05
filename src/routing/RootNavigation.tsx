@@ -3,9 +3,11 @@ import {ActivityIndicator} from 'react-native';
 import {TransitionPresets, createStackNavigator} from '@react-navigation/stack';
 import {LinkingOptions, NavigationContainer} from '@react-navigation/native';
 import {MainScreen} from '../screens/MainScreen';
+import {ExampleScreen} from '../screens/Example';
 
 export type RootStackParamList = {
   Main: undefined;
+  Example: undefined;
 };
 
 export type ScreenName = keyof RootStackParamList;
@@ -20,7 +22,7 @@ const linking: LinkingOptions<RootStackParamList> = {
 };
 
 export const RootNavigation = () => {
-  const initialRouteName: ScreenName = 'Main';
+  const initialRouteName: ScreenName = 'Example';
 
   return (
     <NavigationContainer
@@ -35,6 +37,11 @@ export const RootNavigation = () => {
           <RootStack.Screen
             name="Main"
             component={MainScreen}
+            options={{animationEnabled: false}}
+          />
+          <RootStack.Screen
+            name="Example"
+            component={ExampleScreen}
             options={{animationEnabled: false}}
           />
         </RootStack.Group>
