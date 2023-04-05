@@ -10,6 +10,10 @@ import { Oracle } from "./Oracle";
 
 import { weightedHarmonicMean, ConvertScoresToProbabilityDistribution, SampleFromProbabilityDistribution } from "./MathService";
 
+interface exerciseScore {
+    exerciseId: string;
+    score: number;
+}
 
 export class RecommendationEngine implements IRecommendationEngine {
 
