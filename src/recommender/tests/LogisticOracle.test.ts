@@ -159,7 +159,8 @@ describe('LogisticOracle', () => {
   describe('toJSON', () => {
     it('should return a JSON object with the correct properties', () => {
       expect(oracle.toJSON()).toEqual(
-      "{\"contextFeatures\":[\"context1\",\"context2\"],\"exerciseFeatures\":[\"feature1\",\"feature2\"],\"exerciseNames\":[\"exercise1\",\"exercise2\"],\"learningRate\":0.1,\"iterations\":1,\"addIntercept\":true,\"contextExerciseInteractions\":false,\"contextExerciseFeatureInteractions\":true,\"useInversePropensityWeighting\":false,\"useInversePropensityWeightingPositiveOnly\":false,\"targetLabel\":\"label\",\"weights\":{\"intercept\":0,\"exercise1\":0.1,\"exercise2\":0.2,\"feature1\":0.3,\"feature2\":0.4,\"context1*feature1\":0,\"context1*feature2\":0,\"context2*feature1\":0,\"context2*feature2\":0}}");
+      "{\"contextFeatures\":[\"context1\",\"context2\"],\"exerciseFeatures\":[\"feature1\",\"feature2\"],\"exerciseIds\":[\"exercise1\",\"exercise2\"],\"learningRate\":0.1,\"iterations\":1,\"addIntercept\":true,\"contextExerciseInteractions\":false,\"contextExerciseFeatureInteractions\":true,\"useInversePropensityWeighting\":false,\"useInversePropensityWeightingPositiveOnly\":false,\"targetLabel\":\"label\",\"weights\":{\"intercept\":0,\"exercise1\":0.1,\"exercise2\":0.2,\"feature1\":0.3,\"feature2\":0.4,\"context1*feature1\":0,\"context1*feature2\":0,\"context2*feature1\":0,\"context2*feature2\":0}}"
+      );
     });
   });
 

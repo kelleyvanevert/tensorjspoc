@@ -5,6 +5,7 @@ import {IOracleState} from './IOracleState';
 import {IEvaluation} from './IEvaluation';
 import {RecommendationEngine} from '../RecommendationEngine';
 import {Oracle} from '../Oracle';
+import {DefaultRecommendationEngine} from '../Defaults';
 
 export type IRecommendationEngineState = {
   clickOracleState: IOracleState;
@@ -17,7 +18,7 @@ export type IRecommendationEngineState = {
 export function createEngineWithDefaults(
   exercises: IExerciseData,
 ): IRecommendationEngine {
-  return RecommendationEngine.createNew(exercises);
+  return RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
 }
 
 export function createEngineFromJSON(

@@ -43,22 +43,6 @@ export class RecommendationEngine implements IRecommendationEngine {
         this.nRecommendations = nRecommendations;
     }
 
-    /** 
-     * @Oege Create the engine the first time, without any existing training data
-     */
-    static createNew(exercises: IExerciseData): IRecommendationEngine {
-        const clickOracle = Oracle.fromOracleState({}); // TODO: Oege
-        const ratingOracle = Oracle.fromOracleState({}); // TODO: Oege
-        return new RecommendationEngine(
-            clickOracle,
-            ratingOracle,
-            exercises,
-        );
-    }
-
-    /** 
-     * @Oege Restore the engine from saved state
-     */
     static fromJSON(json:string, exercises: IExerciseData): IRecommendationEngine {
         const state = JSON.parse(json) as IRecommendationEngineState; // @Oege: this might not work as simply as I put it here ...
         return RecommendationEngine.fromRecommendationEngineState(state, exercises);
