@@ -1,35 +1,22 @@
-import React from 'react';
-import { Text, StyleProp, ViewStyle } from 'react-native';
-import { Touchable } from './Touchable';
-import { BaseColors } from './colors';
-import { StyleSheet } from 'react-native';
+import cx from "classnames";
 
 type Props = {
   title: string;
-  style?: StyleProp<ViewStyle>;
-  onPress?: () => void;
-  testID?: string;
+  onClick?: () => void;
+  className?: string;
 };
 
-export function AppButton({ title, style, onPress, testID }: Props) {
+export function AppButton({ title, onClick, className }: Props) {
   return (
-    <Touchable onPress={onPress} style={[styles.container, style]}>
-      <Text testID={testID} style={styles.title}>{title}</Text>
-    </Touchable>
+    <button
+      type="button"
+      onClick={onClick}
+      className={cx(
+        "block bg-green py-1 px-3 rounded-full font-display font-bold text-deepblue text-center transition-transform active:scale-[0.9]",
+        className
+      )}
+    >
+      {title}
+    </button>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: BaseColors.green,
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    borderRadius: 999,
-  },
-  title: {
-    fontFamily: 'Rubik-Bold',
-    fontSize: 18,
-    color: BaseColors.deepblue,
-    textAlign: 'center',
-  },
-});

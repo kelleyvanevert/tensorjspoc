@@ -1,4 +1,4 @@
-let math = require('mathjs');
+import * as math from "mathjs";
 
 import { 
   IOracleState, 
@@ -103,7 +103,7 @@ export class Oracle {
   }
 
   toJSON(): string {
-    return JSON.stringify(this.getOracleState());
+    return JSON.stringify(this.getOracleState(), null, 2);
   }
 
   static fromJSON(json: string): Oracle {

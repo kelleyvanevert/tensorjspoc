@@ -75,7 +75,7 @@ export class RecommendationEngine implements IRecommendationEngine {
     }
 
     toJSON(): string {
-        return JSON.stringify(this.getRecommendationEngineState());
+        return JSON.stringify(this.getRecommendationEngineState(), null, 2);
     }
 
     setExercises(exercises: IExerciseData) {
@@ -153,7 +153,7 @@ export class RecommendationEngine implements IRecommendationEngine {
     
             trainingData.push({ input, clicked, rating, probability });
           }
-          console.log("_generateClickTrainingData", JSON.stringify(trainingData))
+          console.log("_generateClickTrainingData", JSON.stringify(trainingData, null, 2))
           return trainingData
     }
 

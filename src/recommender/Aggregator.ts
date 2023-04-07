@@ -170,7 +170,7 @@ export class WeightAggregator {
       }
       
     private _roundObj(obj: Object): Object {
-        return JSON.parse(JSON.stringify(obj, this._valueRounder));
+        return JSON.parse(JSON.stringify(obj, this._valueRounder, 2));
     }
 
     logWeights(): void {

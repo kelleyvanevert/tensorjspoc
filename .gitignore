@@ -69,3 +69,5 @@ todo.*
 /android/app/release
 cache
 coverage
+
+dist
