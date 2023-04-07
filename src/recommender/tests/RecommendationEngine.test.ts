@@ -103,7 +103,7 @@ describe('RecommendationEngine', () => {
     const exerciseIds = Object.keys(Exercises);
     exerciseIds.forEach(exerciseId => {
       it('should be a key of exercises', () => {
-        expect(Exercises[exerciseId]).toBeDefined();
+        expect(Exercises[(exerciseId as any)]).toBeDefined();
       });
     });
   });
