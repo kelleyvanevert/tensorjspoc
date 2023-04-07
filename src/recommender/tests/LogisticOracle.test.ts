@@ -376,7 +376,7 @@ describe('LogisticOracle', () => {
         probability: 0.5,
       }
       const oldWeights = oracle.weights;
-      oracle.fit(trainingData);
+      oracle.fit(trainingData as any);
       expect(oracle.weights).not.toEqual(oldWeights);
 
       const newWeights = oracle.getWeightsHash();
@@ -410,7 +410,7 @@ describe('LogisticOracle', () => {
       ]
 
       const oldWeights = oracle.weights;
-      oracle.fitMany(trainingData);
+      oracle.fitMany(trainingData as any);
       expect(oracle.weights).not.toEqual(oldWeights);
 
       const newWeights = oracle.getWeightsHash();

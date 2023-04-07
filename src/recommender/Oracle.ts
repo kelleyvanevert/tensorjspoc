@@ -4,28 +4,29 @@ import {
   IOracleState, 
   WeightsHash, 
   FeaturesHash, 
-  ITrainingData, 
+  ITrainingData,
+  IExerciseTrainingData, 
 } from './interfaces';
 
 
 export class Oracle {
-  contextFeatures: string[];
-  exerciseFeatures: string[];
-  exerciseNames: string[];
+  contextFeatures!: string[];
+  exerciseFeatures!: string[];
+  exerciseNames!: string[];
   learningRate: number;
   iterations: number;
-  addIntercept: boolean;
-  contextExerciseInteractions: boolean;
-  contextExerciseFeatureInteractions: boolean;
+  addIntercept!: boolean;
+  contextExerciseInteractions!: boolean;
+  contextExerciseFeatureInteractions!: boolean;
   useInversePropensityWeighting: boolean;
   useInversePropensityWeightingPositiveOnly: boolean;
   targetLabel: string;
-  weights: number[];
+  weights!: number[];
 
-  allInputFeatures: string[];
-  interactionFeatures: string[];
-  features: string[];
-  nFeatures: number;
+  allInputFeatures!: string[];
+  interactionFeatures!: string[];
+  features!: string[];
+  nFeatures!: number;
 
   constructor(
     contextFeatures: string[] = [],
@@ -103,7 +104,7 @@ export class Oracle {
   }
 
   toJSON(): string {
-    return JSON.stringify(this.getOracleState(), null, 2);
+    return JSON.stringify(this.getOracleState());
   }
 
   static fromJSON(json: string): Oracle {
@@ -145,7 +146,7 @@ export class Oracle {
 
   zeroWeights(nFeatures: number): number[] {
     return Array(nFeatures)
-      .fill()
+      .fill(null)
       .map(() => [0])
       .flat();
   }
@@ -266,7 +267,7 @@ export class Oracle {
     exerciseInputs: FeaturesHash,
     exerciseName: string | undefined = undefined,
     ): number[][] {
-    let inputsHash: FeatureHash = {...contextInputs, ...exerciseInputs};
+    let inputsHash: FeaturesHash = {...contextInputs, ...exerciseInputs};
     if (!this.hashContainsAllKeys(inputsHash, this.allInputFeatures)) {
         // throw error with missing features:
         const missingFeatures: string[] = [];
@@ -305,7 +306,7 @@ export class Oracle {
   }
 
   fit(
-    trainingData: ITrainingData,
+    trainingData: IExerciseTrainingData,
   ) {
     let X = this.getOrderedInputsArray(
       trainingData.input.contextFeatures ?? {},
@@ -337,7 +338,7 @@ export class Oracle {
   }
 
   fitMany(
-    trainingDataList: ITrainingData[], 
+    trainingDataList: IExerciseTrainingData[], 
     ) {
     for (let i = 0; i < trainingDataList.length; i++) {
       this.fit(trainingDataList[i]);

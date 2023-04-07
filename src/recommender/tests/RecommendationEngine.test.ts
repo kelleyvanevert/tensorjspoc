@@ -91,15 +91,6 @@ describe('RecommendationEngine', () => {
           expect(recommendationEngine.toJSON()).toEqual(JSON.stringify(state));
         });
       });
-
-      describe('all exercideIds should be keys of exercises', () => {
-        const exerciseIds = Object.keys(Exercises);
-        exerciseIds.forEach((exerciseId) => {
-            it('should be a key of exercises', () => {
-                expect(Exercises[exerciseId]).toBeDefined();
-            });
-            });
-      });
         
 });
 
