@@ -16,31 +16,27 @@ describe('RecommendationEngine', () => {
 
   beforeEach(() => {
     clickOracle = new Oracle(
-      ['happy'],
-      ['article', 'breathing'],
-      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'],
-      0.1,
-      1,
-      true,
-      true,
-      true,
-      true,
-      false,
-      'clicked',
+      ['happy'], // contextFeatures
+      ['article', 'breathing'], // exerciseFeatures
+      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      0.1,  // learningRate
+      true, // contextExerciseInteractions
+      true,   // contextExerciseFeatureInteractions
+      true, // useInversePropensityWeighting
+      0.5, // negativeClassWeight
+      'clicked', 
     );
 
     ratingOracle = new Oracle(
-      [],
-      [],
-      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'],
-      0.1,
-      1,
-      true,
-      true,
-      true,
-      true,
-      false,
-      'rating',
+      [], // contextFeatures
+      [], // exerciseFeatures
+      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      0.1, // learningRate
+      true, // contextExerciseInteractions
+      true, // contextExerciseFeatureInteractions
+      true, // useInversePropensityWeighting
+      1.0, // negativeClassWeight
+      'rating', // targetLabel
     );
     // new list of exercises with only exercises with exercideId in ['articles_act', 'follow_your_breath']
     const filteredExercises = Exercises.filter(exercise => {
@@ -188,92 +184,91 @@ describe('RecommendationEngine', () => {
         ).toBeLessThan(oldClickWeights[interactionKey]);
       });
     });
+  });
 
-    describe('onChooseRecommendedExercise', () => {
-      let context: IContext;
-      let recommendation: IRecommendation;
-      let chosenExerciseId: string;
-      beforeEach(() => {
-        context = {
-          happy: 1,
-          sad: 0,
-        };
-        recommendation = recommendationEngine.makeRecommendation(context);
-        chosenExerciseId = recommendation.recommendedExercises[0].exerciseId;
+  describe('onChooseRecommendedExercise', () => {
+    let context: IContext;
+    let recommendation: IRecommendation;
+    let chosenExerciseId: string;
+    beforeEach(() => {
+      context = {
+        happy: 1,
+        sad: 0,
+      };
+      recommendation = recommendationEngine.makeRecommendation(context);
+      chosenExerciseId = recommendation.recommendedExercises[0].exerciseId;
+    });
+    it('the weights of the clickOracle should be changed', () => {
+      const oldClickWeights = recommendationEngine.clickOracle.weights;
+      recommendationEngine.onChooseRecommendedExercise(
+        recommendation,
+        chosenExerciseId,
+      );
+      expect(recommendationEngine.clickOracle.weights).not.toEqual(
+        oldClickWeights,
+      );
+    });
+    it('the weights of the ratingOracle should not be changesd', () => {
+      const oldRatingWeights = recommendationEngine.ratingOracle.weights;
+      recommendationEngine.onChooseRecommendedExercise(
+        recommendation,
+        chosenExerciseId,
+      );
+      expect(recommendationEngine.ratingOracle.weights).toEqual(
+        oldRatingWeights,
+      );
+    });
+    it('expect the clickOracle weight for chosenExerciseId in recommendedExercises to be increased', () => {
+      const oldClickWeights =
+        recommendationEngine.clickOracle.getWeightsHash();
+      recommendationEngine.onChooseRecommendedExercise(
+        recommendation,
+        chosenExerciseId,
+      );
+      recommendation.recommendedExercises.forEach(rec => {
+        if (rec.exerciseId === chosenExerciseId) {
+          expect(
+            recommendationEngine.clickOracle.getWeightsHash()[rec.exerciseId],
+          ).toBeGreaterThan(oldClickWeights[rec.exerciseId]);
+        } else {
+          expect(
+            recommendationEngine.clickOracle.getWeightsHash()[rec.exerciseId],
+          ).toBeLessThan(oldClickWeights[rec.exerciseId]);
+        }
       });
-      it('the weights of the clickOracle should be changed', () => {
-        const oldClickWeights = recommendationEngine.clickOracle.weights;
-        recommendationEngine.onChooseRecommendedExercise(
-          recommendation,
-          chosenExerciseId,
-        );
-        expect(recommendationEngine.clickOracle.weights).not.toEqual(
-          oldClickWeights,
-        );
+    });
+    it('expect the clickOracle weight for each happy*exerciseId in recommendedExercises to increased for the chosen exerciseId', () => {
+      const oldClickWeights =
+        recommendationEngine.clickOracle.getWeightsHash();
+      recommendationEngine.onChooseRecommendedExercise(
+        recommendation,
+        chosenExerciseId,
+      );
+      recommendation.recommendedExercises.forEach(rec => {
+        const interactionKey = `happy*${rec.exerciseId}`;
+        if (rec.exerciseId === chosenExerciseId) {
+          expect(
+            recommendationEngine.clickOracle.getWeightsHash()[interactionKey],
+          ).toBeGreaterThan(oldClickWeights[interactionKey]);
+        } else {
+          expect(
+            recommendationEngine.clickOracle.getWeightsHash()[interactionKey],
+          ).toBeLessThan(oldClickWeights[interactionKey]);
+        }
       });
-      it('the weights of the ratingOracle should not be changesd', () => {
-        const oldRatingWeights = recommendationEngine.ratingOracle.weights;
-        recommendationEngine.onChooseRecommendedExercise(
-          recommendation,
-          chosenExerciseId,
-        );
-        expect(recommendationEngine.ratingOracle.weights).toEqual(
-          oldRatingWeights,
-        );
-      });
-      it('expect the clickOracle weight for chosenExerciseId in recommendedExercises to be increased', () => {
-        const oldClickWeights =
-          recommendationEngine.clickOracle.getWeightsHash();
-        recommendationEngine.onChooseRecommendedExercise(
-          recommendation,
-          chosenExerciseId,
-        );
-        recommendation.recommendedExercises.forEach(rec => {
-          if (rec.exerciseId === chosenExerciseId) {
-            expect(
-              recommendationEngine.clickOracle.getWeightsHash()[rec.exerciseId],
-            ).toBeGreaterThan(oldClickWeights[rec.exerciseId]);
-          } else {
-            expect(
-              recommendationEngine.clickOracle.getWeightsHash()[rec.exerciseId],
-            ).toBeLessThan(oldClickWeights[rec.exerciseId]);
-          }
-        });
-      });
-      it('expect the clickOracle weight for each happy*exerciseId in recommendedExercises to increased for the chosen exerciseId', () => {
-        const oldClickWeights =
-          recommendationEngine.clickOracle.getWeightsHash();
-        recommendationEngine.onChooseRecommendedExercise(
-          recommendation,
-          chosenExerciseId,
-        );
-        recommendation.recommendedExercises.forEach(rec => {
-          const interactionKey = `happy*${rec.exerciseId}`;
-          if (rec.exerciseId === chosenExerciseId) {
-            expect(
-              recommendationEngine.clickOracle.getWeightsHash()[interactionKey],
-            ).toBeGreaterThan(oldClickWeights[interactionKey]);
-          } else {
-            expect(
-              recommendationEngine.clickOracle.getWeightsHash()[interactionKey],
-            ).toBeLessThan(oldClickWeights[interactionKey]);
-          }
-        });
-      });
+    });
+  });
 
-      describe('toJSON', () => {
-        it('should return the correct JSON string', () => {
-          const state: IRecommendationEngineState = {
-            clickOracleState: clickOracle.getOracleState(),
-            ratingOracleState: ratingOracle.getOracleState(),
-            softmaxBeta: 1.0,
-            ratingWeight: 0.2,
-            nRecommendations: 3,
-          };
-          expect(recommendationEngine.toJSON()).toEqual(JSON.stringify(state));
-        });
-      });
-        
+  describe('toJSON', () => {
+    it('should return the correct JSON string', () => {
+      const state: IRecommendationEngineState = {
+        clickOracleState: clickOracle.getOracleState(),
+        ratingOracleState: ratingOracle.getOracleState(),
+        softmaxBeta: 1.0,
+        ratingWeight: 0.2,
+        nRecommendations: 3,
+      };
+      expect(recommendationEngine.toJSON()).toEqual(JSON.stringify(state));
     });
   });
 });
@@ -285,31 +280,27 @@ describe('DemoRecommendationEngine', () => {
 
   beforeEach(() => {
     clickOracle = new Oracle(
-      ['happy'],
-      ['article', 'breathing'],
-      ['articles_act', 'follow_your_breath'],
-      0.1,
-      1,
-      true,
-      true,
-      true,
-      true,
-      false,
-      'clicked',
+      ['happy'], // contextFeatures
+      ['article', 'breathing'], // exerciseFeatures
+      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      0.1,  // learningRate
+      true, // contextExerciseInteractions
+      true,   // contextExerciseFeatureInteractions
+      true, // useInversePropensityWeighting
+      0.5, // negativeClassWeight
+      'clicked', 
     );
 
     ratingOracle = new Oracle(
-      [],
-      [],
-      ['articles_act', 'follow_your_breath'],
-      0.1,
-      1,
-      true,
-      true,
-      true,
-      true,
-      false,
-      'click',
+      [], // contextFeatures
+      [], // exerciseFeatures
+      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      0.1, // learningRate
+      true, // contextExerciseInteractions
+      true, // contextExerciseFeatureInteractions
+      true, // useInversePropensityWeighting
+      1.0, // negativeClassWeight
+      'rating', // targetLabel
     );
     // new list of exercises with only exercises with exercideId in ['articles_act', 'follow_your_breath']
     const filteredExercises = Exercises.filter(exercise => {

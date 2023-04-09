@@ -4,7 +4,6 @@ import {
   IOracleState, 
   WeightsHash, 
   FeaturesHash, 
-  ITrainingData,
   IExerciseTrainingData, 
 } from './interfaces';
 
@@ -13,13 +12,12 @@ export class Oracle {
   contextFeatures!: string[];
   exerciseFeatures!: string[];
   exerciseNames!: string[];
-  learningRate: number;
-  iterations: number;
   addIntercept!: boolean;
+  learningRate: number;
   contextExerciseInteractions!: boolean;
   contextExerciseFeatureInteractions!: boolean;
   useInversePropensityWeighting: boolean;
-  useInversePropensityWeightingPositiveOnly: boolean;
+  negativeClassWeight: number;
   targetLabel: string;
   weights!: number[];
 
@@ -33,40 +31,36 @@ export class Oracle {
     exerciseFeatures: string[] = [],
     exerciseNames: string[] = [],
     learningRate = 0.1,
-    iterations = 1,
-    addIntercept = true,
     contextExerciseInteractions: boolean = false,
     contextExerciseFeatureInteractions: boolean = true,
     useInversePropensityWeighting = false,
-    useInversePropensityWeightingPositiveOnly = false,
+    negativeClassWeight = 1.0,
     targetLabel: string = 'label',
     weights: WeightsHash = {},
   ) {
     if (!Array.isArray(contextFeatures) || !Array.isArray(exerciseFeatures) || !Array.isArray(exerciseNames)) {
       throw new Error("Context features, exercise features, and exercise names must be arrays.");
     }
-    if (typeof learningRate !== 'number' || typeof iterations !== 'number' || typeof addIntercept !== 'boolean') {
-      throw new Error("Learning rate, iterations, and add intercept must be numbers or booleans.");
+    if (typeof learningRate !== 'number') {
+      throw new Error("Learning rate must be a number.");
     }
     if (typeof contextExerciseInteractions !== 'boolean' || typeof contextExerciseFeatureInteractions !== 'boolean' ||
-        typeof useInversePropensityWeighting !== 'boolean' || typeof useInversePropensityWeightingPositiveOnly !== 'boolean') {
-      throw new Error("Context-exercise interactions, context-exercise feature interactions, inverse propensity weighting, and inverse propensity weighting positive only must be booleans.");
+        typeof useInversePropensityWeighting !== 'boolean') {
+      throw new Error("Context-exercise interactions, context-exercise feature interactions, inverse propensity weighting must be booleans.");
     }
-
+    this.addIntercept = true;
     this.setFeaturesAndUpdateWeights(
       contextFeatures, 
       exerciseFeatures, 
       exerciseNames, 
-      addIntercept, 
       contextExerciseInteractions, 
       contextExerciseFeatureInteractions,
       weights
     );
     this.targetLabel = targetLabel;
     this.learningRate = learningRate;
-    this.iterations = iterations;
     this.useInversePropensityWeighting = useInversePropensityWeighting;
-    this.useInversePropensityWeightingPositiveOnly = useInversePropensityWeightingPositiveOnly
+    this.negativeClassWeight = negativeClassWeight;
   }
 
   getOracleState(): IOracleState {
@@ -75,12 +69,10 @@ export class Oracle {
       exerciseFeatures: this.exerciseFeatures,
       exerciseIds: this.exerciseNames,      
       learningRate: this.learningRate,
-      iterations: this.iterations,
-      addIntercept: this.addIntercept,
       contextExerciseInteractions: this.contextExerciseInteractions,
       contextExerciseFeatureInteractions: this.contextExerciseFeatureInteractions,
       useInversePropensityWeighting: this.useInversePropensityWeighting,
-      useInversePropensityWeightingPositiveOnly: this.useInversePropensityWeightingPositiveOnly,
+      negativeClassWeight: this.negativeClassWeight,
       targetLabel: this.targetLabel,
       weights: this.getWeightsHash(),
     }
@@ -92,12 +84,10 @@ export class Oracle {
       oracleState.exerciseFeatures,
       oracleState.exerciseIds,
       oracleState.learningRate,
-      oracleState.iterations,
-      oracleState.addIntercept,
       oracleState.contextExerciseInteractions,
       oracleState.contextExerciseFeatureInteractions,
       oracleState.useInversePropensityWeighting,
-      oracleState.useInversePropensityWeightingPositiveOnly,
+      oracleState.negativeClassWeight,
       oracleState.targetLabel,
       oracleState.weights,
     );
@@ -118,7 +108,7 @@ export class Oracle {
   }
 
   generateInteractionFeatures(): string[] {
-    let interactionFeatures = [];
+    let interactionFeatures: string[] = [];
     if (this.contextExerciseInteractions) {
       for (let i = 0; i < this.contextFeatures.length; i++) {
         for (let j = 0; j < this.exerciseNames.length; j++) {
@@ -170,7 +160,6 @@ export class Oracle {
       contextFeatures?: string[], 
       exerciseFeatures?: string[],
       exerciseNames?: string[],
-      addIntercept?: boolean,
       contextExerciseInteractions?: boolean,
       contextExerciseFeatureInteractions?: boolean,
       weights: WeightsHash  = {},
@@ -178,7 +167,6 @@ export class Oracle {
     this.contextFeatures = contextFeatures ?? this.contextFeatures;
     this.exerciseFeatures = exerciseFeatures ?? this.exerciseFeatures;
     this.exerciseNames = exerciseNames ?? this.exerciseNames;
-    this.addIntercept = addIntercept ?? this.addIntercept;
     this.contextExerciseInteractions = contextExerciseInteractions ?? this.contextExerciseInteractions;
     this.contextExerciseFeatureInteractions = contextExerciseFeatureInteractions ?? this.contextExerciseFeatureInteractions;
     
@@ -219,6 +207,15 @@ export class Oracle {
     return result;
   }
 
+  hashContainsAllKeys(hash: FeaturesHash, keys: string[]): boolean {
+    for (let i = 0; i < keys.length; i++) {
+      if (!hash.hasOwnProperty(keys[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   addExerciseNameFeatures(
     inputsHash: FeaturesHash, 
     exercisename: string |undefined = undefined
@@ -231,15 +228,6 @@ export class Oracle {
       }
     }
     return inputsHash;
-  }
-
-  hashContainsAllKeys(hash: FeaturesHash, keys: string[]): boolean {
-    for (let i = 0; i < keys.length; i++) {
-      if (!hash.hasOwnProperty(keys[i])) {
-        return false;
-      }
-    }
-    return true;
   }
 
   calculateInteractionFeatures(inputsHash: FeaturesHash): FeaturesHash {
@@ -299,7 +287,7 @@ export class Oracle {
     return logit;
   }
 
-  predictProba(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {    
+  predict(contextInputs: any, exerciseInputs: any, exerciseName: string | undefined): number {    
     const logit = this.predictLogit(contextInputs, exerciseInputs, exerciseName);
     const proba = this.sigmoid(logit);
     return proba;
@@ -308,33 +296,30 @@ export class Oracle {
   fit(
     trainingData: IExerciseTrainingData,
   ) {
-    let X = this.getOrderedInputsArray(
-      trainingData.input.contextFeatures ?? {},
-      trainingData.input.exerciseFeatures ?? {},
-      trainingData.input.exerciseId,
-    );
-    let y = [(trainingData as any)[this.targetLabel]];
 
-    if (y[0] != undefined) {
+    if ((this.targetLabel in trainingData) && ((trainingData as any)[this.targetLabel] != undefined)) {
+      const X = this.getOrderedInputsArray(
+        trainingData.input.contextFeatures ?? {},
+        trainingData.input.exerciseFeatures ?? {},
+        trainingData.input.exerciseId,
+      );
+      const y = [(trainingData as any)[this.targetLabel]];
       let sampleWeight = 1;
       if (this.useInversePropensityWeighting) {
         sampleWeight = 1 / (trainingData.probability || 1);
-      } else if ((this.useInversePropensityWeightingPositiveOnly) && (trainingData.clicked == 1)) {
-        sampleWeight = 1 / (trainingData.probability || 1);
+      } 
+      if (y[0] == 0) {
+        sampleWeight = sampleWeight * this.negativeClassWeight;
       }
 
-      for (let i = 0; i < this.iterations; i++) {
-        let pred = this.sigmoid(
-          math.evaluate(`X * weights`, { X, weights: this.weights })
-        );
-        this.weights = math.evaluate(
-          `weights - sampleWeight * learningRate / 1 * ((pred - y)' * X)'`,
-          { weights: this.weights, sampleWeight: sampleWeight, learningRate: this.learningRate, pred, y, X }
-        );
-      }
-    } else {
-      console.log("fit: no target label found in trainingData:", trainingData);
-    }
+      const pred = this.sigmoid(
+        math.evaluate(`X * weights`, { X, weights: this.weights })
+      );
+      this.weights = math.evaluate(
+        `weights - sampleWeight * learningRate / 1 * ((pred - y)' * X)'`,
+        { weights: this.weights, sampleWeight: sampleWeight, learningRate: this.learningRate, pred, y, X }
+      );
+    } 
   }
 
   fitMany(

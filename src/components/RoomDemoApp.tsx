@@ -11,6 +11,7 @@ import {
   IScoredExercise,
   IDemoRecommendationEngine,
 } from "../recommender/interfaces";
+import { DefaultClickOracle, DefaultRatingOracle, DefaultRecommendationEngine } from "../recommender/Defaults";
 
 import { ContextComponent } from "./ContextComponent";
 import { ScoredExercisesList } from "./ScoredExercisesList";
@@ -25,79 +26,54 @@ import { FeatureSelector } from "./FeatureSelector";
 export function RoomDemoApp() {
   const [exercises, setExercises] = useState<IExercise[]>(Exercises);
 
-  const [clickLearningRate, setClickLearningRate] = useState<number>(0.01);
-  const [clickAddIntercept, setClickAddIntercept] = useState<boolean>(true);
+  const [clickLearningRate, setClickLearningRate] = useState<number>(DefaultClickOracle.learningRate);
   const [
     clickContextExerciseInteractions,
     setClickContextExerciseInteractions,
-  ] = useState<boolean>(true);
+  ] = useState<boolean>(DefaultClickOracle.contextExerciseInteractions);
   const [
     clickContextExerciseFeatureInteractions,
     setClickContextExerciseFeatureInteractions,
-  ] = useState<boolean>(true);
+  ] = useState<boolean>(DefaultClickOracle.contextExerciseFeatureInteractions);
+  const [
+    clickInversePropensityWeighting,
+    setClickInversePropensityWeighting,
+  ] = useState<boolean>(DefaultClickOracle.useInversePropensityWeighting);
 
-  const [ClickContextFeatures, setClickContextFeatures] = useState<string[]>([
-    "happy",
-    "sad",
-  ]);
-  const [ClickExerciseFeatures, setClickExerciseFeatures] = useState<string[]>([
-    "three_five_mins",
-    "five_seven_mins",
-    "seven_ten_mins",
-    // 'defuse',
-    // 'zoom_out',
-    // 'feeling_stressed',
-    // 'feeling_angry',
-    "mood_boost",
-    "self_compassion",
-    "relax",
-    "energize",
-    // 'feeling_anxious',
-    "grounding",
-    // 'feeling_blue',
-    "focus",
-    "shift_perspective",
-    "introspect",
-    "breathing",
-    "article",
-    "ACT",
-    "Mindfulness",
-    "Relaxation",
-    "PositivePsychology",
-  ]);
+  const [ClickContextFeatures, setClickContextFeatures] = useState<string[]>(DefaultClickOracle.contextFeatures);
+  const [ClickExerciseFeatures, setClickExerciseFeatures] = useState<string[]>(DefaultClickOracle.exerciseFeatures);
   const [clickOracle, setClickOracle] = useState<Oracle>(
     new Oracle(
       ClickContextFeatures, //contextFeatures
       ClickExerciseFeatures, //exerciseFeatures
       exerciseIds, //exerciseNames
       clickLearningRate, //learningRate
-      1, //iterations
-      clickAddIntercept, //addIntercept
       clickContextExerciseInteractions, // contextExerciseInteractions
       clickContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
-      true, //useInversePropensityWeighting
-      false, //useInversePropensityWeightingPositiveOnly
-      "clicked" // targetLabel
+      clickInversePropensityWeighting, //useInversePropensityWeighting
+      DefaultClickOracle.negativeClassWeight,
+      DefaultClickOracle.targetLabel, // targetLabel
+      DefaultClickOracle.weights, // weights
     )
   );
 
-  const [ratingLearningRate, setRatingLearningRate] = useState<number>(2.0);
-  const [ratingAddIntercept, setRatingAddIntercept] = useState<boolean>(true);
+  const [ratingLearningRate, setRatingLearningRate] = useState<number>(DefaultRatingOracle.learningRate);
   const [
     ratingContextExerciseInteractions,
     setRatingContextExerciseInteractions,
-  ] = useState<boolean>(true);
+  ] = useState<boolean>(DefaultRatingOracle.contextExerciseInteractions);
   const [
     ratingContextExerciseFeatureInteractions,
     setRatingContextExerciseFeatureInteractions,
-  ] = useState<boolean>(false);
-  const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>([
-    "happy",
-    "sad",
-  ]);
+  ] = useState<boolean>(DefaultRatingOracle.contextExerciseFeatureInteractions);
+  const [
+    ratingInversePropensityWeighting,
+    setRatingInversePropensityWeighting,
+  ] = useState<boolean>(DefaultRatingOracle.useInversePropensityWeighting);
+  const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>(DefaultRatingOracle.contextFeatures);
   const [RatingExerciseFeatures, setRatingExerciseFeatures] = useState<
     string[]
-  >(["ACT", "Mindfulness", "Relaxation", "PositivePsychology"]);
+  >(DefaultRatingOracle.exerciseFeatures);
 
   const [ratingOracle, setRatingOracle] = useState<Oracle>(
     new Oracle(
@@ -105,17 +81,16 @@ export function RoomDemoApp() {
       RatingExerciseFeatures, //exerciseFeatures
       exerciseIds, //exerciseNames
       ratingLearningRate, //learningRate
-      1, //iterations
-      ratingAddIntercept, //addIntercept
       ratingContextExerciseInteractions, // contextExerciseInteractions
       ratingContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
-      false, //useInversePropensityWeighting
-      false, //useInversePropensityWeightingPositiveOnly
-      "rating" // targetLabel
+      ratingInversePropensityWeighting, //useInversePropensityWeighting
+      DefaultRatingOracle.negativeClassWeight, //negativeClassWeight
+      DefaultRatingOracle.targetLabel, // targetLabel
+      DefaultRatingOracle.weights, // weights
     )
   );
-  const [softmaxBeta, setSoftmaxBeta] = useState<number>(2);
-  const [ratingWeight, setRatingWeight] = useState<number>(0.2);
+  const [softmaxBeta, setSoftmaxBeta] = useState<number>(DefaultRecommendationEngine.softmaxBeta);
+  const [ratingWeight, setRatingWeight] = useState<number>(DefaultRecommendationEngine.ratingWeight);
 
   const [engine, setEngine] = useState<IDemoRecommendationEngine>(
     new DemoRecommendationEngine(
@@ -182,6 +157,11 @@ export function RoomDemoApp() {
   const onClickLearningRateChange = (value: number) => {
     setClickLearningRate(value);
     engine.clickOracle.learningRate = value;
+  };
+
+  const onClickInversePropensityWeightingChange = (value: boolean) => {
+    setClickInversePropensityWeighting(value);
+    engine.clickOracle.useInversePropensityWeighting = value;
   };
 
   const onSelectedClickContextItemsChange = (newContextFeatures: string[]) => {
@@ -251,6 +231,11 @@ export function RoomDemoApp() {
   const onRatingLearningRateChange = (value: number) => {
     setRatingLearningRate(value);
     engine.ratingOracle.learningRate = value;
+  };
+
+  const onRatingInversePropensityWeightingChange = (value: boolean) => {
+    setRatingInversePropensityWeighting(value);
+    engine.ratingOracle.useInversePropensityWeighting = value;
   };
 
   const onSelectedRatingContextItemsChange = (newContextFeatures: string[]) => {
@@ -377,6 +362,13 @@ export function RoomDemoApp() {
           />
           <div>{clickLearningRate.toFixed(2)}</div>
         </div>
+        <div className="mt-4 flex gap-4">
+          <div>Inverse Propensity Weighting:</div>
+          <Switch
+            onChange={onClickInversePropensityWeightingChange}
+            value={clickInversePropensityWeighting}
+          />
+        </div>
 
         <div className="mt-4 flex gap-4">
           <div>Context-Exercise Interactions:</div>
@@ -393,6 +385,7 @@ export function RoomDemoApp() {
             value={clickContextExerciseFeatureInteractions}
           />
         </div>
+        
 
         <div className="mt-3">Context features</div>
         <FeatureSelector
@@ -409,7 +402,7 @@ export function RoomDemoApp() {
         />
 
         <div className="mt-4">JSON payload</div>
-        <div className="text-[10px] font-mono text-gray-600">
+        <div className="text-[10px] font-mono text-gray-600 overflow-auto">
           {clickOracle.toJSON()}
         </div>
       </Section>
@@ -429,6 +422,13 @@ export function RoomDemoApp() {
           />
           <div>{ratingLearningRate.toFixed(2)}</div>
         </div>
+        <div className="mt-4 flex gap-4">
+          <div>Inverse Propensity Weighting:</div>
+          <Switch
+            onChange={onRatingInversePropensityWeightingChange}
+            value={ratingInversePropensityWeighting}
+          />
+        </div>
 
         <div className="mt-4 flex gap-4">
           <div>Context-Exercise Interactions:</div>
@@ -445,6 +445,7 @@ export function RoomDemoApp() {
             value={ratingContextExerciseFeatureInteractions}
           />
         </div>
+        
 
         <div className="mt-4">Context features</div>
         <FeatureSelector
@@ -495,9 +496,10 @@ export function RoomDemoApp() {
         </div>
 
         <div className="mt-4">JSON payload</div>
-        <div className="text-[10px] font-mono text-gray-600">
-          {ratingOracle.toJSON()}
+        <div className="text-[10px] font-mono text-gray-600 overflow-auto">
+                {ratingOracle.toJSON()}
         </div>
+
       </Section>
 
       <Section>
@@ -510,7 +512,7 @@ export function RoomDemoApp() {
 
       <Section>
         <div className="font-bold text-lg mb-4">Engine details</div>
-        <div className="text-[10px] font-mono text-gray-600">
+        <div className="text-[10px] font-mono text-gray-600 overflow-auto">
           {engine.toJSON()}
         </div>
       </Section>

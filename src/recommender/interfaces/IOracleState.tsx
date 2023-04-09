@@ -6,12 +6,10 @@ export type IOracleState = {
   exerciseFeatures: string[];
   exerciseIds: string[];
   learningRate: number;
-  iterations: number;
-  addIntercept: boolean;
   contextExerciseInteractions: boolean;
   contextExerciseFeatureInteractions: boolean;
   useInversePropensityWeighting: boolean;
-  useInversePropensityWeightingPositiveOnly: boolean;
+  negativeClassWeight: number;
   targetLabel: string;
   weights: WeightsHash;
 };

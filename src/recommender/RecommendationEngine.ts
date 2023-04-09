@@ -100,8 +100,8 @@ export class RecommendationEngine implements IRecommendationEngine {
 
         for (const exerciseId in this.exercises) {
             const exercise = this.exercises[exerciseId];
-            const clickScore = this.clickOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
-            const ratingScore = this.ratingOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
+            const clickScore = this.clickOracle.predict(context, exercise.Features, exercise.ExerciseId);
+            const ratingScore = this.ratingOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
                 [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
             );
@@ -229,8 +229,8 @@ export class DemoRecommendationEngine extends RecommendationEngine implements ID
 
         for (const exerciseId in this.exercises) {
             const exercise = this.exercises[exerciseId];
-            const clickScore = this.clickOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
-            const ratingScore = this.ratingOracle.predictProba(context, exercise.Features, exercise.ExerciseId);
+            const clickScore = this.clickOracle.predict(context, exercise.Features, exercise.ExerciseId);
+            const ratingScore = this.ratingOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
                 [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
             );

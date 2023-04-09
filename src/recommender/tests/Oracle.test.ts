@@ -6,12 +6,9 @@ describe('LogisticOracle', () => {
   const exerciseFeatures = ['feature1', 'feature2'];
   const exerciseNames = ['exercise1', 'exercise2'];
   const learningRate = 0.1;
-  const iterations = 1;
-  const addIntercept = true;
   const contextExerciseInteractions = false;
   const contextExerciseFeatureInteractions = true;
   const useInversePropensityWeighting = false;
-  const useInversePropensityWeightingPositiveOnly = false;
   const targetLabel = 'label';
   const weights = {
     intercept: 0,
@@ -29,31 +26,14 @@ describe('LogisticOracle', () => {
       exerciseFeatures,
       exerciseNames,
       learningRate,
-      iterations,
-      addIntercept,
       contextExerciseInteractions,
       contextExerciseFeatureInteractions,
       useInversePropensityWeighting,
-      useInversePropensityWeightingPositiveOnly,
+      1.0,
       targetLabel,
       weights,
     );
   });
-
-  // const oracle = new LogisticOracle(
-  //   contextFeatures,
-  //   exerciseFeatures,
-  //   exerciseNames,
-  //   learningRate,
-  //   iterations,
-  //   addIntercept,
-  //   contextExerciseInteractions,
-  //   contextExerciseFeatureInteractions,
-  //   useInversePropensityWeighting,
-  //   useInversePropensityWeightingPositiveOnly,
-  //   targetLabel,
-  //   weights,
-  // );
 
   describe('constructor', () => {
     it('should create an instance of LogisticOracle with the correct properties', () => {
@@ -61,8 +41,7 @@ describe('LogisticOracle', () => {
       expect(oracle.exerciseFeatures).toEqual(exerciseFeatures);
       expect(oracle.exerciseNames).toEqual(exerciseNames);
       expect(oracle.learningRate).toEqual(learningRate);
-      expect(oracle.iterations).toEqual(iterations);
-      expect(oracle.addIntercept).toEqual(addIntercept);
+      expect(oracle.addIntercept).toEqual(true);
       expect(oracle.contextExerciseInteractions).toEqual(
         contextExerciseInteractions,
       );
@@ -71,9 +50,6 @@ describe('LogisticOracle', () => {
       );
       expect(oracle.useInversePropensityWeighting).toEqual(
         useInversePropensityWeighting,
-      );
-      expect(oracle.useInversePropensityWeightingPositiveOnly).toEqual(
-        useInversePropensityWeightingPositiveOnly,
       );
       expect(oracle.targetLabel).toEqual(targetLabel);
       expect(oracle.weights).toEqual([0, 0.1, 0.2, 0.3, 0.4, 0, 0, 0, 0]);
@@ -178,7 +154,7 @@ describe('LogisticOracle', () => {
   describe('toJSON', () => {
     it('should return a JSON object with the correct properties', () => {
       expect(oracle.toJSON()).toEqual(
-        '{"contextFeatures":["context1","context2"],"exerciseFeatures":["feature1","feature2"],"exerciseIds":["exercise1","exercise2"],"learningRate":0.1,"iterations":1,"addIntercept":true,"contextExerciseInteractions":false,"contextExerciseFeatureInteractions":true,"useInversePropensityWeighting":false,"useInversePropensityWeightingPositiveOnly":false,"targetLabel":"label","weights":{"intercept":0,"exercise1":0.1,"exercise2":0.2,"feature1":0.3,"feature2":0.4,"context1*feature1":0,"context1*feature2":0,"context2*feature1":0,"context2*feature2":0}}',
+        "{\"contextFeatures\":[\"context1\",\"context2\"],\"exerciseFeatures\":[\"feature1\",\"feature2\"],\"exerciseIds\":[\"exercise1\",\"exercise2\"],\"learningRate\":0.1,\"contextExerciseInteractions\":false,\"contextExerciseFeatureInteractions\":true,\"useInversePropensityWeighting\":false,\"negativeClassWeight\":1,\"targetLabel\":\"label\",\"weights\":{\"intercept\":0,\"exercise1\":0.1,\"exercise2\":0.2,\"feature1\":0.3,\"feature2\":0.4,\"context1*feature1\":0,\"context1*feature2\":0,\"context2*feature1\":0,\"context2*feature2\":0}}"
       );
     });
   });
@@ -230,12 +206,11 @@ describe('LogisticOracle', () => {
   describe('calculateInteractionFeatures', () => {
     it('should return an hash of interaction features', () => {
       oracle.setFeaturesAndUpdateWeights(
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        true,
-        true,
+        undefined, // contextFeatures
+        undefined, // exerciseFeatures
+        undefined, // exerciseIds
+        true, // contextExerciseInteractions
+        true, // contextExerciseFeatureInteractions
       );
       const hash = {
         context1: 1,
@@ -285,7 +260,6 @@ describe('LogisticOracle', () => {
         undefined,
         undefined,
         undefined,
-        undefined,
         true,
         false,
       );
@@ -305,7 +279,6 @@ describe('LogisticOracle', () => {
         undefined,
         undefined,
         undefined,
-        undefined,
         true,
         true,
       );
@@ -321,12 +294,11 @@ describe('LogisticOracle', () => {
 
     it('should return an array of inputs in the correct order with both exercise and feature interactions', () => {
       oracle.setFeaturesAndUpdateWeights(
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        true,
-        true,
+        undefined, // contextFeatures
+        undefined, // exerciseFeatures
+        undefined, // exerciseNames
+        true, // useFeatureInteractions
+        true, // useExerciseInteractions
       );
       const exerciseName = 'exercise1';
       expect(
@@ -345,7 +317,6 @@ describe('LogisticOracle', () => {
         undefined,
         undefined,
         false,
-        false,
       );
       const exerciseName = 'exercise1';
       expect(
@@ -359,7 +330,6 @@ describe('LogisticOracle', () => {
 
     it('should return an array of inputs in the correct order with only feature interactions with exercise2', () => {
       oracle.setFeaturesAndUpdateWeights(
-        undefined,
         undefined,
         undefined,
         undefined,
@@ -389,13 +359,12 @@ describe('LogisticOracle', () => {
     });
   });
 
-  describe('predictProba', () => {
+  describe('predict', () => {
     beforeEach(() => {
       oracle.setFeaturesAndUpdateWeights(
         undefined,
         undefined,
         undefined,
-        true,
         true,
         true,
         {feature1: 0, 'context1*feature1': 1, 'context1*exercise1': 1},
@@ -412,7 +381,7 @@ describe('LogisticOracle', () => {
       };
       const exerciseName = 'exercise3';
       expect(
-        oracle.predictProba(contextFeatures, exerciseFeatures, exerciseName),
+        oracle.predict(contextFeatures, exerciseFeatures, exerciseName),
       ).toEqual(0.5);
     });
     it('should return 0.73 for all features that add up to 1', () => {
@@ -429,7 +398,7 @@ describe('LogisticOracle', () => {
         oracle.predictLogit(contextFeatures, exerciseFeatures, exerciseName),
       ).toEqual(1);
       expect(
-        oracle.predictProba(contextFeatures, exerciseFeatures, exerciseName),
+        oracle.predict(contextFeatures, exerciseFeatures, exerciseName),
       ).toEqual(0.7310585786300049);
     });
 
@@ -447,7 +416,7 @@ describe('LogisticOracle', () => {
         oracle.predictLogit(contextFeatures, exerciseFeatures, exerciseName),
       ).toEqual(-1);
       expect(
-        oracle.predictProba(contextFeatures, exerciseFeatures, exerciseName),
+        oracle.predict(contextFeatures, exerciseFeatures, exerciseName),
       ).toBeCloseTo(0.2689, 3);
     });
   });

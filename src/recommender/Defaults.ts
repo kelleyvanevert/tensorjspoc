@@ -29,14 +29,12 @@ const DefaultClickOracle: IOracleState = {
     ],
     exerciseIds: exerciseIds,
     learningRate: 0.1,
-    iterations: 1,
-    addIntercept: true,
     contextExerciseInteractions: true,
     contextExerciseFeatureInteractions: true,
     useInversePropensityWeighting: true,
-    useInversePropensityWeightingPositiveOnly: false,
+    negativeClassWeight: 0.5,
     targetLabel: 'clicked',
-    weights: {},
+    weights: {'intercept': -0.7},
 }
 
 const DefaultRatingOracle: IOracleState = {
@@ -49,12 +47,10 @@ const DefaultRatingOracle: IOracleState = {
     ],
     exerciseIds: exerciseIds,
     learningRate: 2.0,
-    iterations: 1,
-    addIntercept: true,
     contextExerciseInteractions: true,
     contextExerciseFeatureInteractions: false,
     useInversePropensityWeighting: false,
-    useInversePropensityWeightingPositiveOnly: false,
+    negativeClassWeight: 1.0,
     targetLabel: 'rating',
     weights: {},
 }
