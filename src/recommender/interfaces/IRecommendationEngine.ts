@@ -1,6 +1,7 @@
 import {IRecommendation} from './IRecommendation';
 import {IContext} from './IContext';
 import {IExercise, IExerciseData, IScoredExercise} from './IExercise';
+import { IExerciseTrainingData } from './ITrainingData';
 import {IOracleState} from './IOracleState';
 import {IEvaluation} from './IEvaluation';
 import {RecommendationEngine} from '../RecommendationEngine';
@@ -35,17 +36,17 @@ export interface IRecommendationEngine {
 
   makeRecommendation(context: IContext): IRecommendation;
   
-  onCloseRecommendations(recommendation: IRecommendation): Promise<void>;
+  onCloseRecommendations(recommendation: IRecommendation): Promise<IExerciseTrainingData[]>;
   onChooseRecommendedExercise(
     recommendation: IRecommendation,
     exerciseId: string,
-  ): Promise<void>;
+  ): Promise<IExerciseTrainingData[]>;
   onEvaluateExercise(
     possibleRecommendationContext: null | IContext,
     evaluationTimeContext: IContext,
     exerciseId: string,
     evaluation: IEvaluation,
-  ): Promise<void>;
+  ): Promise<IExerciseTrainingData[]>;
 }
 
 

@@ -180,7 +180,7 @@ export class RecommendationEngine implements IRecommendationEngine {
             try {
                 const trainingData = this._generateClickTrainingData(recommendation);
                 this.clickOracle.fitMany(trainingData);
-                resolve();
+                resolve(trainingData);
             } catch (error) {
                 reject(error);
             }
@@ -195,7 +195,7 @@ export class RecommendationEngine implements IRecommendationEngine {
             try {
                 const trainingData = this._generateClickTrainingData(recommendation, exerciseId);
                 this.clickOracle.fitMany(trainingData);
-                resolve();
+                resolve(trainingData);
             } catch (error) {
                 reject(error);
             }
@@ -213,7 +213,7 @@ export class RecommendationEngine implements IRecommendationEngine {
                 const context = possibleRecommendationContext ?? evaluationTimeContext;
                 const trainingData = this._generateEvaluationTrainingData(context, exerciseId, evaluation);
                 this.ratingOracle.fit(trainingData);
-                resolve();
+                resolve([trainingData]);
             } catch (error) {
                 reject(error);
             }
