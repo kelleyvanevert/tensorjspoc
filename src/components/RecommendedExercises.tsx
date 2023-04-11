@@ -1,3 +1,5 @@
+
+import { useState } from "react";
 import { AppButton } from "./AppButton";
 import { IExercise, IRecommendation } from "../recommender/interfaces";
 import { Section } from "./Section";
@@ -12,11 +14,21 @@ type Props = {
   ) => void;
 };
 
+
 export function RecommendedExercises({
   recommendation,
   recommendedExercises,
   callback,
 }: Props) {
+
+  const [oldRecommendation, setOldRecommendation] = useState<IRecommendation>(recommendation);
+
+  const submitRecommendation = (exerciseId: string | undefined, starRating:number | undefined) => {
+      // console.log("submitRecommendation", oldRecommendation, recommendation)
+      callback(oldRecommendation, exerciseId, starRating);
+      setOldRecommendation(recommendation);
+  }
+
   return (
     <Section>
       <div className="text-lg font-bold mb-4">Your Recommendations:</div>
@@ -36,7 +48,7 @@ export function RecommendedExercises({
                     type="button"
                     className="block bg-gray-200 w-[32px] h-[32px] text-center ml-2 rounded-full font-semibold transition-transform active:scale-75"
                     onClick={() => {
-                      callback(recommendation, ex.ExerciseId, rating);
+                      submitRecommendation(ex.ExerciseId, rating);
                     }}
                   >
                     {rating ?? "X"}
@@ -51,7 +63,7 @@ export function RecommendedExercises({
           key={"none_of_the_above"}
           title="None of the above"
           onClick={() => {
-            callback(recommendation, undefined, undefined);
+            submitRecommendation(undefined, undefined);
           }}
         />
       </div>
