@@ -175,7 +175,7 @@ export class RecommendationEngine implements IRecommendationEngine {
         return trainingData;
     }
 
-    onCloseRecommendations(recommendation: IRecommendation): Promise<void> {
+    onCloseRecommendations(recommendation: IRecommendation): Promise<IExerciseTrainingData[]> {
         return new Promise((resolve, reject) => {
             try {
                 const trainingData = this._generateClickTrainingData(recommendation);
@@ -190,7 +190,7 @@ export class RecommendationEngine implements IRecommendationEngine {
     onChooseRecommendedExercise(
         recommendation: IRecommendation,
         exerciseId: string,
-      ): Promise<void> {
+      ): Promise<IExerciseTrainingData[]>  {
         return new Promise((resolve, reject) => {
             try {
                 const trainingData = this._generateClickTrainingData(recommendation, exerciseId);
@@ -207,7 +207,7 @@ export class RecommendationEngine implements IRecommendationEngine {
         evaluationTimeContext: IContext,
         exerciseId: string,
         evaluation: IEvaluation,
-      ) : Promise<void> {
+      ) : Promise<IExerciseTrainingData[]>  {
         return new Promise((resolve, reject) => {
             try {
                 const context = possibleRecommendationContext ?? evaluationTimeContext;
