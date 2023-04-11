@@ -7,7 +7,7 @@ export default function App() {
       {/* <div className="w-1/2 bg-gray-200 min-h-screen">
         <Integration />
       </div> */}
-      <div className="w-1/2 bg-gray-200 min-h-screen">
+      <div className="w-full bg-gray-200 min-h-screen">
         <RoomDemoApp />
       </div>
     </div>

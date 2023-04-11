@@ -301,7 +301,7 @@ export class Oracle {
       const X = this.getOrderedInputsArray(
         trainingData.input.contextFeatures ?? {},
         trainingData.input.exerciseFeatures ?? {},
-        trainingData.input.exerciseId,
+        trainingData.input.exerciseId ?? undefined,
       );
       const y = [(trainingData as any)[this.targetLabel]];
       let sampleWeight = 1;

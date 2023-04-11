@@ -170,7 +170,6 @@ export function RoomDemoApp() {
       newContextFeatures,
       engine.clickOracle.exerciseFeatures,
       engine.clickOracle.exerciseNames,
-      engine.clickOracle.addIntercept,
       engine.clickOracle.contextExerciseInteractions,
       engine.clickOracle.contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -186,7 +185,6 @@ export function RoomDemoApp() {
       engine.clickOracle.contextFeatures,
       newExerciseFeatures,
       engine.clickOracle.exerciseNames,
-      engine.clickOracle.addIntercept,
       engine.clickOracle.contextExerciseInteractions,
       engine.clickOracle.contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -202,7 +200,6 @@ export function RoomDemoApp() {
       engine.clickOracle.contextFeatures,
       engine.clickOracle.exerciseFeatures,
       engine.clickOracle.exerciseNames,
-      engine.clickOracle.addIntercept,
       contextExerciseInteractions,
       engine.clickOracle.contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -220,7 +217,6 @@ export function RoomDemoApp() {
       engine.clickOracle.contextFeatures,
       engine.clickOracle.exerciseFeatures,
       engine.clickOracle.exerciseNames,
-      engine.clickOracle.addIntercept,
       engine.clickOracle.contextExerciseInteractions,
       contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -244,7 +240,6 @@ export function RoomDemoApp() {
       newContextFeatures,
       engine.ratingOracle.exerciseFeatures,
       engine.ratingOracle.exerciseNames,
-      engine.ratingOracle.addIntercept,
       engine.ratingOracle.contextExerciseInteractions,
       engine.ratingOracle.contextExerciseFeatureInteractions,
       engine.ratingOracle.getWeightsHash()
@@ -260,7 +255,6 @@ export function RoomDemoApp() {
       engine.ratingOracle.contextFeatures,
       newExerciseFeatures,
       engine.ratingOracle.exerciseNames,
-      engine.ratingOracle.addIntercept,
       engine.ratingOracle.contextExerciseInteractions,
       engine.ratingOracle.contextExerciseFeatureInteractions,
       engine.ratingOracle.getWeightsHash()
@@ -276,7 +270,6 @@ export function RoomDemoApp() {
       engine.ratingOracle.contextFeatures,
       engine.ratingOracle.exerciseFeatures,
       engine.ratingOracle.exerciseNames,
-      engine.ratingOracle.addIntercept,
       contextExerciseInteractions,
       engine.ratingOracle.contextExerciseFeatureInteractions,
       engine.ratingOracle.getWeightsHash()
@@ -294,7 +287,6 @@ export function RoomDemoApp() {
       engine.ratingOracle.contextFeatures,
       engine.ratingOracle.exerciseFeatures,
       engine.ratingOracle.exerciseNames,
-      engine.ratingOracle.addIntercept,
       engine.ratingOracle.contextExerciseInteractions,
       contextExerciseFeatureInteractions,
       engine.ratingOracle.getWeightsHash()
