@@ -11,7 +11,7 @@ import {
   IScoredExercise,
   IDemoRecommendationEngine,
 } from "../recommender/interfaces";
-import { DefaultClickOracle, DefaultRatingOracle, DefaultRecommendationEngine } from "../recommender/Defaults";
+import { DefaultClickOracle, DefaultLikingOracle, DefaultRecommendationEngine } from "../recommender/Defaults";
 
 import { ContextComponent } from "./ContextComponent";
 import { ScoredExercisesList } from "./ScoredExercisesList";
@@ -57,48 +57,48 @@ export function RoomDemoApp() {
     )
   );
 
-  const [ratingLearningRate, setRatingLearningRate] = useState<number>(DefaultRatingOracle.learningRate);
+  const [likingLearningRate, setLikingLearningRate] = useState<number>(DefaultLikingOracle.learningRate);
   const [
-    ratingContextExerciseInteractions,
-    setRatingContextExerciseInteractions,
-  ] = useState<boolean>(DefaultRatingOracle.contextExerciseInteractions);
+    likingContextExerciseInteractions,
+    setLikingContextExerciseInteractions,
+  ] = useState<boolean>(DefaultLikingOracle.contextExerciseInteractions);
   const [
-    ratingContextExerciseFeatureInteractions,
-    setRatingContextExerciseFeatureInteractions,
-  ] = useState<boolean>(DefaultRatingOracle.contextExerciseFeatureInteractions);
+    likingContextExerciseFeatureInteractions,
+    setLikingContextExerciseFeatureInteractions,
+  ] = useState<boolean>(DefaultLikingOracle.contextExerciseFeatureInteractions);
   const [
-    ratingInversePropensityWeighting,
-    setRatingInversePropensityWeighting,
-  ] = useState<boolean>(DefaultRatingOracle.useInversePropensityWeighting);
-  const [RatingContextFeatures, setRatingContextFeatures] = useState<string[]>(DefaultRatingOracle.contextFeatures);
-  const [RatingExerciseFeatures, setRatingExerciseFeatures] = useState<
+    likingInversePropensityWeighting,
+    setLikingInversePropensityWeighting,
+  ] = useState<boolean>(DefaultLikingOracle.useInversePropensityWeighting);
+  const [LikingContextFeatures, setLikingContextFeatures] = useState<string[]>(DefaultLikingOracle.contextFeatures);
+  const [LikingExerciseFeatures, setLikingExerciseFeatures] = useState<
     string[]
-  >(DefaultRatingOracle.exerciseFeatures);
+  >(DefaultLikingOracle.exerciseFeatures);
 
-  const [ratingOracle, setRatingOracle] = useState<Oracle>(
+  const [likingOracle, setLikingOracle] = useState<Oracle>(
     new Oracle(
-      RatingContextFeatures, //contextFeatures
-      RatingExerciseFeatures, //exerciseFeatures
+      LikingContextFeatures, //contextFeatures
+      LikingExerciseFeatures, //exerciseFeatures
       exerciseIds, //exerciseNames
-      ratingLearningRate, //learningRate
-      ratingContextExerciseInteractions, // contextExerciseInteractions
-      ratingContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
-      ratingInversePropensityWeighting, //useInversePropensityWeighting
-      DefaultRatingOracle.negativeClassWeight, //negativeClassWeight
-      DefaultRatingOracle.targetLabel, // targetLabel
-      DefaultRatingOracle.weights, // weights
+      likingLearningRate, //learningRate
+      likingContextExerciseInteractions, // contextExerciseInteractions
+      likingContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
+      likingInversePropensityWeighting, //useInversePropensityWeighting
+      DefaultLikingOracle.negativeClassWeight, //negativeClassWeight
+      DefaultLikingOracle.targetLabel, // targetLabel
+      DefaultLikingOracle.weights, // weights
     )
   );
   const [softmaxBeta, setSoftmaxBeta] = useState<number>(DefaultRecommendationEngine.softmaxBeta);
-  const [ratingWeight, setRatingWeight] = useState<number>(DefaultRecommendationEngine.ratingWeight);
+  const [likingWeight, setLikingWeight] = useState<number>(DefaultRecommendationEngine.likingWeight);
 
   const [engine, setEngine] = useState<IDemoRecommendationEngine>(
     new DemoRecommendationEngine(
       clickOracle,
-      ratingOracle,
+      likingOracle,
       exercises,
       softmaxBeta,
-      ratingWeight
+      likingWeight
     )
   );
 
@@ -224,72 +224,72 @@ export function RoomDemoApp() {
     recalculateRecommendations(context);
   };
 
-  const onRatingLearningRateChange = (value: number) => {
-    setRatingLearningRate(value);
-    engine.ratingOracle.learningRate = value;
+  const onLikingLearningRateChange = (value: number) => {
+    setLikingLearningRate(value);
+    engine.likingOracle.learningRate = value;
   };
 
-  const onRatingInversePropensityWeightingChange = (value: boolean) => {
-    setRatingInversePropensityWeighting(value);
-    engine.ratingOracle.useInversePropensityWeighting = value;
+  const onLikingInversePropensityWeightingChange = (value: boolean) => {
+    setLikingInversePropensityWeighting(value);
+    engine.likingOracle.useInversePropensityWeighting = value;
   };
 
-  const onSelectedRatingContextItemsChange = (newContextFeatures: string[]) => {
-    setRatingContextFeatures(newContextFeatures);
-    engine.ratingOracle.setFeaturesAndUpdateWeights(
+  const onSelectedLikingContextItemsChange = (newContextFeatures: string[]) => {
+    setLikingContextFeatures(newContextFeatures);
+    engine.likingOracle.setFeaturesAndUpdateWeights(
       newContextFeatures,
-      engine.ratingOracle.exerciseFeatures,
-      engine.ratingOracle.exerciseNames,
-      engine.ratingOracle.contextExerciseInteractions,
-      engine.ratingOracle.contextExerciseFeatureInteractions,
-      engine.ratingOracle.getWeightsHash()
+      engine.likingOracle.exerciseFeatures,
+      engine.likingOracle.exerciseNames,
+      engine.likingOracle.contextExerciseInteractions,
+      engine.likingOracle.contextExerciseFeatureInteractions,
+      engine.likingOracle.getWeightsHash()
     );
     recalculateRecommendations(context);
   };
 
-  const onSelectedRatingExerciseItemsChange = (
+  const onSelectedLikingExerciseItemsChange = (
     newExerciseFeatures: string[]
   ) => {
-    setRatingExerciseFeatures(newExerciseFeatures);
-    engine.ratingOracle.setFeaturesAndUpdateWeights(
-      engine.ratingOracle.contextFeatures,
+    setLikingExerciseFeatures(newExerciseFeatures);
+    engine.likingOracle.setFeaturesAndUpdateWeights(
+      engine.likingOracle.contextFeatures,
       newExerciseFeatures,
-      engine.ratingOracle.exerciseNames,
-      engine.ratingOracle.contextExerciseInteractions,
-      engine.ratingOracle.contextExerciseFeatureInteractions,
-      engine.ratingOracle.getWeightsHash()
+      engine.likingOracle.exerciseNames,
+      engine.likingOracle.contextExerciseInteractions,
+      engine.likingOracle.contextExerciseFeatureInteractions,
+      engine.likingOracle.getWeightsHash()
     );
     recalculateRecommendations(context);
   };
 
-  const onRatingExerciseInteractionsChange = (
+  const onLikingExerciseInteractionsChange = (
     contextExerciseInteractions: boolean
   ) => {
-    setRatingContextExerciseInteractions(contextExerciseInteractions);
-    engine.ratingOracle.setFeaturesAndUpdateWeights(
-      engine.ratingOracle.contextFeatures,
-      engine.ratingOracle.exerciseFeatures,
-      engine.ratingOracle.exerciseNames,
+    setLikingContextExerciseInteractions(contextExerciseInteractions);
+    engine.likingOracle.setFeaturesAndUpdateWeights(
+      engine.likingOracle.contextFeatures,
+      engine.likingOracle.exerciseFeatures,
+      engine.likingOracle.exerciseNames,
       contextExerciseInteractions,
-      engine.ratingOracle.contextExerciseFeatureInteractions,
-      engine.ratingOracle.getWeightsHash()
+      engine.likingOracle.contextExerciseFeatureInteractions,
+      engine.likingOracle.getWeightsHash()
     );
     recalculateRecommendations(context);
   };
 
-  const onRatingExerciseFeaturesInteractionsChange = (
+  const onLikingExerciseFeaturesInteractionsChange = (
     contextExerciseFeatureInteractions: boolean
   ) => {
-    setRatingContextExerciseFeatureInteractions(
+    setLikingContextExerciseFeatureInteractions(
       contextExerciseFeatureInteractions
     );
-    engine.ratingOracle.setFeaturesAndUpdateWeights(
-      engine.ratingOracle.contextFeatures,
-      engine.ratingOracle.exerciseFeatures,
-      engine.ratingOracle.exerciseNames,
-      engine.ratingOracle.contextExerciseInteractions,
+    engine.likingOracle.setFeaturesAndUpdateWeights(
+      engine.likingOracle.contextFeatures,
+      engine.likingOracle.exerciseFeatures,
+      engine.likingOracle.exerciseNames,
+      engine.likingOracle.contextExerciseInteractions,
       contextExerciseFeatureInteractions,
-      engine.ratingOracle.getWeightsHash()
+      engine.likingOracle.getWeightsHash()
     );
     recalculateRecommendations(context);
   };
@@ -300,8 +300,8 @@ export function RoomDemoApp() {
     recalculateRecommendations(context);
   };
 
-  const onRatingWeightChange = (value: number) => {
-    setRatingWeight(value);
+  const onLikingWeightChange = (value: number) => {
+    setLikingWeight(value);
     engine.softmaxBeta = value;
     recalculateRecommendations(context);
   };
@@ -400,7 +400,7 @@ export function RoomDemoApp() {
       </Section>
 
       <Section>
-        <div className="font-bold text-lg mb-4">Configure RatingOracle</div>
+        <div className="font-bold text-lg mb-4">Configure LikingOracle</div>
 
         {/* Slider for learningRate */}
         <div className="mt-4 flex gap-4">
@@ -409,32 +409,32 @@ export function RoomDemoApp() {
             minimumValue={0.01}
             maximumValue={10.0}
             step={0.01}
-            value={ratingLearningRate}
-            onChange={onRatingLearningRateChange}
+            value={likingLearningRate}
+            onChange={onLikingLearningRateChange}
           />
-          <div>{ratingLearningRate.toFixed(2)}</div>
+          <div>{likingLearningRate.toFixed(2)}</div>
         </div>
         <div className="mt-4 flex gap-4">
           <div>Inverse Propensity Weighting:</div>
           <Switch
-            onChange={onRatingInversePropensityWeightingChange}
-            value={ratingInversePropensityWeighting}
+            onChange={onLikingInversePropensityWeightingChange}
+            value={likingInversePropensityWeighting}
           />
         </div>
 
         <div className="mt-4 flex gap-4">
           <div>Context-Exercise Interactions:</div>
           <Switch
-            onChange={onRatingExerciseInteractionsChange}
-            value={ratingContextExerciseInteractions}
+            onChange={onLikingExerciseInteractionsChange}
+            value={likingContextExerciseInteractions}
           />
         </div>
 
         <div className="mt-4 flex gap-4">
           <div>Context-Feature Interactions:</div>
           <Switch
-            onChange={onRatingExerciseFeaturesInteractionsChange}
-            value={ratingContextExerciseFeatureInteractions}
+            onChange={onLikingExerciseFeaturesInteractionsChange}
+            value={likingContextExerciseFeatureInteractions}
           />
         </div>
         
@@ -442,15 +442,15 @@ export function RoomDemoApp() {
         <div className="mt-4">Context features</div>
         <FeatureSelector
           features={Object.keys(context)}
-          value={RatingContextFeatures}
-          onChange={onSelectedRatingContextItemsChange}
+          value={LikingContextFeatures}
+          onChange={onSelectedLikingContextItemsChange}
         />
 
         <div className="mt-4">Exercise features</div>
         <FeatureSelector
           features={Object.keys(Exercises[0].Features)}
-          value={RatingExerciseFeatures}
-          onChange={onSelectedRatingExerciseItemsChange}
+          value={LikingExerciseFeatures}
+          onChange={onSelectedLikingExerciseItemsChange}
         />
       </Section>
 
@@ -470,26 +470,26 @@ export function RoomDemoApp() {
           <div>{softmaxBeta.toFixed(1)}</div>
         </div>
 
-        {/* Slider for ratingWeight */}
+        {/* Slider for likingWeight */}
         <div className="mt-4 flex gap-4">
-          <div>Rating weight:</div>
+          <div>Liking weight:</div>
           <Slider
             minimumValue={0.0}
             maximumValue={1.0}
             step={0.01}
-            value={ratingWeight}
+            value={likingWeight}
             onChange={(value) => {
-              setRatingWeight(value);
+              setLikingWeight(value);
               //only update on release: TODO fix again
-              onRatingWeightChange(value);
+              onLikingWeightChange(value);
             }}
           />
-          <div>{ratingWeight.toFixed(2)}</div>
+          <div>{likingWeight.toFixed(2)}</div>
         </div>
 
         <div className="mt-4">JSON payload</div>
         <div className="text-[10px] font-mono text-gray-600 overflow-auto">
-                {ratingOracle.toJSON()}
+                {likingOracle.toJSON()}
         </div>
 
       </Section>

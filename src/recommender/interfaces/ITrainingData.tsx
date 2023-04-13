@@ -18,6 +18,6 @@ export interface IExerciseTrainingData extends ITrainingData{
         exerciseFeatures: IExerciseFeatures;
     }
     clicked: number | undefined;
-    rating: number | undefined;
+    liking: number | undefined;
     probability : number | undefined;
 }

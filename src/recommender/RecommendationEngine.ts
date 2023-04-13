@@ -20,26 +20,26 @@ interface exerciseScore {
 export class RecommendationEngine implements IRecommendationEngine {
 
     clickOracle: Oracle;
-    ratingOracle: Oracle;
+    likingOracle: Oracle;
     exercises: Record<string, IExercise>;
     softmaxBeta: number;
-    ratingWeight: number;
+    likingWeight: number;
     nRecommendations: number;
 
 
     constructor (
         clickOracle: Oracle,
-        ratingOracle: Oracle,
+        likingOracle: Oracle,
         exercises: IExerciseData,
         softmaxBeta: number = 1,
-        ratingWeight: number = 0.5,
+        likingWeight: number = 0.5,
         nRecommendations: number = 3,
     ) {
         this.clickOracle = clickOracle;
-        this.ratingOracle = ratingOracle;
+        this.likingOracle = likingOracle;
         this.exercises = this.setExercises(exercises);
         this.softmaxBeta = softmaxBeta;
-        this.ratingWeight = ratingWeight;
+        this.likingWeight = likingWeight;
         this.nRecommendations = nRecommendations;
     }
 
@@ -50,16 +50,16 @@ export class RecommendationEngine implements IRecommendationEngine {
 
     static fromRecommendationEngineState(state: IRecommendationEngineState, exercises: IExerciseData): IRecommendationEngine {
         const clickOracle = Oracle.fromOracleState(state.clickOracleState);
-        const ratingOracle = Oracle.fromOracleState(state.ratingOracleState);
+        const likingOracle = Oracle.fromOracleState(state.likingOracleState);
         const softmaxBeta = state.softmaxBeta;
-        const ratingWeight = state.ratingWeight;
+        const likingWeight = state.likingWeight;
         const nRecommendations = state.nRecommendations;
         return new RecommendationEngine(
             clickOracle,
-            ratingOracle,
+            likingOracle,
             exercises,
             softmaxBeta,
-            ratingWeight,
+            likingWeight,
             nRecommendations,
         );
     }
@@ -67,9 +67,9 @@ export class RecommendationEngine implements IRecommendationEngine {
     getRecommendationEngineState() : IRecommendationEngineState {
         return {
             clickOracleState: this.clickOracle.getOracleState(),
-            ratingOracleState: this.ratingOracle.getOracleState(),
+            likingOracleState: this.likingOracle.getOracleState(),
             softmaxBeta: this.softmaxBeta,
-            ratingWeight: this.ratingWeight,
+            likingWeight: this.likingWeight,
             nRecommendations: this.nRecommendations,
         }
     }
@@ -101,9 +101,9 @@ export class RecommendationEngine implements IRecommendationEngine {
         for (const exerciseId in this.exercises) {
             const exercise = this.exercises[exerciseId];
             const clickScore = this.clickOracle.predict(context, exercise.Features, exercise.ExerciseId);
-            const ratingScore = this.ratingOracle.predict(context, exercise.Features, exercise.ExerciseId);
+            const likingScore = this.likingOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
-                [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
+                [clickScore, likingScore], [1-this.likingWeight, this.likingWeight]
             );
             const softmaxNumerator = Math.exp(this.softmaxBeta * aggregateScore)
             scoredExercises.push({
@@ -148,10 +148,10 @@ export class RecommendationEngine implements IRecommendationEngine {
             
             const clicked = recommendedExercise.ExerciseId === selectedExerciseId ? 1 : 0;
             console.log("clicked", clicked, recommendedExercise.ExerciseId, selectedExerciseId)
-            const rating = undefined;
+            const liking = undefined;
             const probability = recommendation.recommendedExercises[index].probability;
     
-            trainingData.push({ input, clicked, rating, probability });
+            trainingData.push({ input, clicked, liking, probability });
           }
           console.log("_generateClickTrainingData", JSON.stringify(trainingData))
           return trainingData
@@ -169,9 +169,9 @@ export class RecommendationEngine implements IRecommendationEngine {
         };
         
         const clicked = undefined;
-        const rating = evaluation.liked / 100;
+        const liking = evaluation.liked / 100;
         const probability = 1;
-        const trainingData: IExerciseTrainingData = { input, clicked, rating, probability };
+        const trainingData: IExerciseTrainingData = { input, clicked, liking, probability };
         return trainingData;
     }
 
@@ -212,7 +212,7 @@ export class RecommendationEngine implements IRecommendationEngine {
             try {
                 const context = possibleRecommendationContext ?? evaluationTimeContext;
                 const trainingData = this._generateEvaluationTrainingData(context, exerciseId, evaluation);
-                this.ratingOracle.fit(trainingData);
+                this.likingOracle.fit(trainingData);
                 resolve([trainingData]);
             } catch (error) {
                 reject(error);
@@ -230,16 +230,16 @@ export class DemoRecommendationEngine extends RecommendationEngine implements ID
         for (const exerciseId in this.exercises) {
             const exercise = this.exercises[exerciseId];
             const clickScore = this.clickOracle.predict(context, exercise.Features, exercise.ExerciseId);
-            const ratingScore = this.ratingOracle.predict(context, exercise.Features, exercise.ExerciseId);
+            const likingScore = this.likingOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
-                [clickScore, ratingScore], [1-this.ratingWeight, this.ratingWeight]
+                [clickScore, likingScore], [1-this.likingWeight, this.likingWeight]
             );
             const softmaxNumerator = Math.exp(this.softmaxBeta * aggregateScore)
             scoredExercises.push({
                 ExerciseName: exercise.ExerciseName,
                 ExerciseId: exerciseId,
                 ClickScore: clickScore,
-                RatingScore: ratingScore,
+                LikingScore: likingScore,
                 AggregateScore: aggregateScore,
                 Probability: softmaxNumerator,
                 SelectedCount: exercise.SelectedCount,

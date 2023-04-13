@@ -18,7 +18,7 @@ export function ScoredExercisesList({ scoredExercises }: Props) {
               Click: {Math.round((item.ClickScore || 0) * 100)}
             </div>
             <div className="w-1/6 text-sm">
-              Rating: {Math.round((item.RatingScore || 0) * 50) / 10}
+              Liking: {Math.round((item.LikingScore || 0) * 50) / 10}
             </div>
             <div className="w-1/6 text-sm">
               Proba: {Math.round((item.Probability || 0) * 10000) / 100}%

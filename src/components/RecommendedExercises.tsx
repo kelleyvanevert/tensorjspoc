@@ -10,7 +10,7 @@ type Props = {
   callback: (
     recommendation: IRecommendation,
     exerciseId: string | undefined,
-    rating: number | undefined
+    liking: number | undefined
   ) => void;
 };
 

@@ -11,7 +11,7 @@ import {IRecommendation} from '../interfaces';
 
 describe('RecommendationEngine', () => {
   let clickOracle: Oracle;
-  let ratingOracle: Oracle;
+  let likingOracle: Oracle;
   let recommendationEngine: RecommendationEngine;
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('RecommendationEngine', () => {
       'clicked', 
     );
 
-    ratingOracle = new Oracle(
+    likingOracle = new Oracle(
       [], // contextFeatures
       [], // exerciseFeatures
       ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
@@ -36,7 +36,7 @@ describe('RecommendationEngine', () => {
       true, // contextExerciseFeatureInteractions
       true, // useInversePropensityWeighting
       1.0, // negativeClassWeight
-      'rating', // targetLabel
+      'liking', // targetLabel
     );
     // new list of exercises with only exercises with exercideId in ['articles_act', 'follow_your_breath']
     const filteredExercises = Exercises.filter(exercise => {
@@ -49,7 +49,7 @@ describe('RecommendationEngine', () => {
 
     recommendationEngine = new RecommendationEngine(
       clickOracle,
-      ratingOracle,
+      likingOracle,
       filteredExercises,
       1.0,
       0.2,
@@ -60,9 +60,9 @@ describe('RecommendationEngine', () => {
   describe('constructor', () => {
     it('should create an instance of RecommendationEngine with the correct properties', () => {
       expect(recommendationEngine.clickOracle).toEqual(clickOracle);
-      expect(recommendationEngine.ratingOracle).toEqual(ratingOracle);
+      expect(recommendationEngine.likingOracle).toEqual(likingOracle);
       expect(recommendationEngine.softmaxBeta).toEqual(1.0);
-      expect(recommendationEngine.ratingWeight).toEqual(0.2);
+      expect(recommendationEngine.likingWeight).toEqual(0.2);
       expect(recommendationEngine.nRecommendations).toEqual(3);
     });
   });
@@ -71,9 +71,9 @@ describe('RecommendationEngine', () => {
     it('should return the correct state', () => {
       const state: IRecommendationEngineState = {
         clickOracleState: clickOracle.getOracleState(),
-        ratingOracleState: ratingOracle.getOracleState(),
+        likingOracleState: likingOracle.getOracleState(),
         softmaxBeta: 1.0,
-        ratingWeight: 0.2,
+        likingWeight: 0.2,
         nRecommendations: 3,
       };
       expect(recommendationEngine.getRecommendationEngineState()).toEqual(
@@ -86,9 +86,9 @@ describe('RecommendationEngine', () => {
     it('should return the correct JSON string', () => {
       const state: IRecommendationEngineState = {
         clickOracleState: clickOracle.getOracleState(),
-        ratingOracleState: ratingOracle.getOracleState(),
+        likingOracleState: likingOracle.getOracleState(),
         softmaxBeta: 1.0,
-        ratingWeight: 0.2,
+        likingWeight: 0.2,
         nRecommendations: 3,
       };
       expect(recommendationEngine.toJSON()).toEqual(JSON.stringify(state));
@@ -157,11 +157,11 @@ describe('RecommendationEngine', () => {
         oldClickWeights,
       );
     });
-    it('the weights of the ratingOracle should not be changes', () => {
-      const oldRatingWeights = recommendationEngine.ratingOracle.weights;
+    it('the weights of the likingOracle should not be changes', () => {
+      const oldLikingWeights = recommendationEngine.likingOracle.weights;
       recommendationEngine.onCloseRecommendations(recommendation);
-      expect(recommendationEngine.ratingOracle.weights).toEqual(
-        oldRatingWeights,
+      expect(recommendationEngine.likingOracle.weights).toEqual(
+        oldLikingWeights,
       );
     });
     it('expect the clickOracle weight for each exerciseId in recommendedExercises to be decreased', () => {
@@ -208,14 +208,14 @@ describe('RecommendationEngine', () => {
         oldClickWeights,
       );
     });
-    it('the weights of the ratingOracle should not be changesd', () => {
-      const oldRatingWeights = recommendationEngine.ratingOracle.weights;
+    it('the weights of the likingOracle should not be changesd', () => {
+      const oldLikingWeights = recommendationEngine.likingOracle.weights;
       recommendationEngine.onChooseRecommendedExercise(
         recommendation,
         chosenExerciseId,
       );
-      expect(recommendationEngine.ratingOracle.weights).toEqual(
-        oldRatingWeights,
+      expect(recommendationEngine.likingOracle.weights).toEqual(
+        oldLikingWeights,
       );
     });
     it('expect the clickOracle weight for chosenExerciseId in recommendedExercises to be increased', () => {
@@ -263,9 +263,9 @@ describe('RecommendationEngine', () => {
     it('should return the correct JSON string', () => {
       const state: IRecommendationEngineState = {
         clickOracleState: clickOracle.getOracleState(),
-        ratingOracleState: ratingOracle.getOracleState(),
+        likingOracleState: likingOracle.getOracleState(),
         softmaxBeta: 1.0,
-        ratingWeight: 0.2,
+        likingWeight: 0.2,
         nRecommendations: 3,
       };
       expect(recommendationEngine.toJSON()).toEqual(JSON.stringify(state));
@@ -275,7 +275,7 @@ describe('RecommendationEngine', () => {
 
 describe('DemoRecommendationEngine', () => {
   let clickOracle: Oracle;
-  let ratingOracle: Oracle;
+  let likingOracle: Oracle;
   let demoRecommendationEngine: DemoRecommendationEngine;
 
   beforeEach(() => {
@@ -291,7 +291,7 @@ describe('DemoRecommendationEngine', () => {
       'clicked', 
     );
 
-    ratingOracle = new Oracle(
+    likingOracle = new Oracle(
       [], // contextFeatures
       [], // exerciseFeatures
       ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
@@ -300,7 +300,7 @@ describe('DemoRecommendationEngine', () => {
       true, // contextExerciseFeatureInteractions
       true, // useInversePropensityWeighting
       1.0, // negativeClassWeight
-      'rating', // targetLabel
+      'liking', // targetLabel
     );
     // new list of exercises with only exercises with exercideId in ['articles_act', 'follow_your_breath']
     const filteredExercises = Exercises.filter(exercise => {
@@ -311,7 +311,7 @@ describe('DemoRecommendationEngine', () => {
 
     demoRecommendationEngine = new DemoRecommendationEngine(
       clickOracle,
-      ratingOracle,
+      likingOracle,
       filteredExercises,
       1.0,
       0.2,
@@ -334,7 +334,7 @@ describe('DemoRecommendationEngine', () => {
           AggregateScore: 0.5,
           ClickScore: 0.5,
           Probability: 0.5,
-          RatingScore: 0.5,
+          LikingScore: 0.5,
           SelectedCount: undefined,
         },
         {
@@ -343,7 +343,7 @@ describe('DemoRecommendationEngine', () => {
           ExerciseId: 'follow_your_breath',
           ExerciseName: 'Follow Your Breath',
           Probability: 0.5,
-          RatingScore: 0.5,
+          LikingScore: 0.5,
           SelectedCount: undefined,
         },
       ];

@@ -1,5 +1,6 @@
 import {IRecommendation} from './IRecommendation';
 import {IContext} from './IContext';
+import {INeeds} from './INeeds';
 import {IExercise, IExerciseData, IScoredExercise} from './IExercise';
 import { IExerciseTrainingData } from './ITrainingData';
 import {IOracleState} from './IOracleState';
@@ -10,17 +11,26 @@ import {DefaultRecommendationEngine} from '../Defaults';
 
 export type IRecommendationEngineState = {
   clickOracleState: IOracleState;
-  ratingOracleState: IOracleState;
+  likingOracleState: IOracleState;
   softmaxBeta: number;
-  ratingWeight: number;
+  likingWeight: number;
   nRecommendations: number;
 };
+
 
 export function createEngineWithDefaults(
   exercises: IExerciseData,
 ): IRecommendationEngine {
   return RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
 }
+
+export function createEngineForNeeds(
+  exercises: IExerciseData,
+  needs: INeeds,
+): IRecommendationEngine {
+  return RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
+}
+
 
 export function createEngineFromJSON(
   json: string,
@@ -55,9 +65,9 @@ export interface IDemoRecommendationEngine extends IRecommendationEngine {
   // so we expose them here
 
   clickOracle: Oracle;
-  ratingOracle: Oracle;
+  likingOracle: Oracle;
   softmaxBeta: number;
-  ratingWeight: number;
+  likingWeight: number;
   nRecommendations: number;
 
   // we also want to display all exercises with their scores
