@@ -12,8 +12,11 @@ import {DefaultRecommendationEngine} from '../Defaults';
 export type IRecommendationEngineState = {
   clickOracleState: IOracleState;
   likingOracleState: IOracleState;
+  helpfulnessOracleState: IOracleState;
   softmaxBeta: number;
+  clickWeight: number;
   likingWeight: number;
+  helpfulnessWeight: number;
   nRecommendations: number;
 };
 
@@ -66,14 +69,17 @@ export interface IDemoRecommendationEngine extends IRecommendationEngine {
 
   clickOracle: Oracle;
   likingOracle: Oracle;
+  helpfulnessOracle: Oracle;
   softmaxBeta: number;
+  clickWeight: number;
   likingWeight: number;
+  helpfulnessWeight: number;
   nRecommendations: number;
 
   // we also want to display all exercises with their scores
   scoreAllExercises(context: IContext): IScoredExercise[];
 
-  // and retrieve the recomended exercises inside the recommendation
+  // and easily retrieve the recomended exercises inside the recommendation
   getRecommendedExercises(recommendation: IRecommendation): IExercise[];
 
 }

@@ -1,5 +1,9 @@
 export interface INeeds {
-    relaxation: number;
-    strength: number;
-    [key: string]: number;
+    BeMorePresent: boolean,
+    Relax: boolean,
+    BeKinderToMyself: boolean,
+    IncreasePositiveFeelings: boolean,
+    ManageFifficultThoughtsAndFeelings: boolean,
+    FocusOnWhatMattersToMe: boolean,
+    [key: string]: boolean;
 }

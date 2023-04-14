@@ -11,7 +11,11 @@ import {
   IScoredExercise,
   IDemoRecommendationEngine,
 } from "../recommender/interfaces";
-import { DefaultClickOracle, DefaultLikingOracle, DefaultRecommendationEngine } from "../recommender/Defaults";
+import { 
+    DefaultClickOracle, 
+    DefaultLikingOracle, 
+    DefaultHelpfulnessOracle, 
+    DefaultRecommendationEngine } from "../recommender/Defaults";
 
 import { ContextComponent } from "./ContextComponent";
 import { ScoredExercisesList } from "./ScoredExercisesList";
@@ -39,7 +43,6 @@ export function RoomDemoApp() {
     clickInversePropensityWeighting,
     setClickInversePropensityWeighting,
   ] = useState<boolean>(DefaultClickOracle.useInversePropensityWeighting);
-
   const [ClickContextFeatures, setClickContextFeatures] = useState<string[]>(DefaultClickOracle.contextFeatures);
   const [ClickExerciseFeatures, setClickExerciseFeatures] = useState<string[]>(DefaultClickOracle.exerciseFeatures);
   const [clickOracle, setClickOracle] = useState<Oracle>(
@@ -74,7 +77,6 @@ export function RoomDemoApp() {
   const [LikingExerciseFeatures, setLikingExerciseFeatures] = useState<
     string[]
   >(DefaultLikingOracle.exerciseFeatures);
-
   const [likingOracle, setLikingOracle] = useState<Oracle>(
     new Oracle(
       LikingContextFeatures, //contextFeatures
@@ -89,6 +91,39 @@ export function RoomDemoApp() {
       DefaultLikingOracle.weights, // weights
     )
   );
+
+  const [helpfulnessLearningRate, setHelpfulnessLearningRate] = useState<number>(DefaultHelpfulnessOracle.learningRate);
+  const [
+    helpfulnessContextExerciseInteractions,
+    setHelpfulnessContextExerciseInteractions,
+  ] = useState<boolean>(DefaultHelpfulnessOracle.contextExerciseInteractions);
+  const [
+    helpfulnessContextExerciseFeatureInteractions,
+    setHelpfulnessContextExerciseFeatureInteractions,
+  ] = useState<boolean>(DefaultHelpfulnessOracle.contextExerciseFeatureInteractions);
+  const [
+    helpfulnessInversePropensityWeighting,
+    setHelpfulnessInversePropensityWeighting,
+  ] = useState<boolean>(DefaultHelpfulnessOracle.useInversePropensityWeighting);
+  const [HelpfulnessContextFeatures, setHelpfulnessContextFeatures] = useState<string[]>(DefaultHelpfulnessOracle.contextFeatures);
+  const [HelpfulnessExerciseFeatures, setHelpfulnessExerciseFeatures] = useState<
+    string[]
+  >(DefaultHelpfulnessOracle.exerciseFeatures);
+  const [helpfulnessOracle, setHelpfulnessOracle] = useState<Oracle>(
+    new Oracle(
+      HelpfulnessContextFeatures, //contextFeatures
+      HelpfulnessExerciseFeatures, //exerciseFeatures
+      exerciseIds, //exerciseNames
+      helpfulnessLearningRate, //learningRate
+      helpfulnessContextExerciseInteractions, // contextExerciseInteractions
+      helpfulnessContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
+      helpfulnessInversePropensityWeighting, //useInversePropensityWeighting
+      DefaultHelpfulnessOracle.negativeClassWeight, //negativeClassWeight
+      DefaultHelpfulnessOracle.targetLabel, // targetLabel
+      DefaultHelpfulnessOracle.weights, // weights
+    )
+  );
+
   const [softmaxBeta, setSoftmaxBeta] = useState<number>(DefaultRecommendationEngine.softmaxBeta);
   const [likingWeight, setLikingWeight] = useState<number>(DefaultRecommendationEngine.likingWeight);
 
@@ -96,9 +131,12 @@ export function RoomDemoApp() {
     new DemoRecommendationEngine(
       clickOracle,
       likingOracle,
+      helpfulnessOracle,
       exercises,
       softmaxBeta,
-      likingWeight
+      1-2*likingWeight,
+      likingWeight,
+      likingWeight,
     )
   );
 

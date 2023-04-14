@@ -12,13 +12,15 @@ import {IRecommendation} from '../interfaces';
 describe('RecommendationEngine', () => {
   let clickOracle: Oracle;
   let likingOracle: Oracle;
+  let helpfulnessOracle: Oracle;
   let recommendationEngine: RecommendationEngine;
+  const testExerciseIds = ['positive_self_talk', 'follow_your_breath', 'alternate_nostril_breathing'];
 
   beforeEach(() => {
     clickOracle = new Oracle(
       ['happy'], // contextFeatures
       ['article', 'breathing'], // exerciseFeatures
-      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      testExerciseIds, // exerciseIds
       0.1,  // learningRate
       true, // contextExerciseInteractions
       true,   // contextExerciseFeatureInteractions
@@ -30,7 +32,7 @@ describe('RecommendationEngine', () => {
     likingOracle = new Oracle(
       [], // contextFeatures
       [], // exerciseFeatures
-      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      testExerciseIds, // exerciseIds
       0.1, // learningRate
       true, // contextExerciseInteractions
       true, // contextExerciseFeatureInteractions
@@ -38,22 +40,33 @@ describe('RecommendationEngine', () => {
       1.0, // negativeClassWeight
       'liking', // targetLabel
     );
+
+    helpfulnessOracle = new Oracle(
+      [], // contextFeatures
+      [], // exerciseFeatures
+      testExerciseIds, // exerciseIds
+      0.1, // learningRate
+      true, // contextExerciseInteractions
+      true, // contextExerciseFeatureInteractions
+      true, // useInversePropensityWeighting
+      1.0, // negativeClassWeight
+      'helpfulness', // targetLabel
+    );
     // new list of exercises with only exercises with exercideId in ['articles_act', 'follow_your_breath']
-    const filteredExercises = Exercises.filter(exercise => {
-      return [
-        'articles_act',
-        'follow_your_breath',
-        'alternate_nostril_breathing',
-      ].includes(exercise.ExerciseId);
+    const testExercises = Exercises.filter(exercise => {
+      return testExerciseIds.includes(exercise.ExerciseId);
     });
 
     recommendationEngine = new RecommendationEngine(
-      clickOracle,
-      likingOracle,
-      filteredExercises,
-      1.0,
-      0.2,
-      3,
+      clickOracle, // clickOracle
+      likingOracle, //  likingOracle
+      helpfulnessOracle, // helpfulnessOracle
+      testExercises, // exercises
+      1.0, // softmaxBeta
+      0.7, // clickWeight
+      0.15, // likingWeight
+      0.15, // helpfulnessWeight
+      3, // nRecommendations
     );
   });
 
@@ -61,8 +74,11 @@ describe('RecommendationEngine', () => {
     it('should create an instance of RecommendationEngine with the correct properties', () => {
       expect(recommendationEngine.clickOracle).toEqual(clickOracle);
       expect(recommendationEngine.likingOracle).toEqual(likingOracle);
+      expect(recommendationEngine.helpfulnessOracle).toEqual(helpfulnessOracle);
       expect(recommendationEngine.softmaxBeta).toEqual(1.0);
-      expect(recommendationEngine.likingWeight).toEqual(0.2);
+      expect(recommendationEngine.clickWeight).toEqual(0.7);
+      expect(recommendationEngine.likingWeight).toEqual(0.15);
+      expect(recommendationEngine.helpfulnessWeight).toEqual(0.15);
       expect(recommendationEngine.nRecommendations).toEqual(3);
     });
   });
@@ -72,8 +88,11 @@ describe('RecommendationEngine', () => {
       const state: IRecommendationEngineState = {
         clickOracleState: clickOracle.getOracleState(),
         likingOracleState: likingOracle.getOracleState(),
+        helpfulnessOracleState: helpfulnessOracle.getOracleState(),
         softmaxBeta: 1.0,
-        likingWeight: 0.2,
+        clickWeight: 0.7,
+        likingWeight: 0.15,
+        helpfulnessWeight: 0.15,
         nRecommendations: 3,
       };
       expect(recommendationEngine.getRecommendationEngineState()).toEqual(
@@ -87,8 +106,11 @@ describe('RecommendationEngine', () => {
       const state: IRecommendationEngineState = {
         clickOracleState: clickOracle.getOracleState(),
         likingOracleState: likingOracle.getOracleState(),
+        helpfulnessOracleState: helpfulnessOracle.getOracleState(),
         softmaxBeta: 1.0,
-        likingWeight: 0.2,
+        clickWeight: 0.7,
+        likingWeight: 0.15,
+        helpfulnessWeight: 0.15,
         nRecommendations: 3,
       };
       expect(recommendationEngine.toJSON()).toEqual(JSON.stringify(state));
@@ -116,6 +138,8 @@ describe('RecommendationEngine', () => {
     });
 
     it('recommendation should contain three recommendations', () => {
+      console.log(recommendation.recommendedExercises)
+
       expect(recommendation.recommendedExercises.length).toEqual(3);
     });
     it('recommendation context should equal input context', () => {
@@ -264,8 +288,11 @@ describe('RecommendationEngine', () => {
       const state: IRecommendationEngineState = {
         clickOracleState: clickOracle.getOracleState(),
         likingOracleState: likingOracle.getOracleState(),
+        helpfulnessOracleState: helpfulnessOracle.getOracleState(),
         softmaxBeta: 1.0,
-        likingWeight: 0.2,
+        clickWeight: 0.7,
+        likingWeight: 0.15,
+        helpfulnessWeight: 0.15,
         nRecommendations: 3,
       };
       expect(recommendationEngine.toJSON()).toEqual(JSON.stringify(state));
@@ -276,13 +303,15 @@ describe('RecommendationEngine', () => {
 describe('DemoRecommendationEngine', () => {
   let clickOracle: Oracle;
   let likingOracle: Oracle;
+  let helpfulnessOracle: Oracle;
   let demoRecommendationEngine: DemoRecommendationEngine;
+  const testExerciseIds = ['follow_your_breath', 'alternate_nostril_breathing'];
 
   beforeEach(() => {
     clickOracle = new Oracle(
       ['happy'], // contextFeatures
       ['article', 'breathing'], // exerciseFeatures
-      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      testExerciseIds, // exerciseIds
       0.1,  // learningRate
       true, // contextExerciseInteractions
       true,   // contextExerciseFeatureInteractions
@@ -294,7 +323,7 @@ describe('DemoRecommendationEngine', () => {
     likingOracle = new Oracle(
       [], // contextFeatures
       [], // exerciseFeatures
-      ['articles_act', 'follow_your_breath', 'alternate_nostril_breathing'], // exerciseIds
+      testExerciseIds, // exerciseIds
       0.1, // learningRate
       true, // contextExerciseInteractions
       true, // contextExerciseFeatureInteractions
@@ -302,20 +331,35 @@ describe('DemoRecommendationEngine', () => {
       1.0, // negativeClassWeight
       'liking', // targetLabel
     );
+
+    helpfulnessOracle = new Oracle(
+      [], // contextFeatures
+      [], // exerciseFeatures
+      testExerciseIds, // exerciseIds
+      0.1, // learningRate
+      true, // contextExerciseInteractions
+      true, // contextExerciseFeatureInteractions
+      true, // useInversePropensityWeighting
+      1.0, // negativeClassWeight
+      'helpfulness', // targetLabel
+    );
     // new list of exercises with only exercises with exercideId in ['articles_act', 'follow_your_breath']
-    const filteredExercises = Exercises.filter(exercise => {
-      return ['articles_act', 'follow_your_breath'].includes(
+    const testExercises = Exercises.filter(exercise => {
+      return testExerciseIds.includes(
         exercise.ExerciseId,
       );
     });
 
     demoRecommendationEngine = new DemoRecommendationEngine(
-      clickOracle,
-      likingOracle,
-      filteredExercises,
-      1.0,
-      0.2,
-      3,
+      clickOracle, // clickOracle
+      likingOracle, // likingOracle
+      helpfulnessOracle, // helpfulnessOracle
+      testExercises, // exercises
+      1.0, // softmaxBeta
+      0.7, // clickWeight
+      0.15, // likingWeight
+      0.15, // helpfulnessWeight
+      3, // nRecommendations
     );
   });
 
@@ -329,12 +373,13 @@ describe('DemoRecommendationEngine', () => {
         demoRecommendationEngine.scoreAllExercises(context);
       const expectedScores: IScoredExercise[] = [
         {
-          ExerciseId: 'articles_act',
-          ExerciseName: 'Article ACT',
+          ExerciseId: 'alternate_nostril_breathing',
+          ExerciseName: "Alternate nostril breathing",
           AggregateScore: 0.5,
           ClickScore: 0.5,
           Probability: 0.5,
           LikingScore: 0.5,
+          HelpfulnessScore: 0.5,
           SelectedCount: undefined,
         },
         {
@@ -344,6 +389,7 @@ describe('DemoRecommendationEngine', () => {
           ExerciseName: 'Follow Your Breath',
           Probability: 0.5,
           LikingScore: 0.5,
+          HelpfulnessScore: 0.5,
           SelectedCount: undefined,
         },
       ];

@@ -19,5 +19,6 @@ export interface IExerciseTrainingData extends ITrainingData{
     }
     clicked: number | undefined;
     liking: number | undefined;
+    helpfulness: number | undefined;
     probability : number | undefined;
 }

@@ -21,25 +21,34 @@ export class RecommendationEngine implements IRecommendationEngine {
 
     clickOracle: Oracle;
     likingOracle: Oracle;
+    helpfulnessOracle: Oracle;
     exercises: Record<string, IExercise>;
     softmaxBeta: number;
+    clickWeight: number;
     likingWeight: number;
+    helpfulnessWeight: number;
     nRecommendations: number;
 
 
     constructor (
         clickOracle: Oracle,
         likingOracle: Oracle,
+        helpfulnessOracle: Oracle,
         exercises: IExerciseData,
         softmaxBeta: number = 1,
-        likingWeight: number = 0.5,
+        clickWeight: number = 0.7,
+        likingWeight: number = 0.15,
+        helpfulnessWeight: number = 0.15,
         nRecommendations: number = 3,
     ) {
         this.clickOracle = clickOracle;
         this.likingOracle = likingOracle;
+        this.helpfulnessOracle = helpfulnessOracle;
         this.exercises = this.setExercises(exercises);
         this.softmaxBeta = softmaxBeta;
+        this.clickWeight = clickWeight;
         this.likingWeight = likingWeight;
+        this.helpfulnessWeight = helpfulnessWeight;
         this.nRecommendations = nRecommendations;
     }
 
@@ -51,15 +60,21 @@ export class RecommendationEngine implements IRecommendationEngine {
     static fromRecommendationEngineState(state: IRecommendationEngineState, exercises: IExerciseData): IRecommendationEngine {
         const clickOracle = Oracle.fromOracleState(state.clickOracleState);
         const likingOracle = Oracle.fromOracleState(state.likingOracleState);
+        const helpfulnessOracle = Oracle.fromOracleState(state.helpfulnessOracleState);
         const softmaxBeta = state.softmaxBeta;
+        const clickWeight = state.clickWeight;
         const likingWeight = state.likingWeight;
+        const helpfulnessWeight = state.helpfulnessWeight;
         const nRecommendations = state.nRecommendations;
         return new RecommendationEngine(
             clickOracle,
             likingOracle,
+            helpfulnessOracle,
             exercises,
             softmaxBeta,
+            clickWeight,
             likingWeight,
+            helpfulnessWeight,
             nRecommendations,
         );
     }
@@ -68,8 +83,11 @@ export class RecommendationEngine implements IRecommendationEngine {
         return {
             clickOracleState: this.clickOracle.getOracleState(),
             likingOracleState: this.likingOracle.getOracleState(),
+            helpfulnessOracleState: this.helpfulnessOracle.getOracleState(),
             softmaxBeta: this.softmaxBeta,
+            clickWeight: this.clickWeight,
             likingWeight: this.likingWeight,
+            helpfulnessWeight: this.helpfulnessWeight,
             nRecommendations: this.nRecommendations,
         }
     }
@@ -93,8 +111,6 @@ export class RecommendationEngine implements IRecommendationEngine {
         return sampleIndex;
     }
 
-    
-
     makeRecommendation(context: IContext) {
         let scoredExercises: IRecommendedExercise[] = [];
 
@@ -102,8 +118,10 @@ export class RecommendationEngine implements IRecommendationEngine {
             const exercise = this.exercises[exerciseId];
             const clickScore = this.clickOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const likingScore = this.likingOracle.predict(context, exercise.Features, exercise.ExerciseId);
+            const helpfulnessScore = this.helpfulnessOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
-                [clickScore, likingScore], [1-this.likingWeight, this.likingWeight]
+                [clickScore, likingScore, helpfulnessScore], 
+                [this.clickWeight, this.likingWeight, this.helpfulnessWeight]
             );
             const softmaxNumerator = Math.exp(this.softmaxBeta * aggregateScore)
             scoredExercises.push({
@@ -118,7 +136,6 @@ export class RecommendationEngine implements IRecommendationEngine {
             score: ex.score,
             probability: ex.probability / SoftmaxDenominator,
           }));
-
         let recommendedExercises: IRecommendedExercise[] = []
         for (let index = 0; index < this.nRecommendations; index++) {
             const sampleIndex = this._sampleRecommendation(scoredExercises);
@@ -147,13 +164,12 @@ export class RecommendationEngine implements IRecommendationEngine {
             };
             
             const clicked = recommendedExercise.ExerciseId === selectedExerciseId ? 1 : 0;
-            console.log("clicked", clicked, recommendedExercise.ExerciseId, selectedExerciseId)
             const liking = undefined;
+            const helpfulness = undefined;
             const probability = recommendation.recommendedExercises[index].probability;
     
-            trainingData.push({ input, clicked, liking, probability });
+            trainingData.push({ input, clicked, liking, helpfulness, probability });
           }
-          console.log("_generateClickTrainingData", JSON.stringify(trainingData))
           return trainingData
     }
 
@@ -170,8 +186,9 @@ export class RecommendationEngine implements IRecommendationEngine {
         
         const clicked = undefined;
         const liking = evaluation.liked / 100;
+        const helpfulness = evaluation.helpful / 100;
         const probability = 1;
-        const trainingData: IExerciseTrainingData = { input, clicked, liking, probability };
+        const trainingData: IExerciseTrainingData = { input, clicked, liking, helpfulness, probability };
         return trainingData;
     }
 
@@ -213,6 +230,7 @@ export class RecommendationEngine implements IRecommendationEngine {
                 const context = possibleRecommendationContext ?? evaluationTimeContext;
                 const trainingData = this._generateEvaluationTrainingData(context, exerciseId, evaluation);
                 this.likingOracle.fit(trainingData);
+                this.helpfulnessOracle.fit(trainingData);
                 resolve([trainingData]);
             } catch (error) {
                 reject(error);
@@ -231,8 +249,9 @@ export class DemoRecommendationEngine extends RecommendationEngine implements ID
             const exercise = this.exercises[exerciseId];
             const clickScore = this.clickOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const likingScore = this.likingOracle.predict(context, exercise.Features, exercise.ExerciseId);
+            const helpfulnessScore = this.helpfulnessOracle.predict(context, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
-                [clickScore, likingScore], [1-this.likingWeight, this.likingWeight]
+                [clickScore, likingScore, helpfulnessScore], [this.clickWeight, this.likingWeight, this.helpfulnessWeight]
             );
             const softmaxNumerator = Math.exp(this.softmaxBeta * aggregateScore)
             scoredExercises.push({
@@ -240,6 +259,7 @@ export class DemoRecommendationEngine extends RecommendationEngine implements ID
                 ExerciseId: exerciseId,
                 ClickScore: clickScore,
                 LikingScore: likingScore,
+                HelpfulnessScore: helpfulnessScore,
                 AggregateScore: aggregateScore,
                 Probability: softmaxNumerator,
                 SelectedCount: exercise.SelectedCount,

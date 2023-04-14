@@ -12,6 +12,7 @@ export interface IScoredExercise {
     ExerciseId: string;
     ClickScore: number
     LikingScore: number;
+    HelpfulnessScore: number;
     AggregateScore: number;
     Probability: number;
     SelectedCount?: number;
