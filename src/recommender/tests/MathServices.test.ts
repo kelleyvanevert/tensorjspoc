@@ -79,7 +79,95 @@ describe('ConvertScoresToProbabilityDistribution', () => {
       ConvertScoresToProbabilityDistribution(scores, softmaxBeta);
     }).toThrowError('scores array must not be empty');
   });
+
+  it('should throw an error when there only negative infinities in the scores array', () => {
+    const scores = [-Infinity, -Infinity, -Infinity];
+    const softmaxBeta = 1;
+    expect(() => {
+      ConvertScoresToProbabilityDistribution(scores, softmaxBeta);
+    }).toThrowError('scores array must contain at least one finite number');
+  });
+
+  it('should throw an error when there are infinite scores', () => {  
+    const scores = [1, 2, Infinity];
+    const softmaxBeta = 1;
+    expect(() => {
+      ConvertScoresToProbabilityDistribution(scores, softmaxBeta);
+    }).toThrowError(`score at index 2 must be a finite number`);
+  });
 });
+
+
+describe('SampleFromProbabilityDistribution', () => {
+  describe('when given invalid input', () => {
+    it('should throw an error when the probabilities array is empty', () => {
+      expect(() => SampleFromProbabilityDistribution([])).toThrow('probs array must not be empty');
+    });
+
+    it('should throw an error when the probabilities array contains negative numbers', () => {
+      expect(() => SampleFromProbabilityDistribution([-1, 0, 1])).toThrow(
+        'probs array must contain only non-negative numbers',
+      );
+    });
+
+    it('should throw an error when the probabilities array contains numbers greater than 1', () => {
+      expect(() => SampleFromProbabilityDistribution([0.5, 1.5, 0.25])).toThrow(
+        'probs array must contain numbers between 0 and 1',
+      );
+    });
+
+    it('should throw an error when the sum of probabilities is not greater than 0', () => {
+      expect(() => SampleFromProbabilityDistribution([0, 0, 0])).toThrow(
+        'probs must sum to a value greater than zero',
+      );
+    });
+  });
+
+  describe('when given valid input', () => {
+    it('should return the correct index when the probabilities are [0.1, 0.2, 0.3, 0.4] and Math.random() returns 0.4', () => {
+      // Arrange
+      jest.spyOn(Math, 'random').mockReturnValue(0.4);
+
+      // Act
+      const result = SampleFromProbabilityDistribution([0.1, 0.2, 0.3, 0.4]);
+
+      // Assert
+      expect(result).toBe(2);
+
+      // Clean up
+      jest.spyOn(Math, 'random').mockRestore();
+    });
+
+    it('should return the correct index when the probabilities are [0.2, 0.3, 0.5] and Math.random() returns 0.6', () => {
+      // Arrange
+      jest.spyOn(Math, 'random').mockReturnValue(0.6);
+
+      // Act
+      const result = SampleFromProbabilityDistribution([0.2, 0.3, 0.5]);
+
+      // Assert
+      expect(result).toBe(2);
+
+      // Clean up
+      jest.spyOn(Math, 'random').mockRestore();
+    });
+
+    it('should return the correct index when the probabilities are [0.4, 0.4, 0.2] and Math.random() returns 0.3', () => {
+      // Arrange
+      jest.spyOn(Math, 'random').mockReturnValue(0.3);
+
+      // Act
+      const result = SampleFromProbabilityDistribution([0.4, 0.4, 0.2]);
+
+      // Assert
+      expect(result).toBe(0);
+
+      // Clean up
+      jest.spyOn(Math, 'random').mockRestore();
+    });
+  });
+});
+
 
 describe('CosineSimilarity', () => {
   it('should return 1 for two identical vectors', () => {
@@ -112,6 +200,14 @@ describe('CosineSimilarity', () => {
     const B = [4, 5];
     expect(() => CosineSimilarity(A, B)).toThrow(
       'Arrays must have the same length',
+    );
+  });
+
+  it('should throw an error if A or B contains non-finite numbers', () => {
+    const A = [1, 2, 3];
+    const B = [4, 5, Infinity];
+    expect(() => CosineSimilarity(A, B)).toThrow(
+      "Invalid input. Both A and B should be arrays of finite numbers."
     );
   });
 

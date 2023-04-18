@@ -11,7 +11,7 @@ import {
 export class Oracle {
   contextFeatures!: string[];
   exerciseFeatures!: string[];
-  exerciseNames!: string[];
+  exerciseIds!: string[];
   addIntercept!: boolean;
   learningRate: number;
   contextExerciseInteractions!: boolean;
@@ -29,7 +29,7 @@ export class Oracle {
   constructor(
     contextFeatures: string[] = [],
     exerciseFeatures: string[] = [],
-    exerciseNames: string[] = [],
+    exerciseIds: string[] = [],
     learningRate = 0.1,
     contextExerciseInteractions: boolean = false,
     contextExerciseFeatureInteractions: boolean = true,
@@ -38,7 +38,7 @@ export class Oracle {
     targetLabel: string = 'label',
     weights: WeightsHash = {},
   ) {
-    if (!Array.isArray(contextFeatures) || !Array.isArray(exerciseFeatures) || !Array.isArray(exerciseNames)) {
+    if (!Array.isArray(contextFeatures) || !Array.isArray(exerciseFeatures) || !Array.isArray(exerciseIds)) {
       throw new Error("Context features, exercise features, and exercise names must be arrays.");
     }
     if (typeof learningRate !== 'number') {
@@ -52,7 +52,7 @@ export class Oracle {
     this.setFeaturesAndUpdateWeights(
       contextFeatures, 
       exerciseFeatures, 
-      exerciseNames, 
+      exerciseIds, 
       contextExerciseInteractions, 
       contextExerciseFeatureInteractions,
       weights
@@ -67,7 +67,7 @@ export class Oracle {
     return {
       contextFeatures: this.contextFeatures,
       exerciseFeatures: this.exerciseFeatures,
-      exerciseIds: this.exerciseNames,      
+      exerciseIds: this.exerciseIds,      
       learningRate: this.learningRate,
       contextExerciseInteractions: this.contextExerciseInteractions,
       contextExerciseFeatureInteractions: this.contextExerciseFeatureInteractions,
@@ -103,7 +103,7 @@ export class Oracle {
   }
 
   generateFeatures(): string[] {
-    let features = [...this.exerciseNames, ...this.exerciseFeatures, ...this.interactionFeatures];
+    let features = [...this.exerciseIds, ...this.exerciseFeatures, ...this.interactionFeatures];
     return features
   }
 
@@ -111,8 +111,8 @@ export class Oracle {
     let interactionFeatures: string[] = [];
     if (this.contextExerciseInteractions) {
       for (let i = 0; i < this.contextFeatures.length; i++) {
-        for (let j = 0; j < this.exerciseNames.length; j++) {
-          interactionFeatures.push(this.contextFeatures[i] + '*' + this.exerciseNames[j]);
+        for (let j = 0; j < this.exerciseIds.length; j++) {
+          interactionFeatures.push(this.contextFeatures[i] + '*' + this.exerciseIds[j]);
         }
       }
     }
@@ -142,16 +142,18 @@ export class Oracle {
   }
 
   updateWeights(newWeights: WeightsHash = {}): number[] {
-    this.weights = this.zeroWeights(this.nFeatures);
+    this.weights = this.zeroWeights(this.calculateNFeatures());
     if (this.addIntercept) {
       this.weights[0] = (newWeights as any)['intercept'] || this.weights[0];
       for (let i = 0; i < this.features.length; i++) {
         this.weights[i+1] = (newWeights as any)[this.features[i]] || this.weights[i+1];
       }
     } else {
+      console.log(this.weights, this.features)
       for (let i = 0; i < this.features.length; i++) {
         this.weights[i] = (newWeights as any)[this.features[i]] || this.weights[i];
       }
+      console.log(this.weights, this.features)
     }
     return this.weights
   }
@@ -159,14 +161,14 @@ export class Oracle {
   setFeaturesAndUpdateWeights(
       contextFeatures?: string[], 
       exerciseFeatures?: string[],
-      exerciseNames?: string[],
+      exerciseIds?: string[],
       contextExerciseInteractions?: boolean,
       contextExerciseFeatureInteractions?: boolean,
       weights: WeightsHash  = {},
       ): void {
     this.contextFeatures = contextFeatures ?? this.contextFeatures;
     this.exerciseFeatures = exerciseFeatures ?? this.exerciseFeatures;
-    this.exerciseNames = exerciseNames ?? this.exerciseNames;
+    this.exerciseIds = exerciseIds ?? this.exerciseIds;
     this.contextExerciseInteractions = contextExerciseInteractions ?? this.contextExerciseInteractions;
     this.contextExerciseFeatureInteractions = contextExerciseFeatureInteractions ?? this.contextExerciseFeatureInteractions;
     
@@ -220,11 +222,11 @@ export class Oracle {
     inputsHash: FeaturesHash, 
     exercisename: string |undefined = undefined
     ): Record<string, number> {
-    for (let i = 0; i < this.exerciseNames.length; i++) {
-      if (this.exerciseNames[i] === exercisename) {
-        inputsHash[this.exerciseNames[i]] = 1;
+    for (let i = 0; i < this.exerciseIds.length; i++) {
+      if (this.exerciseIds[i] === exercisename) {
+        inputsHash[this.exerciseIds[i]] = 1;
       } else {
-        inputsHash[this.exerciseNames[i]] = 0;
+        inputsHash[this.exerciseIds[i]] = 0;
       }
     }
     return inputsHash;
@@ -233,9 +235,9 @@ export class Oracle {
   calculateInteractionFeatures(inputsHash: FeaturesHash): FeaturesHash {
     if (this.contextExerciseInteractions) {
       for (let i = 0; i < this.contextFeatures.length; i++) {
-        for (let j = 0; j < this.exerciseNames.length; j++) {
-          inputsHash[this.contextFeatures[i] + '*' + this.exerciseNames[j]] = 
-            inputsHash[this.contextFeatures[i]] * inputsHash[this.exerciseNames[j]];
+        for (let j = 0; j < this.exerciseIds.length; j++) {
+          inputsHash[this.contextFeatures[i] + '*' + this.exerciseIds[j]] = 
+            inputsHash[this.contextFeatures[i]] * inputsHash[this.exerciseIds[j]];
         }
       }
     }

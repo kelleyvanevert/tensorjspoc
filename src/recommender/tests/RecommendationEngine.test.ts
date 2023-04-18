@@ -138,8 +138,6 @@ describe('RecommendationEngine', () => {
     });
 
     it('recommendation should contain three recommendations', () => {
-      console.log(recommendation.recommendedExercises)
-
       expect(recommendation.recommendedExercises.length).toEqual(3);
     });
     it('recommendation context should equal input context', () => {
@@ -200,7 +198,6 @@ describe('RecommendationEngine', () => {
     it('expect the clickOracle weight for each happy*exerciseId in recommendedExercises to be decreased', () => {
       const oldClickWeights = recommendationEngine.clickOracle.getWeightsHash();
       recommendationEngine.onCloseRecommendations(recommendation);
-      console.log(recommendationEngine.clickOracle.getWeightsHash());
       recommendation.recommendedExercises.forEach(rec => {
         const interactionKey = `happy*${rec.exerciseId}`;
         expect(

@@ -49,7 +49,7 @@ export function RoomDemoApp() {
     new Oracle(
       ClickContextFeatures, //contextFeatures
       ClickExerciseFeatures, //exerciseFeatures
-      exerciseIds, //exerciseNames
+      exerciseIds, //exerciseIds
       clickLearningRate, //learningRate
       clickContextExerciseInteractions, // contextExerciseInteractions
       clickContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
@@ -81,7 +81,7 @@ export function RoomDemoApp() {
     new Oracle(
       LikingContextFeatures, //contextFeatures
       LikingExerciseFeatures, //exerciseFeatures
-      exerciseIds, //exerciseNames
+      exerciseIds, //exerciseIds
       likingLearningRate, //learningRate
       likingContextExerciseInteractions, // contextExerciseInteractions
       likingContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
@@ -113,7 +113,7 @@ export function RoomDemoApp() {
     new Oracle(
       HelpfulnessContextFeatures, //contextFeatures
       HelpfulnessExerciseFeatures, //exerciseFeatures
-      exerciseIds, //exerciseNames
+      exerciseIds, //exerciseIds
       helpfulnessLearningRate, //learningRate
       helpfulnessContextExerciseInteractions, // contextExerciseInteractions
       helpfulnessContextExerciseFeatureInteractions, // contextExerciseFeatureInteractions
@@ -207,7 +207,7 @@ export function RoomDemoApp() {
     engine.clickOracle.setFeaturesAndUpdateWeights(
       newContextFeatures,
       engine.clickOracle.exerciseFeatures,
-      engine.clickOracle.exerciseNames,
+      engine.clickOracle.exerciseIds,
       engine.clickOracle.contextExerciseInteractions,
       engine.clickOracle.contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -222,7 +222,7 @@ export function RoomDemoApp() {
     engine.clickOracle.setFeaturesAndUpdateWeights(
       engine.clickOracle.contextFeatures,
       newExerciseFeatures,
-      engine.clickOracle.exerciseNames,
+      engine.clickOracle.exerciseIds,
       engine.clickOracle.contextExerciseInteractions,
       engine.clickOracle.contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -237,7 +237,7 @@ export function RoomDemoApp() {
     engine.clickOracle.setFeaturesAndUpdateWeights(
       engine.clickOracle.contextFeatures,
       engine.clickOracle.exerciseFeatures,
-      engine.clickOracle.exerciseNames,
+      engine.clickOracle.exerciseIds,
       contextExerciseInteractions,
       engine.clickOracle.contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -254,7 +254,7 @@ export function RoomDemoApp() {
     engine.clickOracle.setFeaturesAndUpdateWeights(
       engine.clickOracle.contextFeatures,
       engine.clickOracle.exerciseFeatures,
-      engine.clickOracle.exerciseNames,
+      engine.clickOracle.exerciseIds,
       engine.clickOracle.contextExerciseInteractions,
       contextExerciseFeatureInteractions,
       engine.clickOracle.getWeightsHash()
@@ -277,7 +277,7 @@ export function RoomDemoApp() {
     engine.likingOracle.setFeaturesAndUpdateWeights(
       newContextFeatures,
       engine.likingOracle.exerciseFeatures,
-      engine.likingOracle.exerciseNames,
+      engine.likingOracle.exerciseIds,
       engine.likingOracle.contextExerciseInteractions,
       engine.likingOracle.contextExerciseFeatureInteractions,
       engine.likingOracle.getWeightsHash()
@@ -292,7 +292,7 @@ export function RoomDemoApp() {
     engine.likingOracle.setFeaturesAndUpdateWeights(
       engine.likingOracle.contextFeatures,
       newExerciseFeatures,
-      engine.likingOracle.exerciseNames,
+      engine.likingOracle.exerciseIds,
       engine.likingOracle.contextExerciseInteractions,
       engine.likingOracle.contextExerciseFeatureInteractions,
       engine.likingOracle.getWeightsHash()
@@ -307,7 +307,7 @@ export function RoomDemoApp() {
     engine.likingOracle.setFeaturesAndUpdateWeights(
       engine.likingOracle.contextFeatures,
       engine.likingOracle.exerciseFeatures,
-      engine.likingOracle.exerciseNames,
+      engine.likingOracle.exerciseIds,
       contextExerciseInteractions,
       engine.likingOracle.contextExerciseFeatureInteractions,
       engine.likingOracle.getWeightsHash()
@@ -324,7 +324,7 @@ export function RoomDemoApp() {
     engine.likingOracle.setFeaturesAndUpdateWeights(
       engine.likingOracle.contextFeatures,
       engine.likingOracle.exerciseFeatures,
-      engine.likingOracle.exerciseNames,
+      engine.likingOracle.exerciseIds,
       engine.likingOracle.contextExerciseInteractions,
       contextExerciseFeatureInteractions,
       engine.likingOracle.getWeightsHash()

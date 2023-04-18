@@ -1,10 +1,10 @@
 import {Oracle} from '../Oracle';
-import {ITrainingData} from '../interfaces';
+import {ITrainingData, IOracleState} from '../interfaces';
 
-describe('LogisticOracle', () => {
+describe('Oracle', () => {
   const contextFeatures = ['context1', 'context2'];
   const exerciseFeatures = ['feature1', 'feature2'];
-  const exerciseNames = ['exercise1', 'exercise2'];
+  const exerciseIds = ['exercise1', 'exercise2'];
   const learningRate = 0.1;
   const contextExerciseInteractions = false;
   const contextExerciseFeatureInteractions = true;
@@ -20,11 +20,97 @@ describe('LogisticOracle', () => {
 
   let oracle: Oracle;
 
+  it('should throw error if contextFeatures is not an array', () => {
+    expect(() => {
+      new Oracle(
+        'contextFeatures' as any,
+        exerciseFeatures,
+        exerciseIds,
+        learningRate,
+        contextExerciseInteractions,
+        contextExerciseFeatureInteractions,
+        useInversePropensityWeighting,
+        1.0,
+        targetLabel,
+        weights,
+      );  
+    }).toThrowError("Context features, exercise features, and exercise names must be arrays.");
+  });
+
+
+  it('should throw error if contextFeatures is not an array', () => {
+    expect(() => {
+      new Oracle(
+        contextFeatures,
+        'exerciseFeatures' as any,
+        exerciseIds,
+        learningRate,
+        contextExerciseInteractions,
+        contextExerciseFeatureInteractions,
+        useInversePropensityWeighting,
+        1.0,
+        targetLabel,
+        weights,
+      );  
+    }).toThrowError("Context features, exercise features, and exercise names must be arrays.");
+  });
+
+  it('should throw error if contextFeatures is not an array', () => {
+    expect(() => {
+      new Oracle(
+        contextFeatures,
+        exerciseFeatures,
+        'exerciseIds' as any,
+        learningRate,
+        contextExerciseInteractions,
+        contextExerciseFeatureInteractions,
+        useInversePropensityWeighting,
+        1.0,
+        targetLabel,
+        weights,
+      );  
+    }).toThrowError("Context features, exercise features, and exercise names must be arrays.");
+  });
+
+  it('should throw error if contextFeatures is not an array', () => {
+    expect(() => {
+      new Oracle(
+        contextFeatures,
+        exerciseFeatures,
+        exerciseIds,
+        'learningRate' as any,
+        contextExerciseInteractions,
+        contextExerciseFeatureInteractions,
+        useInversePropensityWeighting,
+        1.0,
+        targetLabel,
+        weights,
+      );  
+    }).toThrowError("Learning rate must be a number.");
+  });
+
+  it('should throw error if contextFeatures is not an array', () => {
+    expect(() => {
+      new Oracle(
+        contextFeatures,
+        exerciseFeatures,
+        exerciseIds,
+        learningRate,
+        'contextExerciseInteractions' as any,
+        contextExerciseFeatureInteractions,
+        useInversePropensityWeighting,
+        1.0,
+        targetLabel,
+        weights,
+      );  
+    }).toThrowError("Context-exercise interactions, context-exercise feature interactions, inverse propensity weighting must be booleans.");
+  });
+
   beforeEach(() => {
     oracle = new Oracle(
       contextFeatures,
       exerciseFeatures,
-      exerciseNames,
+      exerciseIds,
       learningRate,
       contextExerciseInteractions,
       contextExerciseFeatureInteractions,
@@ -39,7 +125,7 @@ describe('LogisticOracle', () => {
     it('should create an instance of LogisticOracle with the correct properties', () => {
       expect(oracle.contextFeatures).toEqual(contextFeatures);
       expect(oracle.exerciseFeatures).toEqual(exerciseFeatures);
-      expect(oracle.exerciseNames).toEqual(exerciseNames);
+      expect(oracle.exerciseIds).toEqual(exerciseIds);
       expect(oracle.learningRate).toEqual(learningRate);
       expect(oracle.addIntercept).toEqual(true);
       expect(oracle.contextExerciseInteractions).toEqual(
@@ -53,6 +139,109 @@ describe('LogisticOracle', () => {
       );
       expect(oracle.targetLabel).toEqual(targetLabel);
       expect(oracle.weights).toEqual([0, 0.1, 0.2, 0.3, 0.4, 0, 0, 0, 0]);
+    });
+  });
+
+  describe('getOracleState', () => {
+    it('should return the correct state', () => {
+
+      const expectedOracleState: IOracleState = {
+        contextFeatures,
+        exerciseFeatures,
+        exerciseIds:exerciseIds,
+        learningRate,
+        contextExerciseInteractions,
+        contextExerciseFeatureInteractions,
+        useInversePropensityWeighting,
+        negativeClassWeight:1.0,
+        targetLabel,
+        weights: {
+          "intercept": 0,
+          "context1*feature1": 0,
+          "context1*feature2": 0,
+          "context2*feature1": 0,
+          "context2*feature2": 0,
+          "exercise1": 0.1,
+          "exercise2": 0.2,
+          "feature1": 0.3,
+          "feature2": 0.4,
+        },
+      }
+
+      expect(oracle.getOracleState()).toEqual(
+        expectedOracleState,
+      );
+    });
+  });
+
+  describe('fromOracleState', () => {
+    it('should return an instance of LogisticOracle with the correct properties', () => {
+      const oracleState: IOracleState = {
+        contextFeatures,
+        exerciseFeatures,
+        exerciseIds,
+        learningRate,
+        contextExerciseInteractions,
+        contextExerciseFeatureInteractions,
+        useInversePropensityWeighting,
+        negativeClassWeight:1.0,
+        targetLabel,
+        weights: {
+          "intercept": 0,
+          "context1*feature1": 0,
+          "context1*feature2": 0,
+          "context2*feature1": 0,
+          "context2*feature2": 0,
+          "exercise1": 0.1,
+          "exercise2": 0.2,
+          "feature1": 0.3,
+          "feature2": 0.4,
+        },
+      };
+      const newOracle = Oracle.fromOracleState(oracleState);
+      expect(newOracle.contextFeatures).toEqual(contextFeatures);
+      expect(newOracle.exerciseFeatures).toEqual(exerciseFeatures);
+      expect(newOracle.exerciseIds).toEqual(exerciseIds);
+      expect(newOracle.learningRate).toEqual(learningRate);
+      expect(newOracle.addIntercept).toEqual(true);
+      expect(newOracle.contextExerciseInteractions).toEqual(
+        contextExerciseInteractions);
+      expect(newOracle.contextExerciseFeatureInteractions).toEqual(
+        contextExerciseFeatureInteractions);
+      expect(newOracle.useInversePropensityWeighting).toEqual(
+        useInversePropensityWeighting);
+      expect(newOracle.targetLabel).toEqual(targetLabel);
+      expect(newOracle.weights).toEqual([0, 0.1, 0.2, 0.3, 0.4, 0, 0, 0, 0]);
+    });
+  });
+
+  describe('fromJSON', () => {
+    it('should return an instance of LogisticOracle with the correct properties', () => {
+      const newOracle = Oracle.fromJSON(oracle.toJSON());
+      expect(newOracle.contextFeatures).toEqual(contextFeatures);
+      expect(newOracle.exerciseFeatures).toEqual(exerciseFeatures);
+      expect(newOracle.exerciseIds).toEqual(exerciseIds);
+      expect(newOracle.learningRate).toEqual(learningRate);
+      expect(newOracle.addIntercept).toEqual(true);
+      expect(newOracle.contextExerciseInteractions).toEqual(
+        contextExerciseInteractions);
+      expect(newOracle.contextExerciseFeatureInteractions).toEqual(
+        contextExerciseFeatureInteractions);
+      expect(newOracle.useInversePropensityWeighting).toEqual(
+        useInversePropensityWeighting);
+      expect(newOracle.targetLabel).toEqual(targetLabel);
+      expect(newOracle.weights).toEqual([0, 0.1, 0.2, 0.3, 0.4, 0, 0, 0, 0]);
+    });
+  });
+
+  describe('calculateNFeatures', () => {
+    it('should return the correct number of features', () => {
+      expect(oracle.calculateNFeatures()).toEqual(9);
+    });
+
+    it('should return the correct number of features when addIntercept is false', () => {
+      oracle.addIntercept = false;
+      expect(oracle.calculateNFeatures()).toEqual(8);
     });
   });
 
@@ -100,6 +289,13 @@ describe('LogisticOracle', () => {
       const newWeights = {exercise1: -0.1, exercise2: -0.2};
       const updatedWeights = oracle.updateWeights(newWeights);
       expect(updatedWeights).toEqual([0, -0.1, -0.2, 0, 0, 0, 0, 0, 0]);
+    });
+
+    it('should update the weights when addIntercept is false', () => {
+      oracle.addIntercept = false;
+      const newWeights = {exercise1: -0.1, exercise2: -0.2};
+      const updatedWeights = oracle.updateWeights(newWeights);
+      expect(updatedWeights).toEqual([-0.1, -0.2, 0, 0, 0, 0, 0, 0]);
     });
   });
 
@@ -149,6 +345,22 @@ describe('LogisticOracle', () => {
         ]),
       );
     });
+    it('should return a hash of the weights when addIntercept is false', () => {
+      oracle.addIntercept = false;
+      oracle.updateWeights(oracle.getWeightsHash())
+      expect(oracle.getWeightsMap()).toEqual(
+        new Map([
+          ['exercise1', '0.100'],
+          ['exercise2', '0.200'],
+          ['feature1', '0.300'],
+          ['feature2', '0.400'],
+          ['context1*feature1', '0.000'],
+          ['context1*feature2', '0.000'],
+          ['context2*feature1', '0.000'],
+          ['context2*feature2', '0.000'],
+        ]),
+      );
+    });
   });
 
   describe('toJSON', () => {
@@ -168,7 +380,7 @@ describe('LogisticOracle', () => {
       const newInputsHash = oracle.addExerciseNameFeatures({});
       expect(newInputsHash).toEqual({exercise1: 0, exercise2: 0});
     });
-    it('should not add the exercise name features to the features array if the exercise name is not in the exerciseNames array', () => {
+    it('should not add the exercise name features to the features array if the exercise name is not in the exerciseIds array', () => {
       const newInputsHash = oracle.addExerciseNameFeatures({}, 'exercise3');
       expect(newInputsHash).toEqual({exercise1: 0, exercise2: 0});
     });
@@ -296,7 +508,7 @@ describe('LogisticOracle', () => {
       oracle.setFeaturesAndUpdateWeights(
         undefined, // contextFeatures
         undefined, // exerciseFeatures
-        undefined, // exerciseNames
+        undefined, // exerciseIds
         true, // useFeatureInteractions
         true, // useExerciseInteractions
       );
@@ -344,6 +556,25 @@ describe('LogisticOracle', () => {
           exerciseName,
         ),
       ).toEqual([[1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0]]);
+    });
+
+    it('it should throw an error if there is a missing features', () => {
+      oracle.setFeaturesAndUpdateWeights(
+        undefined,
+        undefined,
+        undefined,
+        true,
+        true,
+      );
+      const exerciseName = 'exercise2';
+      delete contextFeatures.context1;
+      expect(() =>
+        oracle.getOrderedInputsArray(
+          contextFeatures,
+          exerciseFeatures,
+          exerciseName,
+        ),
+      ).toThrowError('Missing features in inputsHash: ');
     });
   });
 

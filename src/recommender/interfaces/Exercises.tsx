@@ -755,5 +755,5 @@ export const Exercises: IExercise[] = [
     
 ]
 
-// exerciseNames is a list of all the exercise ExerciseNames:
+// exerciseIds is a list of all the exercise ExerciseNames:
 export const exerciseIds = Exercises.map((exercise) => exercise.ExerciseId);
