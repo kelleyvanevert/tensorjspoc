@@ -5,9 +5,10 @@ import {
 } from '../RecommendationEngine';
 import {IRecommendationEngineState} from '../interfaces/IRecommendationEngine';
 import {IScoredExercise} from '../interfaces/IExercise';
-import {IContext} from '../interfaces/IContext';
+import {IContext, createDefaultContext} from '../interfaces/IContext';
 import {Exercises} from '../interfaces/Exercises';
 import {IRecommendation} from '../interfaces';
+import { create } from 'domain';
 
 describe('RecommendationEngine', () => {
   let clickOracle: Oracle;
@@ -127,13 +128,11 @@ describe('RecommendationEngine', () => {
   });
 
   describe('makeRecommendation', () => {
-    let context: IContext;
+    const context: IContext = createDefaultContext();
+    context.happy = 1;
     let recommendation: IRecommendation;
     beforeEach(() => {
-      context = {
-        happy: 1,
-        sad: 0,
-      };
+      
       recommendation = recommendationEngine.makeRecommendation(context);
     });
 
@@ -166,10 +165,8 @@ describe('RecommendationEngine', () => {
     let context: IContext;
     let recommendation: IRecommendation;
     beforeEach(() => {
-      context = {
-        happy: 1,
-        sad: 0,
-      };
+      context = createDefaultContext();
+      context.happy = 1;
       recommendation = recommendationEngine.makeRecommendation(context);
     });
     it('the weights of the clickOracle should be changed', () => {
@@ -212,10 +209,8 @@ describe('RecommendationEngine', () => {
     let recommendation: IRecommendation;
     let chosenExerciseId: string;
     beforeEach(() => {
-      context = {
-        happy: 1,
-        sad: 0,
-      };
+      context = createDefaultContext();
+      context.happy = 1;
       recommendation = recommendationEngine.makeRecommendation(context);
       chosenExerciseId = recommendation.recommendedExercises[0].exerciseId;
     });
@@ -362,10 +357,8 @@ describe('DemoRecommendationEngine', () => {
 
   describe('scoreAllExercises', () => {
     it('should return the correct scores', () => {
-      const context: IContext = {
-        happy: 1,
-        sad: 0,
-      };
+      const context: IContext = createDefaultContext();
+      context.happy = 1;
       const scoredExercises: IScoredExercise[] =
         demoRecommendationEngine.scoreAllExercises(context);
       const expectedScores: IScoredExercise[] = [
