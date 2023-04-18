@@ -1,5 +1,5 @@
 import { IExercise, IScoredExercise } from "./interfaces/IExercise";
-import { IContext } from "./interfaces/IContext";
+import { IContext, createDefaultContext } from "./interfaces/IContext";
 import { IRecommendation, IRecommendedExercise } from "./interfaces/IRecommendation";
 import { IExerciseData } from "./interfaces/IExercise";
 import { IEvaluation, IExerciseTrainingData } from "./interfaces";
@@ -149,6 +149,23 @@ export class RecommendationEngine implements IRecommendationEngine {
         return recommendation
     }
 
+    private _generateDirectChoiceTrainingData(exerciseId: string): IExerciseTrainingData[] {
+        const exercise = this.exercises[exerciseId];
+        if (!exercise) {
+            throw new Error(`Failed to generate training data for exercise with id ${exerciseId}.`);
+        }
+        const input = {
+          exerciseId: exerciseId,
+          contextFeatures: createDefaultContext(),
+          exerciseFeatures: exercise.Features,
+        };
+        const clicked = 1;
+        const liking = undefined;
+        const helpfulness = undefined;
+        const probability = undefined;
+        return [{ input, clicked, liking, helpfulness, probability }];
+    }
+
     private _generateClickTrainingData(recommendation: IRecommendation, selectedExerciseId:string|undefined=undefined) : IExerciseTrainingData[] {
         let trainingData: IExerciseTrainingData[] = []
         for (let index = 0; index < recommendation.recommendedExercises.length; index++) {
@@ -190,6 +207,18 @@ export class RecommendationEngine implements IRecommendationEngine {
         const probability = 1;
         const trainingData: IExerciseTrainingData = { input, clicked, liking, helpfulness, probability };
         return trainingData;
+    }
+
+    onChooseExerciseDirectly(exerciseId:string): Promise<IExerciseTrainingData[]> {
+        return new Promise((resolve, reject) => {
+            try {
+                const trainingData = this._generateDirectChoiceTrainingData(exerciseId);
+                this.clickOracle.fitMany(trainingData);
+                resolve(trainingData);
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     onCloseRecommendations(recommendation: IRecommendation): Promise<IExerciseTrainingData[]> {
@@ -236,6 +265,19 @@ export class RecommendationEngine implements IRecommendationEngine {
                 reject(error);
             }
       });
+    }
+
+    fitOnTrainingData(trainingData: IExerciseTrainingData[]): Promise<void> {
+        return new Promise((resolve, reject) => {
+            try {
+                this.clickOracle.fitMany(trainingData);
+                this.likingOracle.fitMany(trainingData);
+                this.helpfulnessOracle.fitMany(trainingData);
+                resolve();
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
     
 }

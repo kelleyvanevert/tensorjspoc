@@ -1,6 +1,7 @@
 import {IRecommendation} from './IRecommendation';
 import {IContext} from './IContext';
 import {INeeds} from './INeeds';
+import { IDemographics } from './IDemographics';
 import {IExercise, IExerciseData, IScoredExercise} from './IExercise';
 import { IExerciseTrainingData } from './ITrainingData';
 import {IOracleState} from './IOracleState';
@@ -23,15 +24,22 @@ export type IRecommendationEngineState = {
 
 export function createEngineWithDefaults(
   exercises: IExerciseData,
+  initialTrainingData: IExerciseTrainingData[] = [],
 ): IRecommendationEngine {
-  return RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
+  const engine = RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
+  engine.fitOnTrainingData(initialTrainingData);
+  return engine;
 }
 
-export function createEngineForNeeds(
+export function createEngineForDemographicsAndNeeds(
   exercises: IExerciseData,
+  demographics: IDemographics,
   needs: INeeds,
+  initialTrainingData: IExerciseTrainingData[] = [],
 ): IRecommendationEngine {
-  return RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
+  const engine = RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
+  engine.fitOnTrainingData(initialTrainingData);
+  return engine;
 }
 
 
@@ -49,17 +57,21 @@ export interface IRecommendationEngine {
 
   makeRecommendation(context: IContext): IRecommendation;
   
+  onChooseExerciseDirectly(exerciseId:string): Promise<IExerciseTrainingData[]>;
   onCloseRecommendations(recommendation: IRecommendation): Promise<IExerciseTrainingData[]>;
   onChooseRecommendedExercise(
     recommendation: IRecommendation,
     exerciseId: string,
   ): Promise<IExerciseTrainingData[]>;
+
   onEvaluateExercise(
     possibleRecommendationContext: null | IContext,
     evaluationTimeContext: IContext,
     exerciseId: string,
     evaluation: IEvaluation,
   ): Promise<IExerciseTrainingData[]>;
+
+  fitOnTrainingData(trainingData: IExerciseTrainingData[]): Promise<void>;
 }
 
 

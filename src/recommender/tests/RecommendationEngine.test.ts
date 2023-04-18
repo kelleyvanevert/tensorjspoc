@@ -20,7 +20,7 @@ describe('RecommendationEngine', () => {
   beforeEach(() => {
     clickOracle = new Oracle(
       ['happy'], // contextFeatures
-      ['article', 'breathing'], // exerciseFeatures
+      ['short', 'relax'], // exerciseFeatures
       testExerciseIds, // exerciseIds
       0.1,  // learningRate
       true, // contextExerciseInteractions
@@ -132,7 +132,6 @@ describe('RecommendationEngine', () => {
     context.happy = 1;
     let recommendation: IRecommendation;
     beforeEach(() => {
-      
       recommendation = recommendationEngine.makeRecommendation(context);
     });
 
@@ -302,7 +301,7 @@ describe('DemoRecommendationEngine', () => {
   beforeEach(() => {
     clickOracle = new Oracle(
       ['happy'], // contextFeatures
-      ['article', 'breathing'], // exerciseFeatures
+      ['short', 'relax'], // exerciseFeatures
       testExerciseIds, // exerciseIds
       0.1,  // learningRate
       true, // contextExerciseInteractions

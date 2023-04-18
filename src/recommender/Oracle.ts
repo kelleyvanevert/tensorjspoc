@@ -7,6 +7,7 @@ import {
   IExerciseTrainingData, 
 } from './interfaces';
 
+const DEFAULT_PROBABILITY = 0.1;
 
 export class Oracle {
   contextFeatures!: string[];
@@ -308,7 +309,7 @@ export class Oracle {
       const y = [(trainingData as any)[this.targetLabel]];
       let sampleWeight = 1;
       if (this.useInversePropensityWeighting) {
-        sampleWeight = 1 / (trainingData.probability || 1);
+        sampleWeight = 1 / (trainingData.probability ?? DEFAULT_PROBABILITY);
       } 
       if (y[0] == 0) {
         sampleWeight = sampleWeight * this.negativeClassWeight;
