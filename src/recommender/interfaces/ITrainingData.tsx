@@ -1,11 +1,11 @@
 import { IExerciseFeatures } from "./IExerciseFeatures";
-import { IContext } from "./IContext";
+import { IProcessedContext } from "./IContext";
 
 export interface ITrainingData {
     input: {
         exerciseId?: string | undefined;
-        contextFeatures?: Record<string, number> | undefined;
-        exerciseFeatures?: Record<string, number> | undefined;
+        contextFeatures?: Record<string, number | undefined> | undefined;
+        exerciseFeatures?: Record<string, number | undefined> | undefined;
     }
     label?: number | undefined;
     probability?: number | undefined;
@@ -14,7 +14,7 @@ export interface ITrainingData {
 export interface IExerciseTrainingData extends ITrainingData{
     input: {
         exerciseId: string;
-        contextFeatures: IContext;
+        contextFeatures: IProcessedContext;
         exerciseFeatures: IExerciseFeatures;
     }
     clicked: number | undefined;

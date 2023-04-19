@@ -1,4 +1,4 @@
-import { IContext } from "./IContext";
+import { IProcessedContext } from "./IContext";
 
 export interface IRecommendedExercise {
   exerciseId: string,
@@ -8,6 +8,6 @@ export interface IRecommendedExercise {
 
 
 export interface IRecommendation {
-    context: IContext;
+    context: IProcessedContext;
     recommendedExercises: Array<IRecommendedExercise>;
   };

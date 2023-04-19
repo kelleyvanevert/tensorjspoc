@@ -5,6 +5,7 @@ import {
   WeightsHash, 
   FeaturesHash, 
   IExerciseTrainingData, 
+  processContext,
 } from './interfaces';
 
 const DEFAULT_PROBABILITY = 0.1;

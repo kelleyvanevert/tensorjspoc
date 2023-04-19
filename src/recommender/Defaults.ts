@@ -8,12 +8,8 @@ const DefaultClickOracle: IOracleState = {
   contextFeatures: [
     "evening",
     "weekend",
-    "happy", 
-    "sad",
-    // "stressed",
-    // "energetic",
-    // "stressed",
-    // "fatigued",
+    "positive", 
+    "negative",
   ],
   exerciseFeatures: [
     "short",
@@ -52,12 +48,8 @@ const DefaultLikingOracle: IOracleState = {
   contextFeatures: [
     "evening",
     "weekend",
-    // "happy", 
-    // "sad",
-    // "stressed",
-    // "energetic",
-    // "stressed",
-    // "fatigued",
+    "positive",
+    "negative",
   ],
   exerciseFeatures: [
     "short",
@@ -96,12 +88,8 @@ const DefaultHelpfulnessOracle: IOracleState = {
   contextFeatures: [
     "evening",
     "weekend",
-    // "happy", 
-    // "sad",
-    // "stressed",
-    // "energetic",
-    // "stressed",
-    // "fatigued",
+    "positive",
+    "negative",
   ],
   exerciseFeatures: [
     "short",

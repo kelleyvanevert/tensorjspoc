@@ -5,7 +5,7 @@ import {
 } from '../RecommendationEngine';
 import {IRecommendationEngineState} from '../interfaces/IRecommendationEngine';
 import {IScoredExercise} from '../interfaces/IExercise';
-import {IContext, createDefaultContext} from '../interfaces/IContext';
+import {IContext, createDefaultContext, processContext} from '../interfaces/IContext';
 import {Exercises} from '../interfaces/Exercises';
 import {IRecommendation} from '../interfaces';
 import { create } from 'domain';
@@ -19,7 +19,7 @@ describe('RecommendationEngine', () => {
 
   beforeEach(() => {
     clickOracle = new Oracle(
-      ['happy'], // contextFeatures
+      ['positive'], // contextFeatures
       ['short', 'relax'], // exerciseFeatures
       testExerciseIds, // exerciseIds
       0.1,  // learningRate
@@ -129,7 +129,8 @@ describe('RecommendationEngine', () => {
 
   describe('makeRecommendation', () => {
     const context: IContext = createDefaultContext();
-    context.happy = 1;
+    context.happy = 5;
+    const processedContext = processContext(context)
     let recommendation: IRecommendation;
     beforeEach(() => {
       recommendation = recommendationEngine.makeRecommendation(context);
@@ -139,7 +140,7 @@ describe('RecommendationEngine', () => {
       expect(recommendation.recommendedExercises.length).toEqual(3);
     });
     it('recommendation context should equal input context', () => {
-      expect(recommendation.context).toEqual(context);
+      expect(recommendation.context).toEqual(processedContext);
     });
     it('recommendedExercises should be unique', () => {
       const recommendedExerciseIds = recommendation.recommendedExercises.map(
@@ -165,7 +166,7 @@ describe('RecommendationEngine', () => {
     let recommendation: IRecommendation;
     beforeEach(() => {
       context = createDefaultContext();
-      context.happy = 1;
+      context.happy = 5; context.energetic = 5; context.relaxed= 5;
       recommendation = recommendationEngine.makeRecommendation(context);
     });
     it('the weights of the clickOracle should be changed', () => {
@@ -191,11 +192,11 @@ describe('RecommendationEngine', () => {
         ).toBeLessThan(oldClickWeights[rec.exerciseId]);
       });
     });
-    it('expect the clickOracle weight for each happy*exerciseId in recommendedExercises to be decreased', () => {
+    it('expect the clickOracle weight for each positive*exerciseId in recommendedExercises to be decreased', () => {
       const oldClickWeights = recommendationEngine.clickOracle.getWeightsHash();
       recommendationEngine.onCloseRecommendations(recommendation);
       recommendation.recommendedExercises.forEach(rec => {
-        const interactionKey = `happy*${rec.exerciseId}`;
+        const interactionKey = `positive*${rec.exerciseId}`;
         expect(
           recommendationEngine.clickOracle.getWeightsHash()[interactionKey],
         ).toBeLessThan(oldClickWeights[interactionKey]);
@@ -209,7 +210,7 @@ describe('RecommendationEngine', () => {
     let chosenExerciseId: string;
     beforeEach(() => {
       context = createDefaultContext();
-      context.happy = 1;
+      context.happy = 5; context.energetic = 5; context.relaxed= 5;
       recommendation = recommendationEngine.makeRecommendation(context);
       chosenExerciseId = recommendation.recommendedExercises[0].exerciseId;
     });
@@ -252,7 +253,7 @@ describe('RecommendationEngine', () => {
         }
       });
     });
-    it('expect the clickOracle weight for each happy*exerciseId in recommendedExercises to increased for the chosen exerciseId', () => {
+    it('expect the clickOracle weight for each positive*exerciseId in recommendedExercises to increased for the chosen exerciseId', () => {
       const oldClickWeights =
         recommendationEngine.clickOracle.getWeightsHash();
       recommendationEngine.onChooseRecommendedExercise(
@@ -260,7 +261,7 @@ describe('RecommendationEngine', () => {
         chosenExerciseId,
       );
       recommendation.recommendedExercises.forEach(rec => {
-        const interactionKey = `happy*${rec.exerciseId}`;
+        const interactionKey = `positive*${rec.exerciseId}`;
         if (rec.exerciseId === chosenExerciseId) {
           expect(
             recommendationEngine.clickOracle.getWeightsHash()[interactionKey],
@@ -300,7 +301,7 @@ describe('DemoRecommendationEngine', () => {
 
   beforeEach(() => {
     clickOracle = new Oracle(
-      ['happy'], // contextFeatures
+      ['positive'], // contextFeatures
       ['short', 'relax'], // exerciseFeatures
       testExerciseIds, // exerciseIds
       0.1,  // learningRate

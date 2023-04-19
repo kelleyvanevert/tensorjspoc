@@ -1,5 +1,5 @@
 import { IExercise, IScoredExercise } from "./interfaces/IExercise";
-import { IContext, createDefaultContext } from "./interfaces/IContext";
+import { IContext, IProcessedContext, createDefaultProcessedContext, processContext } from "./interfaces/IContext";
 import { IRecommendation, IRecommendedExercise } from "./interfaces/IRecommendation";
 import { IExerciseData } from "./interfaces/IExercise";
 import { IEvaluation, IExerciseTrainingData } from "./interfaces";
@@ -111,14 +111,36 @@ export class RecommendationEngine implements IRecommendationEngine {
         return sampleIndex;
     }
 
-    makeRecommendation(context: IContext) {
-        let scoredExercises: IRecommendedExercise[] = [];
-
+    private _filteredExerciseIds(context: IContext) : string[] {
+        const filteredExerciseIds: string[] = [];
         for (const exerciseId in this.exercises) {
             const exercise = this.exercises[exerciseId];
-            const clickScore = this.clickOracle.predict(context, exercise.Features, exercise.ExerciseId);
-            const likingScore = this.likingOracle.predict(context, exercise.Features, exercise.ExerciseId);
-            const helpfulnessScore = this.helpfulnessOracle.predict(context, exercise.Features, exercise.ExerciseId);
+            if (
+                (context?.frustrated ?? 0 >= 4)
+                 && (context?.stress ?? 0 >= 4)
+                 && (exercise.Features.relax == 0)
+                 && (exercise.Features.breathing == 0)
+            ) { continue; }
+            if (
+                (context?.sad ?? 0 >= 4)
+                && (exercise.Features.be_more_present == 1)
+            ) { continue; }
+            filteredExerciseIds.push(exercise.ExerciseId);
+        }
+        return filteredExerciseIds;
+    }
+
+    makeRecommendation(context: IContext) {
+        let scoredExercises: IRecommendedExercise[] = [];
+        const processedContext: IProcessedContext = processContext(context)
+        const filteredExerciseIds = this._filteredExerciseIds(context);
+
+        for (let i = 0; i < filteredExerciseIds.length; i++) {
+            const exerciseId = filteredExerciseIds[i];
+            const exercise = this.exercises[exerciseId];
+            const clickScore = this.clickOracle.predict(processedContext, exercise.Features, exercise.ExerciseId);
+            const likingScore = this.likingOracle.predict(processedContext, exercise.Features, exercise.ExerciseId);
+            const helpfulnessScore = this.helpfulnessOracle.predict(processedContext, exercise.Features, exercise.ExerciseId);
             const aggregateScore = weightedHarmonicMean(
                 [clickScore, likingScore, helpfulnessScore], 
                 [this.clickWeight, this.likingWeight, this.helpfulnessWeight]
@@ -143,7 +165,7 @@ export class RecommendationEngine implements IRecommendationEngine {
             scoredExercises.splice(sampleIndex, 1); 
         }
         const recommendation: IRecommendation = {
-            context: context,
+            context: processedContext,
             recommendedExercises: recommendedExercises
         }
         return recommendation
@@ -156,7 +178,7 @@ export class RecommendationEngine implements IRecommendationEngine {
         }
         const input = {
           exerciseId: exerciseId,
-          contextFeatures: createDefaultContext(),
+          contextFeatures: createDefaultProcessedContext(),
           exerciseFeatures: exercise.Features,
         };
         const clicked = 1;
@@ -195,9 +217,10 @@ export class RecommendationEngine implements IRecommendationEngine {
         if (!evaluatedExercise) {
             throw new Error(`Failed to generate training data for evaluated exercise at index ${exerciseId}.`);
         } 
+        const processedContext = processContext(context);
         const input = {
             exerciseId: exerciseId,
-            contextFeatures: context,
+            contextFeatures: processedContext,
             exerciseFeatures: evaluatedExercise.Features,
         };
         

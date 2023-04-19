@@ -69,11 +69,14 @@ export interface IExerciseFeatures {
     grounding: YesNo;
     audio_guided_exercise: YesNo;
     audio_only: YesNo;
+    involves_body: YesNo;
     notebook_exercise: YesNo;
     outdoors: YesNo;
     private_location: YesNo;
+    // dynamic features:
     in_the_room_already: YesNo;
-    [key: string]: YesNo;
+    times_completed: number;
+    [key: string]: YesNo | number;
 }
 
 
@@ -97,10 +100,13 @@ export function createDefaultExerciseFeatures(): IExerciseFeatures {
         grounding: YesNo.No,
         audio_guided_exercise: YesNo.No,
         audio_only: YesNo.No,
+        involves_body: YesNo.No,
         notebook_exercise: YesNo.No,
         outdoors: YesNo.No,
         private_location: YesNo.No,
         in_the_room_already: YesNo.No,
+        times_completed: 0,
+
     };
 }
 
