@@ -141,6 +141,7 @@ export function RoomDemoApp() {
   );
 
   const [context, setContext] = useState<IContext>(generateContext(Moods[0]));
+  const allContextFeatures = ['evening', 'weekend', 'positive', 'negative'];
   const [scoredExercises, setScoredExercises] = useState<IScoredExercise[]>(
     engine.scoreAllExercises(context)
   );
@@ -419,7 +420,7 @@ export function RoomDemoApp() {
 
         <div className="mt-3">Context features</div>
         <FeatureSelector
-          features={Object.keys(context)}
+          features={allContextFeatures}
           value={ClickContextFeatures}
           onChange={onSelectedClickContextItemsChange}
         />
@@ -479,7 +480,7 @@ export function RoomDemoApp() {
 
         <div className="mt-4">Context features</div>
         <FeatureSelector
-          features={Object.keys(context)}
+          features={allContextFeatures}
           value={LikingContextFeatures}
           onChange={onSelectedLikingContextItemsChange}
         />
