@@ -38,6 +38,33 @@ export function createEngineForDemographicsAndNeeds(
   initialTrainingData: IExerciseTrainingData[] = [],
 ): IRecommendationEngine {
   const engine = RecommendationEngine.fromRecommendationEngineState(DefaultRecommendationEngine, exercises);
+  engine.clickOracle.updateWeights({
+    "be_more_present": needs.beMorePresent ? 1.0 : 0.0 ,
+    "relax": needs.relax ? 1.0 : 0.0 ,
+    "be_kinder_to_myself" : needs.beKinderToMyself ? 1.0 : 0.0 ,
+    "increase_positive_feelings"  : needs.increasePositiveFeelings ? 1.0 : 0.0 ,
+    "manage_difficult_thoughts_and_feelings"  : needs.managedifficultThoughtsAndFeelings ? 1.0 : 0.0 ,
+    "focus_on_what_matters_to_me"   :needs.focusOnWhatMattersToMe ? 1.0 : 0.0 ,
+  })
+
+  engine.likingOracle.updateWeights({
+    "be_more_present": needs.beMorePresent ? 1.0 : 0.0 ,
+    "relax": needs.relax ? 1.0 : 0.0 ,
+    "be_kinder_to_myself" : needs.beKinderToMyself ? 1.0 : 0.0 ,
+    "increase_positive_feelings"  : needs.increasePositiveFeelings ? 1.0 : 0.0 ,
+    "manage_difficult_thoughts_and_feelings"  : needs.managedifficultThoughtsAndFeelings ? 1.0 : 0.0 ,
+    "focus_on_what_matters_to_me"   :needs.focusOnWhatMattersToMe ? 1.0 : 0.0 ,
+  })
+
+  engine.helpfulnessOracle.updateWeights({
+    "be_more_present": needs.beMorePresent ? 1.0 : 0.0 ,
+    "relax": needs.relax ? 1.0 : 0.0 ,
+    "be_kinder_to_myself" : needs.beKinderToMyself ? 1.0 : 0.0 ,
+    "increase_positive_feelings"  : needs.increasePositiveFeelings ? 1.0 : 0.0 ,
+    "manage_difficult_thoughts_and_feelings"  : needs.managedifficultThoughtsAndFeelings ? 1.0 : 0.0 ,
+    "focus_on_what_matters_to_me"   :needs.focusOnWhatMattersToMe ? 1.0 : 0.0 ,
+  })
+
   engine.fitOnTrainingData(initialTrainingData);
   return engine;
 }
@@ -51,6 +78,11 @@ export function createEngineFromJSON(
 }
 
 export interface IRecommendationEngine {
+
+  // oracles are exposed so can adjust weights in createEngineForDemographicsAndNeeds
+  clickOracle: Oracle;
+  likingOracle: Oracle;
+  helpfulnessOracle: Oracle;
 
   getRecommendationEngineState(): IRecommendationEngineState;
   toJSON(): string;
@@ -79,9 +111,6 @@ export interface IDemoRecommendationEngine extends IRecommendationEngine {
   // in the demo we need more access to the internals of the engine and its oracles
   // so we expose them here
 
-  clickOracle: Oracle;
-  likingOracle: Oracle;
-  helpfulnessOracle: Oracle;
   softmaxBeta: number;
   clickWeight: number;
   likingWeight: number;

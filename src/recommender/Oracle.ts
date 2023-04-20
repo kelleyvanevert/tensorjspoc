@@ -144,18 +144,17 @@ export class Oracle {
   }
 
   updateWeights(newWeights: WeightsHash = {}): number[] {
+    const combinedWeights = {...this.getWeightsHash(), ...newWeights}
     this.weights = this.zeroWeights(this.calculateNFeatures());
     if (this.addIntercept) {
-      this.weights[0] = (newWeights as any)['intercept'] || this.weights[0];
+      this.weights[0] = (combinedWeights as any)['intercept'] || this.weights[0];
       for (let i = 0; i < this.features.length; i++) {
-        this.weights[i+1] = (newWeights as any)[this.features[i]] || this.weights[i+1];
+        this.weights[i+1] = (combinedWeights as any)[this.features[i]] || this.weights[i+1];
       }
     } else {
-      console.log(this.weights, this.features)
       for (let i = 0; i < this.features.length; i++) {
-        this.weights[i] = (newWeights as any)[this.features[i]] || this.weights[i];
+        this.weights[i] = (combinedWeights as any)[this.features[i]] || this.weights[i];
       }
-      console.log(this.weights, this.features)
     }
     return this.weights
   }
@@ -178,8 +177,8 @@ export class Oracle {
     this.interactionFeatures = this.generateInteractionFeatures()
     this.features = this.generateFeatures();
     this.nFeatures = this.calculateNFeatures();
-    const combinedWeights = {...this.getWeightsHash(), ...weights}
-    this.weights = this.updateWeights(combinedWeights);
+    // const combinedWeights = {...this.getWeightsHash(), ...weights}
+    this.weights = this.updateWeights(weights);
   }
 
   getWeightsHash() : WeightsHash {

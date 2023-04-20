@@ -288,14 +288,14 @@ describe('Oracle', () => {
     it('should update the weights', () => {
       const newWeights = {exercise1: -0.1, exercise2: -0.2};
       const updatedWeights = oracle.updateWeights(newWeights);
-      expect(updatedWeights).toEqual([0, -0.1, -0.2, 0, 0, 0, 0, 0, 0]);
+      expect(updatedWeights).toEqual([0, -0.1, -0.2, 0.3, 0.4, 0, 0, 0, 0]);
     });
 
     it('should update the weights when addIntercept is false', () => {
       oracle.addIntercept = false;
       const newWeights = {exercise1: -0.1, exercise2: -0.2};
       const updatedWeights = oracle.updateWeights(newWeights);
-      expect(updatedWeights).toEqual([-0.1, -0.2, 0, 0, 0, 0, 0, 0]);
+      expect(updatedWeights).toEqual([-0.1, -0.2, 0.3, 0.4, 0, 0, 0, 0]);
     });
   });
 

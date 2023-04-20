@@ -42,7 +42,15 @@ const DefaultClickOracle: IOracleState = {
   useInversePropensityWeighting: true,
   negativeClassWeight: 0.5,
   targetLabel: "clicked",
-  weights: {intercept: -0.7},
+  weights: {
+    intercept: -0.7,
+    "be_more_present": 1.0,
+    "relax": 0.0,
+    "be_kinder_to_myself" : 0.0,
+    "increase_positive_feelings"  : 0.0,
+    "manage_difficult_thoughts_and_feelings"  : 0.0,
+    "focus_on_what_matters_to_me"   : 0.0,
+  },
 };
 
 const DefaultLikingOracle: IOracleState = {
@@ -77,13 +85,20 @@ const DefaultLikingOracle: IOracleState = {
     "in_the_room_already",
   ],
   exerciseIds: exerciseIds,
-  learningRate: 2.0,
+  learningRate: 1.0,
   contextExerciseInteractions: true,
   contextExerciseFeatureInteractions: false,
   useInversePropensityWeighting: false,
   negativeClassWeight: 1.0,
   targetLabel: "liking",
-  weights: {},
+  weights: {
+    "be_more_present": 1.0,
+    "relax": 0.0,
+    "be_kinder_to_myself" : 0.0,
+    "increase_positive_feelings"  : 0.0,
+    "manage_difficult_thoughts_and_feelings"  : 0.0,
+    "focus_on_what_matters_to_me"   : 0.0,
+  },
 };
 
 const DefaultHelpfulnessOracle: IOracleState = {
@@ -124,7 +139,14 @@ const DefaultHelpfulnessOracle: IOracleState = {
     useInversePropensityWeighting: false,
     negativeClassWeight: 1.0,
     targetLabel: "helpfulness",
-    weights: {},
+    weights: {
+      "be_more_present": 1.0,
+      "relax": 0.0,
+      "be_kinder_to_myself" : 0.0,
+      "increase_positive_feelings"  : 0,
+      "manage_difficult_thoughts_and_feelings"  : 0.0,
+      "focus_on_what_matters_to_me"   : 0.0,
+    },
   };
 
 const DefaultRecommendationEngine: IRecommendationEngineState = {
