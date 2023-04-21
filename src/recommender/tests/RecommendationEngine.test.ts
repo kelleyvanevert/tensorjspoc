@@ -5,10 +5,10 @@ import {
 } from '../RecommendationEngine';
 import {IRecommendationEngineState} from '../interfaces/IRecommendationEngine';
 import {IScoredExercise} from '../interfaces/IExercise';
-import {IContext, createDefaultContext, processContext} from '../interfaces/IContext';
+import {IContext, createDefaultContext, processContext, IProcessedContext} from '../interfaces/IContext';
 import {Exercises} from '../interfaces/Exercises';
-import {IRecommendation} from '../interfaces';
-import { create } from 'domain';
+import {IEvaluation, IRecommendation, IRecommendedExercise} from '../interfaces';
+
 
 describe('RecommendationEngine', () => {
   let clickOracle: Oracle;
@@ -102,6 +102,35 @@ describe('RecommendationEngine', () => {
     });
   });
 
+  describe('_filteredExerciseIds', () => {
+    it('should return the correct list of exercises with default context', () => {
+      const context: IContext = createDefaultContext();
+
+      const filteredExerciseIds = recommendationEngine._filteredExerciseIds(context);
+      expect(filteredExerciseIds.length).toEqual(3);
+      expect(filteredExerciseIds.sort()).toEqual(testExerciseIds.sort());
+    });
+
+    it('should exclude follow_your_breath when context.sad >= 4', () => {
+      const context: IContext = createDefaultContext();
+      context.sad = 4;
+
+      const filteredExerciseIds = recommendationEngine._filteredExerciseIds(context);
+      expect(filteredExerciseIds.length).toEqual(2);
+      expect(filteredExerciseIds.sort()).toEqual(['positive_self_talk', 'alternate_nostril_breathing'].sort());
+    });
+
+    it('only breathing or relaxation exercises and when context.frustrated >= 4 and context.stressed >= 4', () => {
+      const context: IContext = createDefaultContext();
+      context.frustrated = 4;
+      context.stressed = 4;
+
+      const filteredExerciseIds = recommendationEngine._filteredExerciseIds(context);
+      expect(filteredExerciseIds.length).toEqual(2);
+      expect(filteredExerciseIds.sort()).toEqual(['follow_your_breath', 'alternate_nostril_breathing'].sort());
+    });
+  });
+
   describe('toJSON', () => {
     it('should return the correct JSON string', () => {
       const state: IRecommendationEngineState = {
@@ -158,6 +187,16 @@ describe('RecommendationEngine', () => {
         expect(rec.score).toBeDefined();
         expect(rec.probability).toBeDefined();
       });
+    });
+  });
+
+  describe('onChooseExerciseDirectly', () => {
+    it('the weights of the clickOracle should be changed', () => {
+      const oldClickWeights = recommendationEngine.clickOracle.weights;
+      recommendationEngine.onChooseExerciseDirectly('positive_self_talk');  
+      expect(recommendationEngine.clickOracle.weights).not.toEqual(
+        oldClickWeights,
+      );
     });
   });
 
@@ -275,6 +314,62 @@ describe('RecommendationEngine', () => {
     });
   });
 
+  describe('onEvaluateExercise', () => {
+    let context: IContext;
+    let processedContext: IProcessedContext;
+    let recommendation: IRecommendation;
+    let chosenExerciseId: string;
+    let evaluation: IEvaluation;
+    beforeEach(() => {
+      context = createDefaultContext();
+      context.happy = 5; context.energetic = 5; context.relaxed= 5;
+      processedContext = processContext(context);
+      recommendation = recommendationEngine.makeRecommendation(context);
+      chosenExerciseId = recommendation.recommendedExercises[0].exerciseId;
+      evaluation = {
+        liked: 100,
+        helpful: 100,
+      };
+    });
+    it('the weights of the clickOracle should not be changed', () => {
+      const oldClickWeights = recommendationEngine.clickOracle.weights;
+      recommendationEngine.onEvaluateExercise(
+        processedContext,
+        context,
+        chosenExerciseId,
+        evaluation,
+      );
+      expect(recommendationEngine.clickOracle.weights).toEqual(
+        oldClickWeights,
+      );
+    });
+    it('the weights of the likingOracle should be changed', () => {
+      const oldLikingWeights = recommendationEngine.likingOracle.weights;
+      recommendationEngine.onEvaluateExercise(
+        processedContext,
+        context,
+        chosenExerciseId,
+        evaluation,
+      );
+      expect(recommendationEngine.likingOracle.weights).not.toEqual(
+        oldLikingWeights,
+      );
+    });
+
+    it('the weights of the helpfulnessOracle should be changed', () => {
+      const oldHelpfulnessWeights = recommendationEngine.helpfulnessOracle.weights;
+      recommendationEngine.onEvaluateExercise(
+        processedContext,
+        context,
+        chosenExerciseId,
+        evaluation,
+      );
+      expect(recommendationEngine.helpfulnessOracle.weights).not.toEqual(
+        oldHelpfulnessWeights,
+      );
+    });
+  });
+
   describe('toJSON', () => {
     it('should return the correct JSON string', () => {
       const state: IRecommendationEngineState = {
@@ -297,7 +392,7 @@ describe('DemoRecommendationEngine', () => {
   let likingOracle: Oracle;
   let helpfulnessOracle: Oracle;
   let demoRecommendationEngine: DemoRecommendationEngine;
-  const testExerciseIds = ['follow_your_breath', 'alternate_nostril_breathing'];
+  const testExerciseIds = ['positive_self_talk', 'follow_your_breath', 'alternate_nostril_breathing'];
 
   beforeEach(() => {
     clickOracle = new Oracle(
@@ -367,7 +462,17 @@ describe('DemoRecommendationEngine', () => {
           ExerciseName: "Alternate nostril breathing",
           AggregateScore: 0.5,
           ClickScore: 0.5,
-          Probability: 0.5,
+          Probability: 0.3333333333333333,
+          LikingScore: 0.5,
+          HelpfulnessScore: 0.5,
+          SelectedCount: undefined,
+        },
+        {
+          AggregateScore: 0.5,
+          ClickScore: 0.5,
+          ExerciseId: 'positive_self_talk',
+          ExerciseName: 'Positive Self Talk',
+          Probability: 0.3333333333333333,
           LikingScore: 0.5,
           HelpfulnessScore: 0.5,
           SelectedCount: undefined,
@@ -377,13 +482,40 @@ describe('DemoRecommendationEngine', () => {
           ClickScore: 0.5,
           ExerciseId: 'follow_your_breath',
           ExerciseName: 'Follow Your Breath',
-          Probability: 0.5,
+          Probability: 0.3333333333333333,
           LikingScore: 0.5,
           HelpfulnessScore: 0.5,
           SelectedCount: undefined,
         },
       ];
       expect(scoredExercises).toEqual(expectedScores);
+    });
+  });
+
+  describe('getRecommendedExercises', () => {
+    it('should return the correct recommended exercises', () => {
+      const context: IContext = createDefaultContext();
+      const recommendation: IRecommendation =
+        demoRecommendationEngine.makeRecommendation(context);
+      const recommendedExercises: IRecommendedExercise[] = recommendation.recommendedExercises;
+      const expectedRecommendedExercises: IRecommendedExercise[] = [
+        {
+          exerciseId: 'follow_your_breath',
+          score: 0.5,
+          probability: 0.3333333333333333,
+        },
+        {
+          exerciseId: 'positive_self_talk',
+          score: 0.5,
+          probability: 0.3333333333333333,
+        },
+        {
+          exerciseId: 'alternate_nostril_breathing',
+          score: 0.5,
+          probability: 0.3333333333333333,
+        },
+      ];
+      expect(recommendedExercises).toEqual(expect.arrayContaining(expectedRecommendedExercises.map(exercise => expect.objectContaining(exercise))));
     });
   });
 });

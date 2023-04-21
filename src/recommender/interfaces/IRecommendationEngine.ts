@@ -1,5 +1,5 @@
 import {IRecommendation} from './IRecommendation';
-import {IContext} from './IContext';
+import {IContext, IProcessedContext} from './IContext';
 import {INeeds} from './INeeds';
 import { IDemographics } from './IDemographics';
 import {IExercise, IExerciseData, IScoredExercise} from './IExercise';
@@ -97,7 +97,7 @@ export interface IRecommendationEngine {
   ): Promise<IExerciseTrainingData[]>;
 
   onEvaluateExercise(
-    possibleRecommendationContext: null | IContext,
+    possibleRecommendationContext: null | IProcessedContext,
     evaluationTimeContext: IContext,
     exerciseId: string,
     evaluation: IEvaluation,

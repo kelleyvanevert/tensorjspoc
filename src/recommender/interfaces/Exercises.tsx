@@ -30,6 +30,7 @@ export const Exercises: IExercise[] = [
         ExerciseName: 'Body Scan',
         Features: generateExerciseFeatures({
             long: YesNo.Yes,
+            mindfulness: YesNo.Yes,
             be_more_present: YesNo.Yes,
             grounding: YesNo.Yes,
             audio_guided_exercise: YesNo.Yes,
@@ -129,6 +130,7 @@ export const Exercises: IExercise[] = [
         ExerciseName: 'Five Senses',
         Features: generateExerciseFeatures({
             short: YesNo.Yes,
+            mindfulness: YesNo.Yes,
             be_more_present: YesNo.Yes,
             grounding: YesNo.Yes,
             audio_guided_exercise: YesNo.Yes,
@@ -141,6 +143,7 @@ export const Exercises: IExercise[] = [
         ExerciseName: 'Tracking thoughts in time',
         Features: generateExerciseFeatures({
             medium: YesNo.Yes,
+            mindfulness: YesNo.Yes,
             be_more_present: YesNo.Yes,
             grounding:  YesNo.Yes,
             involves_body: YesNo.Yes,
@@ -215,6 +218,7 @@ export const Exercises: IExercise[] = [
         ExerciseName: 'Follow Your Breath',
         Features: generateExerciseFeatures({
             medium: YesNo.Yes,
+            mindfulness: YesNo.Yes,
             be_more_present: YesNo.Yes,
             breathing: YesNo.Yes,
             grounding: YesNo.Yes,

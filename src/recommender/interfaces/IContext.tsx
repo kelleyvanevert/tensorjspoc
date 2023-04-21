@@ -18,8 +18,8 @@ export const Moods: Mood[] = [
 },
 ]
 
-const MEAN_POSITIVE_IN_MRT = 2.95;
-const MEAN_NEGATIVE_IN_MRT = 2.4;
+export const MEAN_POSITIVE_IN_MRT = 2.95;
+export const MEAN_NEGATIVE_IN_MRT = 2.4;
 const MIN_EMA_RECENCY_IN_HOURS = 8;
 const EVENING_CUTOFF = 18;
 

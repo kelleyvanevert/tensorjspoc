@@ -1,60 +1,10 @@
 import { YesNo } from "./YesNo";
 
-
-
-// export interface IExerciseFeatures {
-//     three_five_mins: YesNo;
-//     five_seven_mins: YesNo;
-//     seven_ten_mins: YesNo;
-//     defuse: YesNo;
-//     zoom_out: YesNo;
-//     feeling_stressed: YesNo;
-//     feeling_angry: YesNo;
-//     mood_boost: YesNo;
-//     self_compassion: YesNo;
-//     relax: YesNo;
-//     energize: YesNo;
-//     feeling_anxious: YesNo;
-//     grounding: YesNo;
-//     feeling_blue: YesNo;
-//     focus: YesNo;
-//     shift_perspective: YesNo;
-//     introspect: YesNo;
-//     breathing: YesNo;
-//     article: YesNo;
-//     ACT: YesNo;
-//     Mindfulness: YesNo;
-//     Relaxation: YesNo;
-//     PositivePsychology: YesNo;
-//     [key: string]: number;
-// }
-
-// short (≤5)
-// Medium (6-10)
-// Long (>10)
-// Be more present
-// Relax
-// Be kinder to myself
-// Increase positive feelings
-// Manage difficult thoughts and feelings
-// Focus on what matters to me
-// Visualisation
-// Savouring
-// Breathing 
-// Reframing
-// Defusing
-// Grounding
-// Audio-guided exercise
-// Audio only
-// Notebook exercise
-// Outdoors
-// Private location
-// In the Room
-
 export interface IExerciseFeatures {
     short: YesNo;
     medium: YesNo;
     long: YesNo;
+    mindfulness: YesNo;
     be_more_present: YesNo;
     relax: YesNo;
     be_kinder_to_myself: YesNo;
@@ -86,6 +36,7 @@ export function createDefaultExerciseFeatures(): IExerciseFeatures {
         short: YesNo.No,
         medium: YesNo.No,
         long: YesNo.No,
+        mindfulness: YesNo.No,
         be_more_present: YesNo.No,
         relax: YesNo.No,
         be_kinder_to_myself: YesNo.No,
